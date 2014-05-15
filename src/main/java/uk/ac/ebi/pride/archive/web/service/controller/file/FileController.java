@@ -210,7 +210,7 @@ public class FileController {
         ProjectSummary projectSummary = projectService.findById(projectId);
         updateProjectAccCache(projectId, projectSummary.getAccession());
 
-        Collection<FileDetail> fileDetails = ObjectMapper.mapFileSummariesToWSFileDetails(fileSummaries);
+        List<FileDetail> fileDetails = ObjectMapper.mapFileSummariesToWSFileDetails(fileSummaries);
 
         // create different FTP path depending on the projects public/private state
         String ftpPath;
@@ -225,6 +225,9 @@ public class FileController {
             ftpPath = buildPublicFtpPathForProject(projectSummary.getAccession(), projectSummary.getPublicationDate());
         }
         addFtpUrls(fileDetails, ftpPath);
+
+        Collections.sort(fileDetails, new DefaultFileComparator());
+
         return new FileDetailList(fileDetails);
     }
 
