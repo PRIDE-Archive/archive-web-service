@@ -12,15 +12,16 @@
 
     <groupId>uk.ac.ebi.pride.archive</groupId>
     <artifactId>web-service</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>1.0.6-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>pride-archive-ws</name>
+    <name>pride-archive-webservice</name>
     <url>http://www.ebi.ac.uk/pride</url>
 
     <!--
          To build the project several settings are required which are provided via maven profiles
          These are:
+                pride-archive-solr-cores (provide the SOLR cores for the searches)
                 pride-archive-web-hx (configuration of solr urls, swagger base and deploy url)
 
           NOTE: DB connection details are provided via JNDI from the server, no local configuration needed
@@ -40,6 +41,7 @@
     </properties>
 
     <build>
+        <finalName>${project.name}-${project.version}</finalName>
         <resources>
             <!-- regular resources -->
             <!-- Maven should filter properties files -->
