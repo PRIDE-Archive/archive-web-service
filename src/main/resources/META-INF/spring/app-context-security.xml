@@ -38,10 +38,10 @@
                 <beans:entry key="isAccessibleProject" value-ref="projectPermission"/>
                 <beans:entry key="isAccessibleProjectAccession" value-ref="projectAccessionPermission"/>
                 <beans:entry key="isAccessibleAssay" value-ref="assayPermission"/>
-                <!--<beans:entry key="isAccessibleAssayAccession" value-ref="assayAccessionPermission"/>-->
+                <beans:entry key="isAccessibleAssayAccession" value-ref="assayAccessionPermission"/>
                 <beans:entry key="isAccessibleFile" value-ref="filePermission"/>
                 <beans:entry key="isAccessibleProjectId" value-ref="projectIdPermission"/>
-                <!--<beans:entry key="isAccessibleAssayId" value-ref="assayIdPermission"/>-->
+                <beans:entry key="isAccessibleAssayId" value-ref="assayIdPermission"/>
             </beans:map>
         </beans:constructor-arg>
     </beans:bean>
@@ -56,10 +56,10 @@
         <beans:constructor-arg name="projectRepository" ref="projectRepository"/>
     </beans:bean>
 
-    <!--<beans:bean id="assayAccessionPermission" class="uk.ac.ebi.pride.prider.service.security.permission.AssayAccessionPermission">-->
-        <!--<beans:constructor-arg name="assayRepository" ref="assayRepository"/>-->
-        <!--<beans:constructor-arg name="projectRepository" ref="projectRepository"/>-->
-    <!--</beans:bean>-->
+    <beans:bean id="assayAccessionPermission" class="uk.ac.ebi.pride.prider.service.security.permission.AssayAccessionPermission">
+        <beans:constructor-arg name="assayRepository" ref="assayRepository"/>
+        <beans:constructor-arg name="projectRepository" ref="projectRepository"/>
+    </beans:bean>
 
     <beans:bean id="filePermission" class="uk.ac.ebi.pride.prider.service.security.permission.FilePermission">
         <beans:constructor-arg name="projectRepository" ref="projectRepository"/>
@@ -69,9 +69,9 @@
         <beans:constructor-arg name="projectRepository" ref="projectRepository"/>
     </beans:bean>
 
-    <!--<beans:bean id="assayIdPermission" class="uk.ac.ebi.pride.prider.service.security.permission.AssayIdPermission">-->
-        <!--<beans:constructor-arg name="assayRepository" ref="assayRepository"/>-->
-        <!--<beans:constructor-arg name="projectRepository" ref="projectRepository"/>-->
-    <!--</beans:bean>-->
+    <beans:bean id="assayIdPermission" class="uk.ac.ebi.pride.prider.service.security.permission.AssayIdPermission">
+        <beans:constructor-arg name="assayRepository" ref="assayRepository"/>
+        <beans:constructor-arg name="projectRepository" ref="projectRepository"/>
+    </beans:bean>
 
 </beans:beans>
