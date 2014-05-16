@@ -88,13 +88,13 @@ public class ProjectController {
     @ResponseBody
     ProjectSummaryList simpleSearchProjects(
             @ApiParam(value = "keyword to query for")
-            @RequestParam(value = "q", required = false) String term,
+            @RequestParam(value = "q", required = false, defaultValue = "") String term,
             @ApiParam(value = "how many results to show per page")
             @RequestParam(value = "show", defaultValue = DEFAULT_SHOW+"") int showResults,
             @ApiParam(value = "which page of the result to return")
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE+"") int page,
             @ApiParam(value = "the field to sort on")
-            @RequestParam(value = "sort", defaultValue = "") String sortBy,
+            @RequestParam(value = "sort", required = false, defaultValue = "") String sortBy,
             @ApiParam(value = "the sorting order (asc or desc)")
             @RequestParam(value = "order", defaultValue = DESCENDING_ORDER) String order,
             @ApiParam(value = "filter by species (NCBI taxon ID or name)")
