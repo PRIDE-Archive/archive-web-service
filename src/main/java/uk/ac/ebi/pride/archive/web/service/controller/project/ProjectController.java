@@ -94,7 +94,7 @@ public class ProjectController {
             @ApiParam(value = "which page of the result to return")
             @RequestParam(value = "page", defaultValue = DEFAULT_PAGE+"") int page,
             @ApiParam(value = "the field to sort on")
-            @RequestParam(value = "sort", defaultValue = SCORE_SORTING_CRITERIA) String sortBy,
+            @RequestParam(value = "sort", defaultValue = "") String sortBy,
             @ApiParam(value = "the sorting order (asc or desc)")
             @RequestParam(value = "order", defaultValue = DESCENDING_ORDER) String order,
             @ApiParam(value = "filter by species (NCBI taxon ID or name)")
