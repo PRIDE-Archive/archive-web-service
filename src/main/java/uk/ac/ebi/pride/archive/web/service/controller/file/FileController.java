@@ -10,9 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.pride.archive.web.service.error.exception.ResourceNotFoundException;
@@ -166,19 +163,19 @@ public class FileController {
 
         List<FileDetail> fileDetails = ObjectMapper.mapFileSummariesToWSFileDetails(fileSummaries);
 
-        // create FTP path depending on the projects public/private state
-        String ftpPath;
-        if (isPrivate(projectSummary)) {
-            // ToDo: do we need/want user specific private locations?
-            Authentication a = SecurityContextHolder.getContext().getAuthentication();
-            UserDetails currentUser = (UserDetails)a.getPrincipal();
-            // add private URLs for the project files
-            ftpPath = buildPrivateFtpPathForProject(projectSummary.getAccession(), currentUser.getUsername());
+        if (isPublicResource(projectSummary)) {
+            String ftpPath = buildPublicFtpPathForProject(projectSummary.getAccession(), projectSummary.getPublicationDate());
+            addFtpUrls(fileDetails, ftpPath);
         } else {
-            // add public URLs for the project files
-            ftpPath = buildPublicFtpPathForProject(projectSummary.getAccession(), projectSummary.getPublicationDate());
+            // ToDo: create real FTP path links once they are available
+            // now there is not private path, so we don't add any FTP links
+//            // we probably need/want user specific private locations, so we retrieve data from the security context
+//            Authentication a = SecurityContextHolder.getContext().getAuthentication();
+//            UserDetails currentUser = (UserDetails)a.getPrincipal();
+//            // add private URLs for the project files
+//            ftpPath = buildPrivateFtpPathForProject(projectSummary.getAccession(), currentUser.getUsername());
+//            addFtpUrls(fileDetails, ftpPath);
         }
-        addFtpUrls(fileDetails, ftpPath);
 
         Collections.sort(fileDetails, new DefaultFileComparator());
 
@@ -212,19 +209,19 @@ public class FileController {
 
         List<FileDetail> fileDetails = ObjectMapper.mapFileSummariesToWSFileDetails(fileSummaries);
 
-        // create different FTP path depending on the projects public/private state
-        String ftpPath;
-        if (isPrivate(projectSummary)) {
-            // ToDo: do we need/want user specific private locations? (probably yes, to make a difference between reviewer/submitter access)
-            Authentication a = SecurityContextHolder.getContext().getAuthentication();
-            UserDetails currentUser = (UserDetails)a.getPrincipal();
-            // add private URLs for the project files
-            ftpPath = buildPrivateFtpPathForProject(projectSummary.getAccession(), currentUser.getUsername());
+        if (isPublicResource(projectSummary)) {
+            String ftpPath = buildPublicFtpPathForProject(projectSummary.getAccession(), projectSummary.getPublicationDate());
+            addFtpUrls(fileDetails, ftpPath);
         } else {
-            // add public URLs for the project files
-            ftpPath = buildPublicFtpPathForProject(projectSummary.getAccession(), projectSummary.getPublicationDate());
+            // ToDo: create real FTP path links once they are available
+            // now there is not private path, so we don't add any FTP links
+//            // we probably need/want user specific private locations, so we retrieve data from the security context
+//            Authentication a = SecurityContextHolder.getContext().getAuthentication();
+//            UserDetails currentUser = (UserDetails)a.getPrincipal();
+//            // add private URLs for the project files
+//            ftpPath = buildPrivateFtpPathForProject(projectSummary.getAccession(), currentUser.getUsername());
+//            addFtpUrls(fileDetails, ftpPath);
         }
-        addFtpUrls(fileDetails, ftpPath);
 
         Collections.sort(fileDetails, new DefaultFileComparator());
 
@@ -330,23 +327,31 @@ public class FileController {
         }
     }
 
-    private boolean isPrivate(ProjectSummary projectSummary) {
+    /**
+     * This method
+     *
+     * @param projectSummary the PRIDE Archive project accession.
+     * @return true if the project's resources are publicly accessible, false otherwise.
+     */
+    private boolean isPublicResource(ProjectSummary projectSummary) {
         if (projectSummary == null) {
             throw new IllegalArgumentException("ProjectSummary cannot be null!");
         }
+
+        // ToDo: there could be better ways to check if a project's resources are publicly available
         Date publicationDate = projectSummary.getPublicationDate();
 
-        // if there is no publication date, the project is private
+        // if there is no publication date, the project is not public
         if (publicationDate == null) {
+            return false;
+        }
+
+        // if there is a publication date, and it is in the past, the project is public
+        if (publicationDate.before(new Date(System.currentTimeMillis()))) {
             return true;
         }
 
-        // if there is a publication date, but it is in the future, the project is private
-        if (publicationDate.after(new Date(System.currentTimeMillis()))) {
-            return true;
-        }
-
-        // the project has a publication date that is in the past, so it is not private
+        // the project has a publication date that is in the future, so it is not yet public
         return false;
     }
 
