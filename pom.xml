@@ -22,10 +22,15 @@
          To build the project several settings are required which are provided via maven profiles
          These are:
                 pride-archive-solr-cores (provide the SOLR cores for the searches)
-                pride-archive-web-hx (configuration of solr urls, swagger base and deploy url)
+                pride-archive-web-local (configuration of solr urls, swagger base and deploy url)
 
-          NOTE: DB connection details are provided via JNDI from the server, no local configuration needed
-                (However, to run locally, for example with jetty, a local server configuration is needed)
+          If DB connections are provided via JNDI no other profiles are needed, otherwise:
+                db-pride-repo-pridepro
+                db-pride-repo-pridearch-ro-user
+
+
+          NOTE: If configured via JNDI, the server has to provide the connection details.
+                To run locally, for example with jetty, a local server configuration is needed.
      -->
 
     <properties>
@@ -151,6 +156,8 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
+            <version>3.2.5.RELEASE</version>
+
         </dependency>
 
         <!-- Spring test-->
