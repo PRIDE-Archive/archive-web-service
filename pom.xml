@@ -34,15 +34,15 @@
      -->
 
     <properties>
-        <prider.utils.version>0.1.1</prider.utils.version>
-        <prider.service.version>0.1.9-SNAPSHOT</prider.service.version>
-        <archive.ws.model.version>0.1-SNAPSHOT</archive.ws.model.version>
+        <prider.utils.version>0.1.7</prider.utils.version>
+        <prider.service.version>1.0.0</prider.service.version>
+        <archive.ws.model.version>0.1</archive.ws.model.version>
         <pride.web.utils.version>1.3.8</pride.web.utils.version>
         <dozer.version>5.4.0</dozer.version>
         <swagger.version>0.8.3</swagger.version>
-		<protein.index.search.version>0.1.2-SNAPSHOT</protein.index.search.version>
-		<psm.index.search.version>0.1.0-SNAPSHOT</psm.index.search.version>
-		<data.provider.api.version>2.0.0-SNAPSHOT</data.provider.api.version>
+		<!--<protein.index.search.version>0.1.2-SNAPSHOT</protein.index.search.version>-->
+		<!--<psm.index.search.version>0.1.0-SNAPSHOT</psm.index.search.version>-->
+		<data.provider.api.version>2.0.0</data.provider.api.version>
     </properties>
 
     <build>
@@ -118,16 +118,16 @@
             <version>${data.provider.api.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>uk.ac.ebi.pride</groupId>
-            <artifactId>psm-index-search</artifactId>
-            <version>${psm.index.search.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>uk.ac.ebi.pride</groupId>
-            <artifactId>protein-index-search</artifactId>
-            <version>${protein.index.search.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>uk.ac.ebi.pride</groupId>-->
+            <!--<artifactId>psm-index-search</artifactId>-->
+            <!--<version>${psm.index.search.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>uk.ac.ebi.pride</groupId>-->
+            <!--<artifactId>protein-index-search</artifactId>-->
+            <!--<version>${protein.index.search.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>uk.ac.ebi.pride.archive</groupId>
             <artifactId>web-service-model</artifactId>
