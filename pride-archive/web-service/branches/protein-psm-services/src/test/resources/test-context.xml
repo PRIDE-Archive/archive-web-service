@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!--<bean id="assayRepository" class="org.mockito.Mockito" factory-method="mock">-->
+    <!--<constructor-arg value="uk.ac.ebi.pride.prider.repo.assay.AssayRepository"/>-->
+    <!--</bean>-->
+
+    <!--<bean id="projectRepository" class="org.mockito.Mockito" factory-method="mock">-->
+    <!--<constructor-arg value="uk.ac.ebi.pride.prider.repo.project.ProjectRepository"/>-->
+    <!--</bean>-->
+
+    <!--<bean id="projectFileRepository" class="org.mockito.Mockito" factory-method="mock">-->
+    <!--<constructor-arg value="uk.ac.ebi.pride.prider.repo.file.ProjectFileRepository"/>-->
+    <!--</bean>-->
+
+    <bean id="filePathBuilder" class="uk.ac.ebi.pride.prider.utils.config.FilePathBuilderPride3"/>
+    <bean id="fileUtils" class="uk.ac.ebi.pride.prider.utils.streaming.FileUtils"/>
+
+    <util:properties id="fileConfig" location="classpath:META-INF/props/file.properties"/>
+
+    <util:properties id="buildConfig" location="classpath:META-INF/props/build.properties"/>
+
+    <util:properties id="databaseConfig" location="classpath:META-INF/props/db.properties"/>
+
+    <!--<bean id="userRepository" class="org.mockito.Mockito" factory-method="mock">-->
+    <!--<constructor-arg value="uk.ac.ebi.pride.prider.repo.user.UserRepository"/>-->
+    <!--</bean>-->
+
+    <bean id="assayServiceImpl" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="uk.ac.ebi.pride.archive.repo.assay.AssayServiceImpl"/>
+    </bean>
+
+    <bean id="projectServiceImpl" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="uk.ac.ebi.pride.archive.repo.project.serviceProjectServiceImpl"/>
+    </bean>
+
+    <bean id="fileServiceImpl" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="uk.ac.ebi.pride.archive.repo.file.FileServiceImpl"/>
+    </bean>
+
+    <bean id="userServiceImpl" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="uk.ac.ebi.pride.archive.repo.user.service.UserServiceImpl"/>
+    </bean>
+
+    <!--<bean id="projectSearchDao" class="org.mockito.Mockito" factory-method="mock">-->
+    <!--<constructor-arg value="uk.ac.ebi.pride.prider.search.project.dao.ProjectSearchDao"/>-->
+    <!--</bean>-->
+    <bean id="projectSearchService" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="uk.ac.ebi.pride.archive.service.project.ProjectSearchService" />
+    </bean>
+
+</beans>

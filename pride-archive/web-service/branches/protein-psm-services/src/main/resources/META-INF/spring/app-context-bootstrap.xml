@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--suppress SpringSecurityFiltersConfiguredInspection -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- Root Context: defines shared resources visible to all other web components -->
+    <!-- property files -->
+    <context:property-placeholder location="classpath:META-INF/props/*.properties" ignore-unresolvable="true"/>
+
+    <!--suppress SpringModelInspection -->
+    <context:component-scan base-package="uk.ac.ebi.pride.archive.security,
+                                          uk.ac.ebi.pride.archive.repo"/>
+
+    <!-- Callback filter for cross server query support -->
+    <bean class="uk.ac.ebi.pride.web.util.callback.filter.JsonpCallbackFilter" id="jsonpCallbackFilter"/>
+
+    <bean id="filePathBuilder" class="uk.ac.ebi.pride.prider.utils.config.FilePathBuilderPride3"/>
+
+    <bean id="fileUtils" class="uk.ac.ebi.pride.prider.utils.streaming.FileUtils"/>
+
+    <util:properties id="fileConfig" location="classpath:META-INF/props/file.properties"/>
+
+    <util:properties id="buildConfig" location="classpath:META-INF/props/build.properties"/>
+
+    <util:properties id="databaseConfig" location="classpath:META-INF/props/db.properties"/>
+
+    <bean id="userWebServiceUrl" class="uk.ac.ebi.pride.archive.repo.user.service.url.UserWebServiceUrl">
+        <constructor-arg name="signUpUrl" value="${user.signup.url}"/>
+        <constructor-arg name="passwordResetUrl" value="${user.reset.password.url}"/>
+        <constructor-arg name="updateUrl" value="${user.update.url}"/>
+    </bean>
+
+</beans>
