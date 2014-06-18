@@ -7,7 +7,9 @@
                             http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
                             http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 
-    <jpa:repositories base-package="uk.ac.ebi.pride.prider.repo"/>
+    <tx:annotation-driven/>
+
+    <jpa:repositories base-package="uk.ac.ebi.pride.archive.repo"/>
 
     <!--Setup data source using place holder properties-->
     <bean id="priderDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
@@ -36,8 +38,6 @@
   <!--<property name="lookupOnStartup" value="true"/>-->
   <!--<property name="proxyInterface" value="javax.sql.DataSource"/>-->
 <!--</bean>-->
-
-    <tx:annotation-driven/>
 
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="priderDataSource"/>

@@ -12,16 +12,16 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
+import uk.ac.ebi.pride.archive.repo.user.service.UserSummary;
+import uk.ac.ebi.pride.archive.search.service.ProjectSearchService;
+import uk.ac.ebi.pride.archive.search.service.ProjectSearchSummary;
+import uk.ac.ebi.pride.archive.security.project.ProjectSecureService;
+import uk.ac.ebi.pride.archive.security.user.UserSecureService;
 import uk.ac.ebi.pride.archive.web.service.error.exception.ResourceNotFoundException;
 import uk.ac.ebi.pride.archive.web.service.model.project.ProjectDetail;
 import uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummaryList;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
-import uk.ac.ebi.pride.prider.service.person.UserService;
-import uk.ac.ebi.pride.prider.service.person.UserSummary;
-import uk.ac.ebi.pride.prider.service.project.ProjectSearchService;
-import uk.ac.ebi.pride.prider.service.project.ProjectSearchSummary;
-import uk.ac.ebi.pride.prider.service.project.ProjectService;
-import uk.ac.ebi.pride.prider.service.project.ProjectSummary;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
@@ -53,10 +53,10 @@ public class ProjectController {
     private ProjectSearchService projectSearchService;
 
     @Autowired
-    private ProjectService projectService;
+    private ProjectSecureService projectService;
 
     @Autowired
-    private UserService userServiceImpl;
+    private UserSecureService userServiceImpl;
 
 
     @ApiOperation(value = "retrieve project information by accession", position = 1)
@@ -71,7 +71,7 @@ public class ProjectController {
 
         // retrieve the authorization header value (if there is any)
 //        System.out.println("header value: " + request.getHeader("Authorization"));
-        uk.ac.ebi.pride.prider.service.project.ProjectSummary projectSummary = projectService.findByAccession(accession);
+        ProjectSummary projectSummary = projectService.findByAccession(accession);
         if (projectSummary == null) {
             throw new ResourceNotFoundException("No project found for accession: " + accession);
         }

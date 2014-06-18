@@ -12,6 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import uk.ac.ebi.pride.archive.repo.assay.service.AssaySummary;
+import uk.ac.ebi.pride.archive.repo.file.service.FileSummary;
+import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
+import uk.ac.ebi.pride.archive.security.assay.AssaySecureService;
+import uk.ac.ebi.pride.archive.security.file.FileSecureService;
+import uk.ac.ebi.pride.archive.security.project.ProjectSecureService;
 import uk.ac.ebi.pride.archive.web.service.error.exception.ResourceNotFoundException;
 import uk.ac.ebi.pride.archive.web.service.model.file.DefaultFileComparator;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
@@ -19,12 +25,6 @@ import uk.ac.ebi.pride.archive.web.service.model.file.FileDetailList;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileType;
 import uk.ac.ebi.pride.archive.web.service.util.IdMapper;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
-import uk.ac.ebi.pride.prider.service.assay.AssayService;
-import uk.ac.ebi.pride.prider.service.assay.AssaySummary;
-import uk.ac.ebi.pride.prider.service.file.FileService;
-import uk.ac.ebi.pride.prider.service.file.FileSummary;
-import uk.ac.ebi.pride.prider.service.project.ProjectService;
-import uk.ac.ebi.pride.prider.service.project.ProjectSummary;
 import uk.ac.ebi.pride.prider.utils.config.FilePathBuilder;
 import uk.ac.ebi.pride.prider.utils.streaming.FileUtils;
 
@@ -49,13 +49,13 @@ public class FileController {
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
     @Autowired
-    private FileService fileService;
+    private FileSecureService fileService;
 
     @Autowired
-    private ProjectService projectService;
+    private ProjectSecureService projectService;
 
     @Autowired
-    private AssayService assayService;
+    private AssaySecureService assayService;
 
     @Autowired
     private FileUtils fileUtils;

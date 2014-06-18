@@ -29,26 +29,26 @@
     <!--</bean>-->
 
     <bean id="assayServiceImpl" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.prider.service.assay.AssayServiceImpl"/>
+        <constructor-arg value="uk.ac.ebi.pride.archive.repo.assay.AssayServiceImpl"/>
     </bean>
 
     <bean id="projectServiceImpl" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.prider.service.project.ProjectServiceImpl"/>
+        <constructor-arg value="uk.ac.ebi.pride.archive.repo.project.serviceProjectServiceImpl"/>
     </bean>
 
     <bean id="fileServiceImpl" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.prider.service.file.FileServiceImpl"/>
+        <constructor-arg value="uk.ac.ebi.pride.archive.repo.file.FileServiceImpl"/>
     </bean>
 
     <bean id="userServiceImpl" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.prider.service.person.UserServiceImpl"/>
+        <constructor-arg value="uk.ac.ebi.pride.archive.repo.user.service.UserServiceImpl"/>
     </bean>
 
     <!--<bean id="projectSearchDao" class="org.mockito.Mockito" factory-method="mock">-->
     <!--<constructor-arg value="uk.ac.ebi.pride.prider.search.project.dao.ProjectSearchDao"/>-->
     <!--</bean>-->
     <bean id="projectSearchService" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.prider.service.project.ProjectSearchService" />
+        <constructor-arg value="uk.ac.ebi.pride.archive.service.project.ProjectSearchService" />
     </bean>
 
 </beans>

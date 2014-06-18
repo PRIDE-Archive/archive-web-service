@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import uk.ac.ebi.pride.archive.repo.file.service.FileSummary;
+import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
+import uk.ac.ebi.pride.archive.security.file.FileSecureService;
+import uk.ac.ebi.pride.archive.security.project.ProjectSecureService;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
-import uk.ac.ebi.pride.prider.service.file.FileService;
-import uk.ac.ebi.pride.prider.service.file.FileSummary;
-import uk.ac.ebi.pride.prider.service.project.ProjectService;
-import uk.ac.ebi.pride.prider.service.project.ProjectSummary;
 import uk.ac.ebi.pride.prider.utils.config.FilePathBuilder;
 import uk.ac.ebi.pride.prider.utils.streaming.FileUtils;
 
@@ -53,10 +53,10 @@ public class CheckController {
     private String fileLocationPrefix;
 
     @Autowired
-    private ProjectService projectService;
+    private ProjectSecureService projectService;
 
     @Autowired
-    private FileService fileService;
+    private FileSecureService fileService;
 
     @Autowired
     private FileUtils fileUtils;

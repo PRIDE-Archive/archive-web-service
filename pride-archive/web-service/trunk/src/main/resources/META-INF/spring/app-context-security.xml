@@ -22,7 +22,7 @@
         </authentication-provider>
     </authentication-manager>
 
-    <beans:bean id="userDetailService" class="uk.ac.ebi.pride.prider.service.security.UserDetailsSecurityServiceImpl">
+    <beans:bean id="userDetailService" class="uk.ac.ebi.pride.archive.security.framework.UserDetailsSecurityServiceImpl">
         <beans:constructor-arg ref="userRepository"/>
     </beans:bean>
 
@@ -32,9 +32,9 @@
         <beans:property name="permissionEvaluator" ref="permissionEvaluator"/>
     </beans:bean>
 
-    <beans:bean id="permissionEvaluator" class="uk.ac.ebi.pride.prider.service.security.UserServicePermissionEvaluator">
+    <beans:bean id="permissionEvaluator" class="uk.ac.ebi.pride.archive.security.framework.UserServicePermissionEvaluator">
         <beans:constructor-arg name="permissionNameToPermissionMap">
-            <beans:map key-type="java.lang.String" value-type="uk.ac.ebi.pride.prider.service.security.permission.Permission">
+            <beans:map key-type="java.lang.String" value-type="uk.ac.ebi.pride.archive.security.framework.permission.Permission">
                 <beans:entry key="isAccessibleProject" value-ref="projectPermission"/>
                 <beans:entry key="isAccessibleProjectAccession" value-ref="projectAccessionPermission"/>
                 <beans:entry key="isAccessibleAssay" value-ref="assayPermission"/>
@@ -46,30 +46,30 @@
         </beans:constructor-arg>
     </beans:bean>
 
-    <beans:bean id="projectPermission" class="uk.ac.ebi.pride.prider.service.security.permission.ProjectPermission"/>
+    <beans:bean id="projectPermission" class="uk.ac.ebi.pride.archive.security.framework.permission.ProjectPermission"/>
 
-    <beans:bean id="projectAccessionPermission" class="uk.ac.ebi.pride.prider.service.security.permission.ProjectAccessionPermission">
+    <beans:bean id="projectAccessionPermission" class="uk.ac.ebi.pride.archive.security.framework.permission.ProjectAccessionPermission">
         <beans:constructor-arg name="projectRepository" ref="projectRepository"/>
     </beans:bean>
 
-    <beans:bean id="assayPermission" class="uk.ac.ebi.pride.prider.service.security.permission.AssayPermission">
+    <beans:bean id="assayPermission" class="uk.ac.ebi.pride.archive.security.framework.permission.AssayPermission">
         <beans:constructor-arg name="projectRepository" ref="projectRepository"/>
     </beans:bean>
 
-    <beans:bean id="assayAccessionPermission" class="uk.ac.ebi.pride.prider.service.security.permission.AssayAccessionPermission">
+    <beans:bean id="assayAccessionPermission" class="uk.ac.ebi.pride.archive.security.framework.permission.AssayAccessionPermission">
         <beans:constructor-arg name="assayRepository" ref="assayRepository"/>
         <beans:constructor-arg name="projectRepository" ref="projectRepository"/>
     </beans:bean>
 
-    <beans:bean id="filePermission" class="uk.ac.ebi.pride.prider.service.security.permission.FilePermission">
+    <beans:bean id="filePermission" class="uk.ac.ebi.pride.archive.security.framework.permission.FilePermission">
         <beans:constructor-arg name="projectRepository" ref="projectRepository"/>
     </beans:bean>
 
-    <beans:bean id="projectIdPermission" class="uk.ac.ebi.pride.prider.service.security.permission.ProjectIdPermission">
+    <beans:bean id="projectIdPermission" class="uk.ac.ebi.pride.archive.security.framework.permission.ProjectIdPermission">
         <beans:constructor-arg name="projectRepository" ref="projectRepository"/>
     </beans:bean>
 
-    <beans:bean id="assayIdPermission" class="uk.ac.ebi.pride.prider.service.security.permission.AssayIdPermission">
+    <beans:bean id="assayIdPermission" class="uk.ac.ebi.pride.archive.security.framework.permission.AssayIdPermission">
         <beans:constructor-arg name="assayRepository" ref="assayRepository"/>
         <beans:constructor-arg name="projectRepository" ref="projectRepository"/>
     </beans:bean>
