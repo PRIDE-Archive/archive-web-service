@@ -11,10 +11,10 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.ac.ebi.pride.prider.service.assay.AssayServiceImpl;
-import uk.ac.ebi.pride.prider.service.assay.AssaySummary;
-import uk.ac.ebi.pride.prider.service.project.ProjectServiceImpl;
-import uk.ac.ebi.pride.prider.service.project.ProjectSummary;
+import uk.ac.ebi.pride.archive.repo.assay.service.AssayServiceImpl;
+import uk.ac.ebi.pride.archive.repo.assay.service.AssaySummary;
+import uk.ac.ebi.pride.archive.repo.project.service.ProjectServiceImpl;
+import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
 
 import java.util.Collection;
 import java.util.HashSet;

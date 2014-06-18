@@ -12,7 +12,6 @@
     <!-- Enables the Spring MVC @Controller programming model -->
     <annotation-driven/>
 
-    <!--<context:component-scan base-package="uk.ac.ebi.pride.prider.webservice"/>-->
     <context:component-scan base-package="uk.ac.ebi.pride.archive.web.service"/>
 
     <!--Swagger config (REST service documentation)-->

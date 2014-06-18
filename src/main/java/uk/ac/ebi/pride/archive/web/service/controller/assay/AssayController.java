@@ -11,17 +11,17 @@ import org.springframework.http.MediaType;
 import org.springframework.social.InternalServerErrorException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import uk.ac.ebi.pride.archive.repo.assay.service.AssayAccessException;
+import uk.ac.ebi.pride.archive.repo.assay.service.AssaySummary;
+import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
+import uk.ac.ebi.pride.archive.security.assay.AssaySecureService;
+import uk.ac.ebi.pride.archive.security.project.ProjectSecureService;
 import uk.ac.ebi.pride.archive.web.service.error.exception.ResourceNotFoundException;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayAccessionComparator;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetailList;
 import uk.ac.ebi.pride.archive.web.service.util.IdMapper;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
-import uk.ac.ebi.pride.prider.service.assay.AssayAccessException;
-import uk.ac.ebi.pride.prider.service.assay.AssayService;
-import uk.ac.ebi.pride.prider.service.assay.AssaySummary;
-import uk.ac.ebi.pride.prider.service.project.ProjectService;
-import uk.ac.ebi.pride.prider.service.project.ProjectSummary;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -40,9 +40,9 @@ public class AssayController {
     private static final Logger logger = LoggerFactory.getLogger(AssayController.class);
 
     @Autowired
-    private AssayService assayService;
+    private AssaySecureService assayService;
     @Autowired
-    private ProjectService projectService;
+    private ProjectSecureService projectService;
 
     @ApiOperation(value = "retrieve assay information by accession", position = 1)
     @RequestMapping(value = "/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -1,20 +1,20 @@
 package uk.ac.ebi.pride.archive.web.service.util;
 
+import uk.ac.ebi.pride.archive.dataprovider.person.Title;
+import uk.ac.ebi.pride.archive.repo.assay.service.AssaySummary;
+import uk.ac.ebi.pride.archive.repo.assay.service.InstrumentSummary;
+import uk.ac.ebi.pride.archive.repo.file.service.FileSummary;
+import uk.ac.ebi.pride.archive.repo.param.service.CvParamSummary;
+import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
+import uk.ac.ebi.pride.archive.repo.project.service.ProjectTagSummary;
+import uk.ac.ebi.pride.archive.repo.user.service.ContactSummary;
+import uk.ac.ebi.pride.archive.repo.user.service.UserSummary;
+import uk.ac.ebi.pride.archive.search.service.ProjectSearchSummary;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
 import uk.ac.ebi.pride.archive.web.service.model.contact.ContactDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileType;
 import uk.ac.ebi.pride.archive.web.service.model.project.ProjectDetail;
-import uk.ac.ebi.pride.prider.dataprovider.person.Title;
-import uk.ac.ebi.pride.prider.service.assay.AssaySummary;
-import uk.ac.ebi.pride.prider.service.assay.InstrumentSummary;
-import uk.ac.ebi.pride.prider.service.file.FileSummary;
-import uk.ac.ebi.pride.prider.service.param.CvParamSummary;
-import uk.ac.ebi.pride.prider.service.person.ContactSummary;
-import uk.ac.ebi.pride.prider.service.person.UserSummary;
-import uk.ac.ebi.pride.prider.service.project.ProjectSearchSummary;
-import uk.ac.ebi.pride.prider.service.project.ProjectSummary;
-import uk.ac.ebi.pride.prider.service.project.ProjectTagSummary;
 
 import java.util.*;
 
@@ -312,7 +312,7 @@ public final class ObjectMapper {
     }
 
 
-
+    // Project tag map methods
     public static Set<String> mapProjectTags(Collection<ProjectTagSummary> projectTags) {
         if (projectTags == null) { return null; }
         if (projectTags.isEmpty()) { return new HashSet<String>(0); }

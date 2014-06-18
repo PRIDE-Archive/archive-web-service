@@ -12,43 +12,17 @@
     <bean id="projectSolrServer" class="org.apache.solr.client.solrj.impl.HttpSolrServer">
         <constructor-arg name="baseURL" value="${solr.server.project.core.url}" />
     </bean>
-    <!--<bean id="proteinSolrServer" class="org.apache.solr.client.solrj.impl.HttpSolrServer">-->
-        <!--<constructor-arg name="baseURL" value="${solr.server.protein.core.url}" />-->
-    <!--</bean>-->
-    <!--<bean id="psmSolrServer" class="org.apache.solr.client.solrj.impl.HttpSolrServer">-->
-        <!--<constructor-arg name="baseURL" value="${solr.server.psm.core.url}" />-->
-    <!--</bean>-->
 
     <!-- Create the DAOs for the SOLR servers -->
-    <bean id="projectSearchDao" class="uk.ac.ebi.pride.prider.search.project.dao.solr.ProjectSearchDaoSolr">
+    <bean id="projectSearchDao" class="uk.ac.ebi.pride.archive.search.service.dao.solr.ProjectSearchDaoSolr">
         <constructor-arg name="projectServer" ref="projectSolrServer" />
     </bean>
 
-    <!--&lt;!&ndash; Spring Data Solr DAOs &ndash;&gt;-->
-    <!--<bean id="proteinSolrTemplate" class="org.springframework.data.solr.core.SolrTemplate">-->
-        <!--<constructor-arg name="solrServer" ref="proteinSolrServer"/>-->
-    <!--</bean>-->
-    <!--<bean id="psmSolrTemplate" class="org.springframework.data.solr.core.SolrTemplate">-->
-        <!--<constructor-arg name="solrServer" ref="psmSolrServer"/>-->
-    <!--</bean>-->
 
-
-    <!--&lt;!&ndash; Protein repository &ndash;&gt;-->
-    <!--<bean id="solrProteinIdentificationRepositoryFactory" class="uk.ac.ebi.pride.proteinindex.search.search.repository.SolrProteinIdentificationRepositoryFactory">-->
-        <!--<constructor-arg ref="proteinSolrTemplate"/>-->
-    <!--</bean>-->
-    <!--<bean id="proteinIdentificationSearchService" class="uk.ac.ebi.pride.proteinindex.search.search.service.ProteinIdentificationSearchService">-->
-        <!--<constructor-arg value="#{ solrProteinIdentificationRepositoryFactory.create() }"/>-->
-    <!--</bean>-->
-
-    <!--&lt;!&ndash; PSM repository &ndash;&gt;-->
-    <!--<bean id="solrPsmRepositoryFactory" class="uk.ac.ebi.pride.psmindex.search.service.repository.SolrPsmRepositoryFactory">-->
-        <!--<constructor-arg ref="psmSolrTemplate"/>-->
-    <!--</bean>-->
-    <!--<bean id="psmSearchService" class="uk.ac.ebi.pride.psmindex.search.service.PsmSearchService">-->
-        <!--<constructor-arg value="#{ solrPsmRepositoryFactory.create() }"/>-->
-    <!--</bean>-->
-
+    <!-- Project repository -->
+    <bean id="projectSearchService" class="uk.ac.ebi.pride.archive.search.service.ProjectSearchService">
+        <constructor-arg ref="projectSearchDao"/>
+    </bean>
 
 
     <context:property-placeholder location="classpath:META-INF/props/search.properties" ignore-unresolvable="true"/>
