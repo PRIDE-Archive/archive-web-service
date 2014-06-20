@@ -46,7 +46,7 @@ public class ProjectController {
     private static final String DATE_SORTING_CRITERIA = "publication_date";
     protected static final String SCORE_SORTING_CRITERIA = "score";
     protected static final String DESCENDING_ORDER = "desc";
-    protected static final int DEFAULT_SHOW = 100;
+    protected static final int DEFAULT_SHOW = 10;
     protected static final int DEFAULT_PAGE = 1;
 
     @Autowired
