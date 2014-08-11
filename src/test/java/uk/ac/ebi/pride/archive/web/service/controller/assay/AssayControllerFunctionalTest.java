@@ -15,6 +15,8 @@ import uk.ac.ebi.pride.archive.repo.assay.service.AssayServiceImpl;
 import uk.ac.ebi.pride.archive.repo.assay.service.AssaySummary;
 import uk.ac.ebi.pride.archive.repo.project.service.ProjectServiceImpl;
 import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
+import uk.ac.ebi.pride.archive.security.assay.AssaySecureServiceImpl;
+import uk.ac.ebi.pride.archive.security.project.ProjectSecureServiceImpl;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration({"classpath:test-context.xml", "classpath:spring/mvc-config.xml"})
+@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-test-config.xml"})
 public class AssayControllerFunctionalTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -36,9 +38,9 @@ public class AssayControllerFunctionalTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ProjectServiceImpl projectServiceImpl;
+    private ProjectSecureServiceImpl projectSecureServiceImpl;
     @Autowired
-    private AssayServiceImpl assayServiceImpl;
+    private AssaySecureServiceImpl assaySecureServiceImpl;
 
 
     private static final String PROJECT_ACCESSION = "PXTEST1";
@@ -64,14 +66,14 @@ public class AssayControllerFunctionalTest {
         assays.add(assaySummary);
 
         // mock assay service
-        when(assayServiceImpl.findByAccession(ASSAY_ACCESSION)).thenReturn(assaySummary);
-        when(assayServiceImpl.findAllByProjectAccession(PROJECT_ACCESSION)).thenReturn(assays);
+        when(assaySecureServiceImpl.findByAccession(ASSAY_ACCESSION)).thenReturn(assaySummary);
+        when(assaySecureServiceImpl.findAllByProjectAccession(PROJECT_ACCESSION)).thenReturn(assays);
 
         ProjectSummary projectSummary = new ProjectSummary();
         projectSummary.setAccession(PROJECT_ACCESSION);
         projectSummary.setId(PROJECT_ID);
-        when(projectServiceImpl.findByAccession(PROJECT_ACCESSION)).thenReturn(projectSummary);
-        when(projectServiceImpl.findById(PROJECT_ID)).thenReturn(projectSummary);
+        when(projectSecureServiceImpl.findByAccession(PROJECT_ACCESSION)).thenReturn(projectSummary);
+        when(projectSecureServiceImpl.findById(PROJECT_ID)).thenReturn(projectSummary);
     }
 
     @Test // /assay/project/{projectAccession}

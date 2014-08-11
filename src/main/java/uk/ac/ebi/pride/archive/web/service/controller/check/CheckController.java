@@ -15,8 +15,8 @@ import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
 import uk.ac.ebi.pride.archive.security.file.FileSecureService;
 import uk.ac.ebi.pride.archive.security.project.ProjectSecureService;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
-import uk.ac.ebi.pride.prider.utils.config.FilePathBuilder;
-import uk.ac.ebi.pride.prider.utils.streaming.FileUtils;
+import uk.ac.ebi.pride.archive.utils.config.FilePathBuilder;
+import uk.ac.ebi.pride.archive.utils.streaming.FileUtils;
 
 import java.io.File;
 import java.util.Collection;

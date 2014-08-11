@@ -25,10 +25,7 @@ import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Rui Wang
@@ -111,8 +108,10 @@ public class ProjectController {
             @RequestParam(value = "instrumentFilter", required = false, defaultValue = "") String[] instrumentFilter,
             @ApiParam(value = "filter by experiment type")
             @RequestParam(value = "experimentTypeFilter", required = false, defaultValue = "") String[] experimentTypeFilter,
-            @ApiParam(value = "")
-            @RequestParam(value = "quantificationFilter", required = false, defaultValue = "") String[] quantificationFilter
+            @ApiParam(value = "filter by quantification annotation")
+            @RequestParam(value = "quantificationFilter", required = false, defaultValue = "") String[] quantificationFilter,
+            @ApiParam(value = "filter by project tags")
+            @RequestParam(value = "projectTagFilter", required = false, defaultValue = "") String[] projectTagFilter
             ) throws org.apache.solr.common.SolrException {
 
         // nonsense request, but can happen...
@@ -139,7 +138,8 @@ public class ProjectController {
                 Arrays.asList(titleFilter),
                 Arrays.asList(instrumentFilter),
                 Arrays.asList(quantificationFilter),
-                Arrays.asList(experimentTypeFilter)
+                Arrays.asList(experimentTypeFilter),
+                Arrays.asList(projectTagFilter)
         );
 
         int start = showResults * (page - 1);
@@ -185,8 +185,10 @@ public class ProjectController {
             @RequestParam(value = "instrumentFilter", required = false, defaultValue = "") String[] instrumentFilter,
             @ApiParam(value = "filter by experiment type")
             @RequestParam(value = "experimentTypeFilter", required = false, defaultValue = "") String[] experimentTypeFilter,
-            @ApiParam(value = "")
-            @RequestParam(value = "quantificationFilter", required = false, defaultValue = "") String[] quantificationFilter
+            @ApiParam(value = "filter by quantification annotation")
+            @RequestParam(value = "quantificationFilter", required = false, defaultValue = "") String[] quantificationFilter,
+            @ApiParam(value = "filter by project tags")
+            @RequestParam(value = "projectTagFilter", required = false, defaultValue = "") String[] projectTagFilter
             ) throws org.apache.solr.common.SolrException {
 
         String queryTerm = SolrQueryBuilder.buildQueryTerm(term);
@@ -199,7 +201,8 @@ public class ProjectController {
                 Arrays.asList(titleFilter),
                 Arrays.asList(instrumentFilter),
                 Arrays.asList(quantificationFilter),
-                Arrays.asList(experimentTypeFilter)
+                Arrays.asList(experimentTypeFilter),
+                Arrays.asList(projectTagFilter)
         );
 
         long count = projectSearchService.numSearchResults(
@@ -282,32 +285,43 @@ public class ProjectController {
                     + SearchFields.QUANTIFICATION_METHODS_ACCESSIONS.getIndexName() + "^" + SearchFields.QUANTIFICATION_METHODS_ACCESSIONS.getFieldRelevance() + " "
                     + SearchFields.EXPERIMENT_TYPES_NAMES.getIndexName() + "^" + SearchFields.EXPERIMENT_TYPES_NAMES.getFieldRelevance() + " "
                     + SearchFields.EXPERIMENT_TYPES_ACCESSIONS.getIndexName() + "^" + SearchFields.EXPERIMENT_TYPES_ACCESSIONS.getFieldRelevance() + " "
-                    + SearchFields.ASSAY_ACCESSIONS.getIndexName() + "^" + SearchFields.ASSAY_ACCESSIONS.getFieldRelevance();
+                    + SearchFields.ASSAY_ACCESSIONS.getIndexName() + "^" + SearchFields.ASSAY_ACCESSIONS.getFieldRelevance() + " "
+                    + SearchFields.PROJECT_TAGS.getIndexName() + "^" + SearchFields.PROJECT_TAGS.getFieldRelevance() + " "
+                    + SearchFields.PROJECT_TAGS_AS_TEXT.getIndexName() + "^" + SearchFields.PROJECT_TAGS_AS_TEXT.getFieldRelevance() + " "
+                    + SearchFields.PROTEIN_IDENTIFICATIONS.getIndexName() + "^" + SearchFields.PROTEIN_IDENTIFICATIONS.getFieldRelevance() + " "
+                    + SearchFields.PEPTIDE_SEQUENCES.getIndexName() + "^" + SearchFields.PEPTIDE_SEQUENCES.getFieldRelevance()
+                    ;
         }
 
-        protected static String buildQueryTerm(String term) {
-    //        if ("".equals(term))
-    //            return "*";
-    //        else
-    //            return term;
-            if (term == null || term.trim().isEmpty())
+        public static String buildQueryTerm(String term) {
+//        if ("".equals(term))
+//            return "*";
+//        else
+//            return term;
+            if ("".equals(term))
                 return "id:PR* id:PX*^"+PX_RELEVANCE; // PX submissions are more relevant
             else
-    //            return term;
-                return "(id:PR* id:PX*^"+PX_RELEVANCE + ") AND " + term; // PX submissions are more relevant
+//            return term;
+                return "(id:PR* id:PX*^"+PX_RELEVANCE + ") AND (" + term +")"; // PX submissions are more relevant
         }
 
-        protected static String[] buildQueryFilters(List<String> ptmsFilterList, List<String> speciesFilterList, List<String> tissueFilterList, List<String> diseaseFilterList,
-                                           List<String> titleFilterList, List<String> instrumentFilterList,
-                                           List<String> quantificationFilterList, List<String> experimentTypeFilterList) {
+        protected static String[] buildQueryFilters(List<String> ptmsFilterList,
+                                                    List<String> speciesFilterList,
+                                                    List<String> tissueFilterList,
+                                                    List<String> diseaseFilterList,
+                                                    List<String> titleFilterList,
+                                                    List<String> instrumentFilterList,
+                                                    List<String> quantificationFilterList,
+                                                    List<String> experimentTypeFilterList,
+                                                    List<String> projectTagFilterList) {
 
             LinkedList<String> queryFilterList = new LinkedList<String>();
 
             if (ptmsFilterList!=null) {
                 for (String filter : ptmsFilterList) {
                     queryFilterList.add(SearchFields.PTM_FACET_NAMES.getIndexName() + ":\"" + filter
-                            //                        +"\" + OR "+ SearchFields.PTM_ACCESSIONS.getIndexName()+":\""+filter
-                            //                        +"\" + OR "+ SearchFields.PTM_NAMES.getIndexName()+":\""+filter
+//                        +"\" + OR "+ SearchFields.PTM_ACCESSIONS.getIndexName()+":\""+filter
+//                        +"\" + OR "+ SearchFields.PTM_NAMES.getIndexName()+":\""+filter
                             + "\"");
                 }
 
@@ -356,7 +370,7 @@ public class ProjectController {
             if (instrumentFilterList!=null) {
                 for (String filter : instrumentFilterList) {
                     queryFilterList.add(SearchFields.INSTRUMENT_FACETS_NAMES.getIndexName() + ":\"" + filter
-                            //                        +"\" + OR "+ SearchFields.INSTRUMENT_MODELS.getIndexName()+":\""+filter
+//                        +"\" + OR "+ SearchFields.INSTRUMENT_MODELS.getIndexName()+":\""+filter
                             + "\"");
                 }
 
@@ -376,10 +390,16 @@ public class ProjectController {
 
             }
 
+            if (projectTagFilterList!=null) {
+                for (String filter : projectTagFilterList) {
+                    queryFilterList.add(SearchFields.PROJECT_TAGS.getIndexName() + ":\"" + filter + "\"");
+                }
+
+            }
+
             return queryFilterList.toArray(new String[queryFilterList.size()]);
         }
     }
-
 
     // ToDo: this class should not be here! It should be part of the solr package (or service package, depends what we want to expose)
     /**
@@ -417,7 +437,11 @@ public class ProjectController {
         CELLTYPE_ASCENDANTS("cell_type_descendants_as_text", 1),
         SAMPLE_NAMES("sample_as_text", 2),
         SAMPLE_ACCESSIONS("sample_accessions", 3),
-        ASSAY_ACCESSIONS("assays_accession", 5)
+        ASSAY_ACCESSIONS("assays_accession", 5),
+        PROJECT_TAGS("project_tags", 5),
+        PROJECT_TAGS_AS_TEXT("project_tags_as_text", 4),
+        PROTEIN_IDENTIFICATIONS("protein_identifications", 25),
+        PEPTIDE_SEQUENCES("peptide_sequences", 25)
         ;
 
         private String indexName;

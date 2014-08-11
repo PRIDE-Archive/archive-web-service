@@ -67,13 +67,16 @@ public final class ObjectMapper {
         mappedObject.setTitle( object.getTitle() );
         mappedObject.setProjectDescription( object.getProjectDescription() );
         mappedObject.setPublicationDate( object.getPublicationDate() );
-        mappedObject.setSubmissionType( object.getSubmissionType().name() );
+        if (object.getSubmissionType() != null) {
+            mappedObject.setSubmissionType(object.getSubmissionType().name());
+        }
         mappedObject.setNumAssays( object.getNumAssays() );
         // ToDo: define the mapping of cvparams to strings
         mappedObject.setSpecies( getCvParamNames(object.getSpecies()) );
         mappedObject.setTissues( getCvParamNames(object.getTissues()) );
         mappedObject.setPtmNames( getCvParamNames(object.getPtms()) );
         mappedObject.setInstrumentNames( getCvParamNames(object.getInstruments()) );
+        mappedObject.setProjectTags( mapProjectTags(object.getProjectTags()) );
 
         return mappedObject;
     }
@@ -82,7 +85,6 @@ public final class ObjectMapper {
         ProjectDetail mappedObject = mapProjectSummary2WSProjectSummary(object, ProjectDetail.class);
 
         mappedObject.setDoi( object.getDoi() );
-        mappedObject.setProjectTags( mapProjectTags(object.getProjectTags()) );
         mappedObject.setSubmitter( mapUserSummaryToWSContactDetail(object.getSubmitter()) );
         if (object.getLabHeads() == null || object.getLabHeads().size() > 0) {
             Set<ContactDetail> labHeads = new HashSet<ContactDetail>();
@@ -127,6 +129,9 @@ public final class ObjectMapper {
         }
         if (projectSearchSummary.getInstrumentModels() != null) {
             mappedProject.getInstrumentNames().addAll( projectSearchSummary.getInstrumentModels() );
+        }
+        if (projectSearchSummary.getProjectTagNames() != null) {
+            mappedProject.setProjectTags(projectSearchSummary.getProjectTagNames());
         }
 
         // build keywords from some other data we have

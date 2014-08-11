@@ -15,8 +15,8 @@
     <!--<constructor-arg value="uk.ac.ebi.pride.prider.repo.file.ProjectFileRepository"/>-->
     <!--</bean>-->
 
-    <bean id="filePathBuilder" class="uk.ac.ebi.pride.prider.utils.config.FilePathBuilderPride3"/>
-    <bean id="fileUtils" class="uk.ac.ebi.pride.prider.utils.streaming.FileUtils"/>
+    <bean id="filePathBuilder" class="uk.ac.ebi.pride.archive.utils.config.FilePathBuilderPride3"/>
+    <bean id="fileUtils" class="uk.ac.ebi.pride.archive.utils.streaming.FileUtils"/>
 
     <util:properties id="fileConfig" location="classpath:META-INF/props/file.properties"/>
 
@@ -24,22 +24,31 @@
 
     <util:properties id="databaseConfig" location="classpath:META-INF/props/db.properties"/>
 
-    <!--<bean id="userRepository" class="org.mockito.Mockito" factory-method="mock">-->
-    <!--<constructor-arg value="uk.ac.ebi.pride.prider.repo.user.UserRepository"/>-->
-    <!--</bean>-->
 
+    <bean id="assaySecureServiceImpl" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="uk.ac.ebi.pride.archive.security.assay.AssaySecureServiceImpl"/>
+    </bean>
     <bean id="assayServiceImpl" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.archive.repo.assay.AssayServiceImpl"/>
+        <constructor-arg value="uk.ac.ebi.pride.archive.repo.assay.service.AssayServiceImpl"/>
     </bean>
 
+    <bean id="projectSecureServiceImpl" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="uk.ac.ebi.pride.archive.security.project.ProjectSecureServiceImpl"/>
+    </bean>
     <bean id="projectServiceImpl" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.archive.repo.project.serviceProjectServiceImpl"/>
+        <constructor-arg value="uk.ac.ebi.pride.archive.repo.project.service.ProjectServiceImpl"/>
     </bean>
 
+    <bean id="fileSecureServiceImpl" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="uk.ac.ebi.pride.archive.security.file.FileSecureServiceImpl"/>
+    </bean>
     <bean id="fileServiceImpl" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.archive.repo.file.FileServiceImpl"/>
+        <constructor-arg value="uk.ac.ebi.pride.archive.repo.file.service.FileServiceImpl"/>
     </bean>
 
+    <bean id="userSecureServiceImpl" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="uk.ac.ebi.pride.archive.security.user.UserSecureWebServiceImpl"/>
+    </bean>
     <bean id="userServiceImpl" class="org.mockito.Mockito" factory-method="mock">
         <constructor-arg value="uk.ac.ebi.pride.archive.repo.user.service.UserServiceImpl"/>
     </bean>
@@ -48,7 +57,7 @@
     <!--<constructor-arg value="uk.ac.ebi.pride.prider.search.project.dao.ProjectSearchDao"/>-->
     <!--</bean>-->
     <bean id="projectSearchService" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="uk.ac.ebi.pride.archive.service.project.ProjectSearchService" />
+        <constructor-arg value="uk.ac.ebi.pride.archive.search.service.ProjectSearchService" />
     </bean>
 
 </beans>
