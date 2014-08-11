@@ -18,6 +18,8 @@ import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
 import uk.ac.ebi.pride.archive.security.assay.AssaySecureService;
 import uk.ac.ebi.pride.archive.security.file.FileSecureService;
 import uk.ac.ebi.pride.archive.security.project.ProjectSecureService;
+import uk.ac.ebi.pride.archive.utils.config.FilePathBuilder;
+import uk.ac.ebi.pride.archive.utils.streaming.FileUtils;
 import uk.ac.ebi.pride.archive.web.service.error.exception.ResourceNotFoundException;
 import uk.ac.ebi.pride.archive.web.service.model.file.DefaultFileComparator;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
@@ -25,8 +27,6 @@ import uk.ac.ebi.pride.archive.web.service.model.file.FileDetailList;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileType;
 import uk.ac.ebi.pride.archive.web.service.util.IdMapper;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
-import uk.ac.ebi.pride.prider.utils.config.FilePathBuilder;
-import uk.ac.ebi.pride.prider.utils.streaming.FileUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -167,7 +167,7 @@ public class FileController {
             String ftpPath = buildPublicFtpPathForProject(projectSummary.getAccession(), projectSummary.getPublicationDate());
             addFtpUrls(fileDetails, ftpPath);
         } else {
-            // ToDo: create real FTP path links once they are available
+            // ToDo: create real private FTP path links once they are available
             // now there is not private path, so we don't add any FTP links
 //            // we probably need/want user specific private locations, so we retrieve data from the security context
 //            Authentication a = SecurityContextHolder.getContext().getAuthentication();
@@ -213,7 +213,7 @@ public class FileController {
             String ftpPath = buildPublicFtpPathForProject(projectSummary.getAccession(), projectSummary.getPublicationDate());
             addFtpUrls(fileDetails, ftpPath);
         } else {
-            // ToDo: create real FTP path links once they are available
+            // ToDo: create real private FTP path links once they are available
             // now there is not private path, so we don't add any FTP links
 //            // we probably need/want user specific private locations, so we retrieve data from the security context
 //            Authentication a = SecurityContextHolder.getContext().getAuthentication();
@@ -290,7 +290,7 @@ public class FileController {
     private String getPrivateDirectoryName(String projectAccession, String username) {
         // ToDo: define how to generate the private directory from the provided details
         // ToDo: should also go into a separate lib that can be used by the pipeline to contruct the directories
-        return "hash12345.a";
+        return "notImplementedYet";
     }
 
     private void updateAssayAccCache(Collection<FileSummary> fileSummaries) {

@@ -20,6 +20,9 @@ import uk.ac.ebi.pride.archive.repo.file.service.FileServiceImpl;
 import uk.ac.ebi.pride.archive.repo.file.service.FileSummary;
 import uk.ac.ebi.pride.archive.repo.project.service.ProjectServiceImpl;
 import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
+import uk.ac.ebi.pride.archive.security.assay.AssaySecureServiceImpl;
+import uk.ac.ebi.pride.archive.security.file.FileSecureServiceImpl;
+import uk.ac.ebi.pride.archive.security.project.ProjectSecureServiceImpl;
 
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -36,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration({"classpath:test-context.xml", "classpath:spring/mvc-config.xml"})
+@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-test-config.xml"})
 public class FileControllerFunctionalTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -47,11 +50,11 @@ public class FileControllerFunctionalTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private FileServiceImpl fileServiceImpl;
+    private FileSecureServiceImpl fileSecureServiceImpl;
     @Autowired
-    private ProjectServiceImpl projectServiceImpl;
+    private ProjectSecureServiceImpl projectSecureServiceImpl;
     @Autowired
-    private AssayServiceImpl assayServiceImpl;
+    private AssaySecureServiceImpl assaySecureServiceImpl;
 
     // mock data values
     private static final String PROJECT_ACCESSION = "PXTEST1";
@@ -81,8 +84,8 @@ public class FileControllerFunctionalTest {
 
         ///// mock services
         // mock file service
-        when(fileServiceImpl.findAllByProjectAccession(PROJECT_ACCESSION)).thenReturn(files);
-        when(fileServiceImpl.findAllByAssayAccession(ASSAY_ACCESSION)).thenReturn(files);
+        when(fileSecureServiceImpl.findAllByProjectAccession(PROJECT_ACCESSION)).thenReturn(files);
+        when(fileSecureServiceImpl.findAllByAssayAccession(ASSAY_ACCESSION)).thenReturn(files);
 //        when(fileServiceImpl.findById(fileId)).thenReturn(fileSummary); // not tested since deprecated internal functionality
 
 
@@ -94,8 +97,8 @@ public class FileControllerFunctionalTest {
         Date date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).parse("2010-01-30");
         projectSummary.setPublicationDate(date);
 
-        when(projectServiceImpl.findByAccession(PROJECT_ACCESSION)).thenReturn(projectSummary);
-        when(projectServiceImpl.findById(PROJECT_ID)).thenReturn(projectSummary);
+        when(projectSecureServiceImpl.findByAccession(PROJECT_ACCESSION)).thenReturn(projectSummary);
+        when(projectSecureServiceImpl.findById(PROJECT_ID)).thenReturn(projectSummary);
 
 
         // mock assay service (used for mapping of assay IDs to assay accessions)
@@ -103,7 +106,7 @@ public class FileControllerFunctionalTest {
         assaySummary.setId(ASSAY_ID);
         assaySummary.setAccession(ASSAY_ACCESSION);
 
-        when(assayServiceImpl.findById(ASSAY_ID)).thenReturn(assaySummary);
+        when(assaySecureServiceImpl.findById(ASSAY_ID)).thenReturn(assaySummary);
 
     }
 

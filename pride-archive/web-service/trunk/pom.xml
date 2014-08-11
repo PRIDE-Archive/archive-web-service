@@ -7,16 +7,14 @@
     <parent>
         <groupId>uk.ac.ebi.pride.maven</groupId>
         <artifactId>pride-base-master</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.3</version>
     </parent>
 
     <groupId>uk.ac.ebi.pride.archive</groupId>
     <artifactId>web-service</artifactId>
     <version>1.0.8-SNAPSHOT</version>
     <packaging>war</packaging>
-
     <name>pride-archive-webservice</name>
-    <url>http://www.ebi.ac.uk/pride</url>
 
     <!--
          To build the project several settings are required which are provided via maven profiles
@@ -35,10 +33,10 @@
      -->
 
     <properties>
-        <archive.ws.model.version>0.2.0-SNAPSHOT</archive.ws.model.version>
-        <archive.security.version>0.1.0-SNAPSHOT</archive.security.version>
+        <archive.ws.model.version>0.2.3-SNAPSHOT</archive.ws.model.version>
+        <archive.security.version>0.1.0</archive.security.version>
         <archive.search.version>1.0.1-SNAPSHOT</archive.search.version>
-        <prider.utils.version>0.1.9-SNAPSHOT</prider.utils.version>
+        <archive.utils.version>0.1.10</archive.utils.version>
         <pride.web.utils.version>1.3.8</pride.web.utils.version>
         <swagger.version>0.8.3</swagger.version>
     </properties>
@@ -64,10 +62,10 @@
                 </excludes>
             </resource>
             <!-- webapp resources -->
-            <resource>
-                <directory>src/main/webapp/WEB-INF</directory>
-                <filtering>false</filtering>
-            </resource>
+            <!--<resource>-->
+                <!--<directory>src/main/webapp/WEB-INF</directory>-->
+                <!--<filtering>false</filtering>-->
+            <!--</resource>-->
         </resources>
 
         <plugins>
@@ -85,7 +83,7 @@
                             <port>9091</port>
                         </connector>
                     </connectors>
-                    <jettyConfig>${basedir}/src/test/resources/jetty.xml</jettyConfig>
+                    <jettyConfig>${basedir}/jetty.xml</jettyConfig>
                     <scanIntervalSeconds>10</scanIntervalSeconds>
                 </configuration>
                 <dependencies>
@@ -105,53 +103,52 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>uk.ac.ebi.pride.archive</groupId>
-            <artifactId>archive-search</artifactId>
-            <version>${archive.search.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>uk.ac.ebi.pride.prider</groupId>
-                    <artifactId>prider-repo</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>uk.ac.ebi.pride.archive</groupId>
-            <artifactId>archive-security</artifactId>
-            <version>${archive.security.version}</version>
-        </dependency>
 
+        <!-- ##### PRIDE dependencies ##### ##### ##### ##### ##### -->
+        <!-- web-service-model -->
         <dependency>
             <groupId>uk.ac.ebi.pride.archive</groupId>
             <artifactId>web-service-model</artifactId>
             <version>${archive.ws.model.version}</version>
         </dependency>
 
+        <!-- archive-search -->
+        <dependency>
+            <groupId>uk.ac.ebi.pride.archive</groupId>
+            <artifactId>archive-search</artifactId>
+            <version>${archive.search.version}</version>
+        </dependency>
+
+        <!-- archive-security -->
+        <dependency>
+            <groupId>uk.ac.ebi.pride.archive</groupId>
+            <artifactId>archive-security</artifactId>
+            <version>${archive.security.version}</version>
+        </dependency>
+
+        <!-- pride-web-utils -->
         <dependency>
             <groupId>uk.ac.ebi.pride.web</groupId>
             <artifactId>pride-web-utils</artifactId>
             <version>${pride.web.utils.version}</version>
         </dependency>
 
-        <!-- prider utils -->
+        <!-- archive-utils -->
         <dependency>
-            <groupId>uk.ac.ebi.pride.prider</groupId>
-            <artifactId>prider-utils</artifactId>
-            <version>${prider.utils.version}</version>
+            <groupId>uk.ac.ebi.pride.archive</groupId>
+            <artifactId>archive-utils</artifactId>
+            <version>${archive.utils.version}</version>
         </dependency>
 
+        <!-- ##### 3rd party dependencies ##### ##### ##### ##### ##### -->
         <!-- Spring -->
-        <dependency> <!-- overwrite parent version to resolve conflicts -->
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>3.2.5.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>3.2.5.RELEASE</version>
-
         </dependency>
 
         <!-- Spring test-->
@@ -165,12 +162,10 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
@@ -206,7 +201,7 @@
             <artifactId>cglib</artifactId>
         </dependency>
 
-        <!--Dependencies for devproxy-->
+        <!--commons dependencies for devproxy-->
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
@@ -222,6 +217,25 @@
             <artifactId>swagger-springmvc</artifactId>
             <version>${swagger.version}</version>
         </dependency>
+
+        <!-- testing libs -->
+        <!--<dependency>-->
+            <!--<groupId>junit</groupId>-->
+            <!--<artifactId>junit-dep</artifactId>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+        </dependency>
+
 
     </dependencies>
 

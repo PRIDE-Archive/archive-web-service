@@ -18,9 +18,9 @@
     <!-- Callback filter for cross server query support -->
     <bean class="uk.ac.ebi.pride.web.util.callback.filter.JsonpCallbackFilter" id="jsonpCallbackFilter"/>
 
-    <bean id="filePathBuilder" class="uk.ac.ebi.pride.prider.utils.config.FilePathBuilderPride3"/>
+    <bean id="filePathBuilder" class="uk.ac.ebi.pride.archive.utils.config.FilePathBuilderPride3"/>
 
-    <bean id="fileUtils" class="uk.ac.ebi.pride.prider.utils.streaming.FileUtils"/>
+    <bean id="fileUtils" class="uk.ac.ebi.pride.archive.utils.streaming.FileUtils"/>
 
     <util:properties id="fileConfig" location="classpath:META-INF/props/file.properties"/>
 

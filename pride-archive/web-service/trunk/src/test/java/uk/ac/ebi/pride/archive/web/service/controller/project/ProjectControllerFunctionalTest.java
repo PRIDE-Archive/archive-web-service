@@ -18,6 +18,7 @@ import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
 import uk.ac.ebi.pride.archive.repo.user.service.UserSummary;
 import uk.ac.ebi.pride.archive.search.service.ProjectSearchService;
 import uk.ac.ebi.pride.archive.search.service.ProjectSearchSummary;
+import uk.ac.ebi.pride.archive.security.project.ProjectSecureServiceImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration({"classpath:test-context.xml", "classpath:spring/mvc-config.xml"})
+@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-test-config.xml"})
 public class ProjectControllerFunctionalTest {
 
     @Autowired
@@ -40,7 +41,7 @@ public class ProjectControllerFunctionalTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ProjectServiceImpl projectServiceImpl;
+    private ProjectSecureServiceImpl projectSecureServiceImpl;
 
     @Autowired
     private ProjectSearchService projectSearchService;
@@ -77,7 +78,7 @@ public class ProjectControllerFunctionalTest {
 
 
         // mock project service
-        when(projectServiceImpl.findByAccession(PROJECT_ACCESSION)).thenReturn(projectSummary);
+        when(projectSecureServiceImpl.findByAccession(PROJECT_ACCESSION)).thenReturn(projectSummary);
         when(projectSearchService.searchProjects(anyString(), anyString(), any(String[].class), anyInt(), anyInt(), anyString(), anyString())).thenReturn(projectSummaries);
         when(projectSearchService.numSearchResults(anyString(), anyString(), any(String[].class))).thenReturn(NUM_COUNT_RESULTS);
     }
