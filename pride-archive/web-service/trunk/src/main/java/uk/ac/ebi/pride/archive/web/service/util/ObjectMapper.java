@@ -1,5 +1,9 @@
 package uk.ac.ebi.pride.archive.web.service.util;
 
+import uk.ac.ebi.pride.archive.dataprovider.assay.instrument.InstrumentProvider;
+import uk.ac.ebi.pride.archive.dataprovider.identification.ModificationProvider;
+import uk.ac.ebi.pride.archive.dataprovider.identification.ProteinIdentificationProvider;
+import uk.ac.ebi.pride.archive.dataprovider.param.CvParamProvider;
 import uk.ac.ebi.pride.archive.dataprovider.person.Title;
 import uk.ac.ebi.pride.archive.repo.assay.service.AssaySummary;
 import uk.ac.ebi.pride.archive.repo.assay.service.InstrumentSummary;
@@ -11,10 +15,15 @@ import uk.ac.ebi.pride.archive.repo.user.service.ContactSummary;
 import uk.ac.ebi.pride.archive.repo.user.service.UserSummary;
 import uk.ac.ebi.pride.archive.search.service.ProjectSearchSummary;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
+import uk.ac.ebi.pride.archive.web.service.model.common.ModifiedLocation;
 import uk.ac.ebi.pride.archive.web.service.model.contact.ContactDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileType;
+import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetail;
 import uk.ac.ebi.pride.archive.web.service.model.project.ProjectDetail;
+import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetail;
+import uk.ac.ebi.pride.proteinidentificationindex.search.model.ProteinIdentification;
+import uk.ac.ebi.pride.psmindex.search.model.Psm;
 
 import java.util.*;
 
@@ -317,6 +326,60 @@ public final class ObjectMapper {
     }
 
 
+    // Protein map methods
+    public static List<ProteinDetail> mapProteinIdentifiedListToWSProteinDetailList(Iterable<ProteinIdentification> proteins) {
+        if (proteins == null || proteins.iterator() == null) { return null; }
+        if (!proteins.iterator().hasNext()) { return new ArrayList<ProteinDetail>(0); }
+
+        List<ProteinDetail> mappedObjects = new ArrayList<ProteinDetail>();
+        for (ProteinIdentification proteinIdentified : proteins) {
+            ProteinDetail mappedObject = new ProteinDetail();
+            mappedObject.setAccession(proteinIdentified.getAccession());
+            mappedObject.setSynonyms(proteinIdentified.getSynonyms());
+            mappedObject.setProjectAccession(proteinIdentified.getProjectAccession());
+            mappedObject.setAssayAccession(proteinIdentified.getAssayAccession());
+            mappedObject.setDescription(proteinIdentified.getDescription());
+            mappedObject.setSequence(proteinIdentified.getSequence());
+            mappedObjects.add(mappedObject);
+        }
+
+        return mappedObjects;
+    }
+
+
+    // PSM map methods
+    public static List<PsmDetail> mapPsmListToWSPsmDetailList(List<Psm> psms) {
+        if (psms == null) { return null; }
+        if (psms.isEmpty()) { return new ArrayList<PsmDetail>(0); }
+
+        List<PsmDetail> mappedObjects = new ArrayList<PsmDetail>();
+        for (Psm psm : psms) {
+            PsmDetail mappedObject = new PsmDetail();
+            mappedObject.setSequence(psm.getPeptideSequence());
+            mappedObject.setStartPosition(psm.getStartPosition());
+            mappedObject.setEndPosition(psm.getEndPosition());
+            mappedObject.setProteinAccession(psm.getProteinAccession());
+            mappedObject.setProjectAccession(psm.getProjectAccession());
+            mappedObject.setAssayAccession(psm.getAssayAccession());
+            mappedObject.setCalculatedMZ(psm.getCalculatedMassToCharge());
+            mappedObject.setExperimentalMZ(psm.getExpMassToCharge());
+            mappedObject.setCharge(psm.getCharge());
+            mappedObject.setPreAA(psm.getPreAminoAcid());
+            mappedObject.setPostAA(psm.getPostAminoAcid());
+            mappedObject.setRetentionTime(psm.getRetentionTime());
+            mappedObject.setSearchEngines(getCvParamNames(psm.getSearchEngines()));
+            mappedObject.setSearchEngineScores(getCvParamNames(psm.getSearchEngineScores()));
+            mappedObject.setSpectrumID( psm.getSpectrumId() );
+            mappedObject.setId(psm.getId());
+            mappedObject.setReportedID( psm.getReportedId() );
+            mappedObject.setModifications( getModifiedLocations(psm.getModifications()) );
+            mappedObjects.add(mappedObject);
+        }
+
+        return mappedObjects;
+    }
+
+
     // Project tag map methods
     public static Set<String> mapProjectTags(Collection<ProjectTagSummary> projectTags) {
         if (projectTags == null) { return null; }
@@ -329,11 +392,13 @@ public final class ObjectMapper {
         return tags;
     }
 
-    private static Set<String> getInstrumentDefinitions(Collection<InstrumentSummary> instrumentSummaries) {
+
+    // Private methods
+    private static <T extends InstrumentProvider> Set<String> getInstrumentDefinitions(Iterable<T> instrumentSummaries) {
         if (instrumentSummaries == null) { return null; }
 
         Set<String> instrumentSet = new HashSet<String>();
-        for (InstrumentSummary instrument : instrumentSummaries) {
+        for (T instrument : instrumentSummaries) {
             // the model may not always be present, in which case we may have to generate a definition from the components
             if (instrument.getModel() != null) {
                 CvParamSummary cv = instrument.getModel();
@@ -351,15 +416,26 @@ public final class ObjectMapper {
         return instrumentSet;
     }
 
-    private static Set<String> getCvParamNames(Collection<CvParamSummary> objects) {
-        if (objects == null) { return null; }
-        if (objects.isEmpty()) { return new HashSet<String>(0); }
+    private static <T extends CvParamProvider> Set<String> getCvParamNames(Iterable<T> objects) {
+        if (objects == null || objects.iterator() == null) { return null; }
+        if (!objects.iterator().hasNext()) { return new HashSet<String>(0); }
 
         Set<String> nameSet = new HashSet<String>();
-        for (CvParamSummary cvParamSummary : objects) {
+        for (T cvParamSummary : objects) {
             nameSet.add( cvParamSummary.getName() );
         }
         return nameSet;
     }
 
+    private static <T extends ModificationProvider> Set<ModifiedLocation> getModifiedLocations(Iterable<T> objects) {
+        if (objects == null || objects.iterator() == null) { return null; }
+        if (!objects.iterator().hasNext()) { return new HashSet<ModifiedLocation>(0); }
+
+        Set<ModifiedLocation> mappedObjects = new HashSet<ModifiedLocation>();
+        for (T mod : objects) {
+            mappedObjects.add( new ModifiedLocation(mod.getAccession(), mod.getMainPosition()) );
+        }
+
+        return mappedObjects;
+    }
 }
