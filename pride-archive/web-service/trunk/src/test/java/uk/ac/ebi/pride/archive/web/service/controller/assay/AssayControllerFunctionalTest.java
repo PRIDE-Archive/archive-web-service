@@ -11,9 +11,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.ac.ebi.pride.archive.repo.assay.service.AssayServiceImpl;
 import uk.ac.ebi.pride.archive.repo.assay.service.AssaySummary;
-import uk.ac.ebi.pride.archive.repo.project.service.ProjectServiceImpl;
 import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
 import uk.ac.ebi.pride.archive.security.assay.AssaySecureServiceImpl;
 import uk.ac.ebi.pride.archive.security.project.ProjectSecureServiceImpl;
@@ -30,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-test-config.xml"})
+@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-config.xml"})
 public class AssayControllerFunctionalTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
