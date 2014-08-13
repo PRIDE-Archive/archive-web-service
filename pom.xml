@@ -68,6 +68,18 @@
             <!--</resource>-->
         </resources>
 
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <directory>src/main/webapp/WEB-INF/spring</directory>
+                <includes>
+                    <include>mvc-config.xml</include>
+                </includes>
+            </testResource>
+        </testResources>
+
         <plugins>
             <!-- Jetty plugin for local testing -->
             <plugin>

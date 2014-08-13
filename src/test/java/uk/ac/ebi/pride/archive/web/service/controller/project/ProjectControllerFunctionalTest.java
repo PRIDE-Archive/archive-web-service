@@ -13,7 +13,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.pride.archive.dataprovider.person.Title;
 import uk.ac.ebi.pride.archive.dataprovider.project.SubmissionType;
-import uk.ac.ebi.pride.archive.repo.project.service.ProjectServiceImpl;
 import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
 import uk.ac.ebi.pride.archive.repo.user.service.UserSummary;
 import uk.ac.ebi.pride.archive.search.service.ProjectSearchService;
@@ -32,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-test-config.xml"})
+@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-config.xml"})
 public class ProjectControllerFunctionalTest {
 
     @Autowired

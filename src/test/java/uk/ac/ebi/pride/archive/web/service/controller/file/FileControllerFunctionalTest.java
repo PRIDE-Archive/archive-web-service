@@ -14,11 +14,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileType;
-import uk.ac.ebi.pride.archive.repo.assay.service.AssayServiceImpl;
 import uk.ac.ebi.pride.archive.repo.assay.service.AssaySummary;
-import uk.ac.ebi.pride.archive.repo.file.service.FileServiceImpl;
 import uk.ac.ebi.pride.archive.repo.file.service.FileSummary;
-import uk.ac.ebi.pride.archive.repo.project.service.ProjectServiceImpl;
 import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
 import uk.ac.ebi.pride.archive.security.assay.AssaySecureServiceImpl;
 import uk.ac.ebi.pride.archive.security.file.FileSecureServiceImpl;
@@ -39,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-test-config.xml"})
+@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-config.xml"})
 public class FileControllerFunctionalTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -61,7 +58,6 @@ public class FileControllerFunctionalTest {
     private static final long PROJECT_ID = 100001;
     private static final String ASSAY_ACCESSION = "9876";
     private static final long ASSAY_ID = 200001;
-    private Long fileId = 1L;
     private static final int FILE_SIZE = 1000;
     private static final String FILE_NAME = "aFileName";
     private static final String FTP_PATH_FRAGMENT = "ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2010/01/" + PROJECT_ACCESSION + "/" + FILE_NAME;

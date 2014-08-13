@@ -46,6 +46,7 @@ public class ProteinController {
 
 
 
+//    not available as not secured yet
 //    @ApiOperation(value = "retrieve protein identifications by protein identifier", position = 1)
 //    @RequestMapping(value = "/{proteinId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 //    @ResponseStatus(HttpStatus.OK) // 200
@@ -91,6 +92,7 @@ public class ProteinController {
         List<ProteinDetail> resultProteins = null;
         try {
             List<ProteinIdentification> foundProteins = pissService.findByProjectAccession(projectAccession, new PageRequest(page, showResults)).getContent();
+//            List<ProteinIdentification> foundProteins = pissService.findByProjectAccession(projectAccession);
             // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects
             resultProteins = ObjectMapper.mapProteinIdentifiedListToWSProteinDetailList(foundProteins);
         } catch (Exception e) {
