@@ -6,7 +6,6 @@ import com.wordnik.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -25,7 +24,7 @@ import java.util.List;
 * @author Florian Reisinger
 * @since 1.0.8
 */
-@Api(value = "retrieve peptide identifications", position = 4)
+@Api(value = "retrieve peptide identifications test", position = 4)
 @Controller
 @RequestMapping(value = "/peptide")
 public class PsmController {
@@ -40,64 +39,36 @@ public class PsmController {
     PsmSecureSearchService psmSecureSearchService;
 
 
-    // ToDo: count methods once available in the service
     // ToDo: performance tests (page sizes, security impact), and perhaps max number of retrievable (page size) results
 
-//    method not available, as not secured
-//    @ApiOperation(value = "retrieve peptide identifications by sequence", position = 1)
-//    @RequestMapping(value = "/{sequence}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    // ToDo: method not available, as not secured
+//    @ApiOperation(value = "retrieve peptide identifications by sequence and project accession", position = 1)
+//    @RequestMapping(value = "/list/{sequence}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 //    @ResponseStatus(HttpStatus.OK) // 200
 //    public
 //    @ResponseBody
-//    PsmDetailList getPeptideBySequence(
+//    PsmDetailList getPsmsBySequence(
 //            @ApiParam(value = "a peptide sequence")
-//            @PathVariable("sequence") String sequence,
-//            @ApiParam(value = "how many results to show per page")
-//            @RequestParam(value = "show", required = false, defaultValue = DEFAULT_SHOW+"") int showResults,
-//            @ApiParam(value = "which page of the result to return")
-//            @RequestParam(value = "page", required = false, defaultValue = DEFAULT_PAGE+"") int page
+//            @PathVariable("sequence") String sequence
 //    ) {
-//        logger.info("Query for peptide with sequence: " + sequence);
+//        logger.info("Query for PSMs with sequence: " + sequence);
 //
-//        List<Psm> foundPsms = psmSecureSearchService.findByPeptideSequence(sequence, new PageRequest(page, showResults));
+//        List<Psm> foundPsms;
+//            foundPsms = psmSecureSearchService.findByPeptideSequence(sequence);
 //
-//        // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects
+//        // convert the searches List of Psm objects into the WS PsmDetail objects
 //        List<PsmDetail> resultPsms = ObjectMapper.mapPsmListToWSPsmDetailList(foundPsms);
 //
 //        return new PsmDetailList(resultPsms);
 //    }
 
-      // ToDo: method not available, as not secured
-//    @ApiOperation(value = "retrieve peptide identifications by extended sequence search", position = 2)
-//    @RequestMapping(value = "/list/ext/{sequence}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//    @ResponseStatus(HttpStatus.OK) // 200
-//    public
-//    @ResponseBody
-//    PsmDetailList getPeptideByExtendedSequenceSearch(
-//            @ApiParam(value = "a peptide sequence")
-//            @PathVariable("sequence") String sequence,
-//            @ApiParam(value = "how many results to show per page")
-//            @RequestParam(value = "show", required = false, defaultValue = DEFAULT_SHOW+"") int showResults,
-//            @ApiParam(value = "which page of the result to return")
-//            @RequestParam(value = "page", required = false, defaultValue = DEFAULT_PAGE+"") int page
-//    ) {
-//        logger.info("Extended query for peptide with sequence: " + sequence);
-//
-//        List<Psm> foundPsms = psmSecureSearchService.findByPeptideSubSequence(sequence, new PageRequest(page, showResults)).getContent();
-//
-//        // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects
-//        List<PsmDetail> resultPsms = ObjectMapper.mapPsmListToWSPsmDetailList(foundPsms);
-//
-//        return new PsmDetailList(resultPsms);
-//    }
-
-      // ToDo: method not available, as not secured
+    // ToDo: method not available, as not secured
 //    @ApiOperation(value = "retrieve peptide identifications by protein accession", position = 4)
 //    @RequestMapping(value = "/list/protein/{proteinAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 //    @ResponseStatus(HttpStatus.OK) // 200
 //    public
 //    @ResponseBody
-//    PsmDetailList getProteinsByProtein(
+//    PsmDetailList getPsmsByProtein(
 //            @ApiParam(value = "an assay accession")
 //            @PathVariable("proteinAccession") String proteinAccession
 //    ) {
@@ -113,12 +84,12 @@ public class PsmController {
 //    }
 
 
-    @ApiOperation(value = "retrieve peptide identifications by project accession", position = 3)
+    @ApiOperation(value = "retrieve peptide identifications by project accession", position = 0)
     @RequestMapping(value = "/list/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
     @ResponseBody
-    PsmDetailList getPeptidesByProject(
+    PsmDetailList getPsmsByProject(
             @ApiParam(value = "a project accession")
             @PathVariable("projectAccession") String projectAccession,
             @ApiParam(value = "how many results to show per page")
@@ -136,12 +107,69 @@ public class PsmController {
         return new PsmDetailList(resultPsms);
     }
 
+    @ApiOperation(value = "count peptide identifications by project accession", position = 1)
+    @RequestMapping(value = "/count/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public
+    @ResponseBody
+    Long countPsmsByProject(
+            @ApiParam(value = "a project accession")
+            @PathVariable("projectAccession") String projectAccession
+    ) {
+        logger.info("PSM count for assay " + projectAccession + " requested");
+
+        Long foundPsms = psmSecureSearchService.countByProjectAccession(projectAccession);
+
+        logger.debug( foundPsms + " PSMs for assay " + projectAccession);
+        return foundPsms;
+    }
+
+    @ApiOperation(value = "retrieve peptide identifications by project accession and peptide sequence", position = 2)
+    @RequestMapping(value = "/list/project/{projectAccession}/sequence/{sequence}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public
+    @ResponseBody
+    PsmDetailList getPsmsByProjectAndSequence(
+            @ApiParam(value = "a project accession")
+            @PathVariable("projectAccession") String projectAccession,
+            @ApiParam(value = "the peptide sequence to limit the query on")
+            @PathVariable("sequence") String sequence
+    ) {
+        logger.info("Request for peptides for project " + projectAccession + " with sequence: " + sequence);
+
+        List<Psm> foundPsms = psmSecureSearchService.findByPeptideSequenceAndProjectAccession(sequence, projectAccession);
+
+        // convert the searches List of Psm objects into the WS PsmDetail objects
+        List<PsmDetail> resultPsms = ObjectMapper.mapPsmListToWSPsmDetailList(foundPsms);
+
+        return new PsmDetailList(resultPsms);
+    }
+
+    @ApiOperation(value = "count peptide identifications by project accession and peptide sequence", position = 3)
+    @RequestMapping(value = "/count/project/{projectAccession}/sequence/{sequence}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public
+    @ResponseBody
+    Long countPsmsByProjectAndSequence(
+            @ApiParam(value = "a project accession")
+            @PathVariable("projectAccession") String projectAccession,
+            @ApiParam(value = "the peptide sequence to limit the query on")
+            @PathVariable("sequence") String sequence
+    ) {
+        logger.info("PSM count for assay " + projectAccession + " requested");
+
+        Long foundPsms = psmSecureSearchService.countByPeptideSequenceAndProjectAccession(sequence, projectAccession);
+
+        logger.debug( foundPsms + " PSMs for assay " + projectAccession);
+        return foundPsms;
+    }
+
     @ApiOperation(value = "retrieve peptide identifications by assay accession", position = 4)
     @RequestMapping(value = "/list/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
     @ResponseBody
-    PsmDetailList getProteinsByAssay(
+    PsmDetailList getPsmsByAssay(
             @ApiParam(value = "an assay accession")
             @PathVariable("assayAccession") String assayAccession,
             @ApiParam(value = "how many results to show per page")
@@ -149,7 +177,7 @@ public class PsmController {
             @ApiParam(value = "which page of the result to return")
             @RequestParam(value = "page", required = false, defaultValue = DEFAULT_PAGE+"") int page
     ) {
-        logger.info("Proteins for assay " + assayAccession + " requested");
+        logger.info("PSMs for assay " + assayAccession + " requested");
 
         List<Psm> foundPsms = psmSecureSearchService.findByAssayAccession(assayAccession, new PageRequest(page, showResults, Sort.Direction.ASC, "peptide_sequence")).getContent();
 
@@ -158,5 +186,63 @@ public class PsmController {
 
         return new PsmDetailList(resultPsms);
     }
+
+    @ApiOperation(value = "count peptide identifications by assay accession", position = 5)
+    @RequestMapping(value = "/count/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public
+    @ResponseBody
+    Long countPsmsByAssay(
+            @ApiParam(value = "an assay accession")
+            @PathVariable("assayAccession") String assayAccession
+            ) {
+        logger.info("PSM count for assay " + assayAccession + " requested");
+
+        Long foundPsms = psmSecureSearchService.countByAssayAccession(assayAccession);
+
+        logger.debug( foundPsms + " PSMs for assay " + assayAccession);
+        return foundPsms;
+    }
+
+    @ApiOperation(value = "retrieve peptide identifications by assay accession and peptide sequence", position = 6)
+    @RequestMapping(value = "/list/assay/{assayAccession}/sequence/{sequence}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public
+    @ResponseBody
+    PsmDetailList getPsmsByAssayAndSequence(
+            @ApiParam(value = "a assay accession")
+            @PathVariable("assayAccession") String assayAccession,
+            @ApiParam(value = "the peptide sequence to limit the query on")
+            @PathVariable("sequence") String sequence
+    ) {
+        logger.info("Request for peptides for assay " + assayAccession + " with sequence: " + sequence);
+
+        List<Psm> foundPsms = psmSecureSearchService.findByPeptideSequenceAndAssayAccession(sequence, assayAccession);
+
+        // convert the searches List of Psm objects into the WS PsmDetail objects
+        List<PsmDetail> resultPsms = ObjectMapper.mapPsmListToWSPsmDetailList(foundPsms);
+
+        return new PsmDetailList(resultPsms);
+    }
+
+    @ApiOperation(value = "count peptide identifications by assay accession and peptide sequence", position = 7)
+    @RequestMapping(value = "/count/assay/{assayAccession}/sequence/{sequence}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public
+    @ResponseBody
+    Long countPsmsByAssayAndSequence(
+            @ApiParam(value = "a assay accession")
+            @PathVariable("assayAccession") String assayAccession,
+            @ApiParam(value = "the peptide sequence to limit the query on")
+            @PathVariable("sequence") String sequence
+    ) {
+        logger.info("PSM count for assay " + assayAccession + " requested");
+
+        Long foundPsms = psmSecureSearchService.countByPeptideSequenceAndAssayAccession(sequence, assayAccession);
+
+        logger.debug( foundPsms + " PSMs for assay " + assayAccession);
+        return foundPsms;
+    }
+
 
 }

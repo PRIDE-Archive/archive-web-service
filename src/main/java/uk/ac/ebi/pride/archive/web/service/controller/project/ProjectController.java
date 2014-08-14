@@ -32,7 +32,7 @@ import java.util.*;
  * @author florian@ebi.ac.uk
  * @since 1.0.4
  */
-@Api(value = "retrieve information about projects", position = 1)
+@Api(value = "retrieve information about projects", position = 0)
 @Controller
 @RequestMapping(value = "/project")
 public class ProjectController {
@@ -56,7 +56,7 @@ public class ProjectController {
     private UserSecureService userServiceImpl;
 
 
-    @ApiOperation(value = "retrieve project information by accession", position = 1)
+    @ApiOperation(value = "retrieve project information by accession", position = 0)
     @RequestMapping(value = "/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
@@ -78,7 +78,7 @@ public class ProjectController {
     }
 
 
-    @ApiOperation(value = "list projects for given criteria", position = 2)
+    @ApiOperation(value = "list projects for given criteria", position = 1)
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
@@ -163,7 +163,7 @@ public class ProjectController {
     }
 
 
-//    @ApiOperation(value = "count projects for given criteria")
+    @ApiOperation(value = "count projects for given criteria", position = 2)
     @RequestMapping(value = "/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public

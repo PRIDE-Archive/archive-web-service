@@ -41,7 +41,7 @@ import java.util.*;
  * @author florian@ebi.ac.uk
  * @since 1.0.4
  */
-@Api(value = "retrieve details about dataset files", position = 3)
+@Api(value = "retrieve details about dataset files", position = 2)
 @Controller
 @RequestMapping(value = "/file")
 public class FileController {
