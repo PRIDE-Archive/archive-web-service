@@ -23,7 +23,7 @@ import java.util.List;
 * @author Florian Reisinger
 * @since 1.0.8
 */
-@Api(value = "retrieve protein identifications", position = 4)
+@Api(value = "retrieve protein identifications", position = 3)
 @Controller
 @RequestMapping(value = "/protein")
 public class ProteinController {
