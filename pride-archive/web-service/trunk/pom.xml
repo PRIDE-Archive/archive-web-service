@@ -14,7 +14,7 @@
     <artifactId>web-service</artifactId>
     <version>1.0.8-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>pride-archive-webservice</name>
+    <name>pride-archive-webservice</name><!-- used for the finalName of the generated artifact -->
 
     <!--
          To build the project several settings are required which are provided via maven profiles
@@ -43,6 +43,7 @@
     </properties>
 
     <build>
+        <!-- define the final name on the project name rather than the artifact id (for clarification) -->
         <finalName>${project.name}-${project.version}</finalName>
         <resources>
             <!-- regular resources -->
@@ -140,7 +141,7 @@
             <version>${archive.security.version}</version>
         </dependency>
 
-        <!-- PSM search library -->
+        <!-- PSM search library (ToDo: only to force specific version, as part of archive-security, remove when stable version available) -->
         <dependency>
             <groupId>uk.ac.ebi.pride</groupId>
             <artifactId>psm-index-search</artifactId>
