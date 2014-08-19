@@ -32,7 +32,7 @@ import java.util.List;
  * @author florian@ebi.ac.uk
  * @version 1.0.4
  */
-@Api(value = "retrieve information about assays", position = 1)
+@Api(value = "assay", description = "retrieve information about assays", position = 1)
 @Controller
 @RequestMapping("/assay")
 public class AssayController {

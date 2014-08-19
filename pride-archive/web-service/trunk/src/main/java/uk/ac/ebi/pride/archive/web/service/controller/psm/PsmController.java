@@ -24,7 +24,7 @@ import java.util.List;
 * @author Florian Reisinger
 * @since 1.0.8
 */
-@Api(value = "retrieve peptide identifications test", position = 4)
+@Api(value = "peptide", description = "retrieve peptide identifications test", position = 4)
 @Controller
 @RequestMapping(value = "/peptide")
 public class PsmController {

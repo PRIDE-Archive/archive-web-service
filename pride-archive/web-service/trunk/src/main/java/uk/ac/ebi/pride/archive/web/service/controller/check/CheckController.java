@@ -29,6 +29,7 @@ import java.util.Collection;
  * @since 1.0.4
  */
 @Controller
+@ApiIgnore
 @RequestMapping("/check")
 public class CheckController {
 
@@ -105,7 +106,7 @@ public class CheckController {
             ProjectSummary projectSummary = projectService.findByAccession(TEST_PROJECT_ACCESSION);
             if (projectSummary == null) { return false; }
             if ( !projectSummary.getAccession().equalsIgnoreCase(TEST_PROJECT_ACCESSION) ) { return false; }
-            ObjectMapper.mapProjectSummary2WSProjectDetail(projectSummary);
+            ObjectMapper.mapProjectSummary2WSProjectDetail(projectSummary, null);
             // if there was no exception trying to map the search result, then we assume all is OK
             return true;
         } catch (Exception ex) {
