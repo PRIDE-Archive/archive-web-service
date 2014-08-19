@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @since $version
  */
 @Controller
+@ApiIgnore
 @RequestMapping(value = {"", "/"})
 public class WelcomeController {
 
