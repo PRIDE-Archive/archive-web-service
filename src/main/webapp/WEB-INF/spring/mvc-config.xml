@@ -14,14 +14,13 @@
 
     <context:component-scan base-package="uk.ac.ebi.pride.archive.web.service"/>
 
-    <!--Swagger config (REST service documentation)-->
+    <!-- Swagger config (REST service documentation)-->
+    <!-- Swagger beans -->
+    <beans:bean class="com.mangofactory.swagger.configuration.SpringSwaggerConfig" />
+    <beans:bean class="uk.ac.ebi.pride.archive.web.service.swagger.SwaggerConfig"/>
     <!-- static resources mapping for Swagger UI -->
     <resources mapping="/**" location="/resources/" />
-    <!-- Enable the default documentation controller -->
-    <context:component-scan base-package="com.mangofactory.swagger.controllers"/>
-    <!-- Pick up the bundled spring config -->
-    <context:component-scan base-package="com.mangofactory.swagger.configuration"/>
-    <!-- Pick up the properties needed for our Swagger configuration -->
-    <context:property-placeholder location="classpath:META-INF/props/swagger.properties" ignore-unresolvable="true"/>
+    <!-- pick up the properties needed for our Swagger configuration -->
+    <!--<context:property-placeholder location="classpath:META-INF/props/swagger.properties" ignore-unresolvable="true"/>-->
 
 </beans:beans>

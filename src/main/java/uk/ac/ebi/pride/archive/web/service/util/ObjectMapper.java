@@ -2,11 +2,9 @@ package uk.ac.ebi.pride.archive.web.service.util;
 
 import uk.ac.ebi.pride.archive.dataprovider.assay.instrument.InstrumentProvider;
 import uk.ac.ebi.pride.archive.dataprovider.identification.ModificationProvider;
-import uk.ac.ebi.pride.archive.dataprovider.identification.ProteinIdentificationProvider;
 import uk.ac.ebi.pride.archive.dataprovider.param.CvParamProvider;
 import uk.ac.ebi.pride.archive.dataprovider.person.Title;
 import uk.ac.ebi.pride.archive.repo.assay.service.AssaySummary;
-import uk.ac.ebi.pride.archive.repo.assay.service.InstrumentSummary;
 import uk.ac.ebi.pride.archive.repo.file.service.FileSummary;
 import uk.ac.ebi.pride.archive.repo.param.service.CvParamSummary;
 import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
@@ -38,23 +36,13 @@ public final class ObjectMapper {
 
 
     // Project map methods
-    @SuppressWarnings("UnusedDeclaration")
-    public static List<ProjectDetail> mapProjectSummaries2WSProjectDetails(Collection<ProjectSummary> projectSummaries) {
-        if (projectSummaries == null) { return null; }
-        if (projectSummaries.isEmpty()) { return new ArrayList<ProjectDetail>(0); }
-
-        List<ProjectDetail> list = new ArrayList<ProjectDetail>(projectSummaries.size());
-        for (ProjectSummary projectSummary : projectSummaries) {
-            list.add(mapProjectSummary2WSProjectDetail(projectSummary));
-        }
-        return list;
-    }
     public static List<uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummary> mapProjectSummaries2WSProjectSummaries(Collection<ProjectSummary> projectSummaries) {
         if (projectSummaries == null) { return null; }
         if (projectSummaries.isEmpty()) { return new ArrayList<uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummary>(0); }
 
         List<uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummary> list = new ArrayList<uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummary>(projectSummaries.size());
         for (ProjectSummary projectSummary : projectSummaries) {
+            // we don't have the assays for each project, so we ignore the additional count info of the assay level
             list.add(mapProjectSummary2WSProjectSummary(projectSummary, uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummary.class));
         }
         return list;
@@ -89,7 +77,7 @@ public final class ObjectMapper {
 
         return mappedObject;
     }
-    public static ProjectDetail mapProjectSummary2WSProjectDetail(ProjectSummary object) {
+    public static ProjectDetail mapProjectSummary2WSProjectDetail(ProjectSummary object, Collection<AssaySummary> assays) {
         if (object == null) { return null; }
         ProjectDetail mappedObject = mapProjectSummary2WSProjectSummary(object, ProjectDetail.class);
 
@@ -98,69 +86,75 @@ public final class ObjectMapper {
         if (object.getLabHeads() == null || object.getLabHeads().size() > 0) {
             Set<ContactDetail> labHeads = new HashSet<ContactDetail>();
             labHeads.addAll( mapContactSummariesToWSContactDetails(object.getLabHeads()) );
-            mappedObject.setLapHeads(labHeads);
+            mappedObject.setLabHeads(labHeads);
         }
-        mappedObject.setSubmissionDate( object.getSubmissionDate( ));
-        mappedObject.setReanalysis( object.getReanalysis() );
-        mappedObject.setExperimentTypes( getCvParamNames(object.getExperimentTypes()) );
-        mappedObject.setQuantificationMethods( getCvParamNames(object.getQuantificationMethods()) );
-        mappedObject.setKeywords( object.getKeywords() );
-        mappedObject.setSampleProcessingProtocol( object.getSampleProcessingProtocol() );
-        mappedObject.setDataProcessingProtocol( object.getDataProcessingProtocol() );
-        mappedObject.setOtherOmicsLink( object.getOtherOmicsLink() );
-        mappedObject.setNumProteins(-1);
-        mappedObject.setNumPeptides(-1);
-        mappedObject.setNumSpectra(-1);
-        mappedObject.setNumUniquePeptides(-1);
-        mappedObject.setNumIdentifiedSpectra(-1);
+        mappedObject.setSubmissionDate(object.getSubmissionDate());
+        mappedObject.setReanalysis(object.getReanalysis());
+        mappedObject.setExperimentTypes(getCvParamNames(object.getExperimentTypes()));
+        mappedObject.setQuantificationMethods(getCvParamNames(object.getQuantificationMethods()));
+        mappedObject.setKeywords(object.getKeywords());
+        mappedObject.setSampleProcessingProtocol(object.getSampleProcessingProtocol());
+        mappedObject.setDataProcessingProtocol(object.getDataProcessingProtocol());
+        mappedObject.setOtherOmicsLink(object.getOtherOmicsLink());
+
+        // generate project level counts from list of assays
+        int numProteins = 0;
+        int numPeptides = 0;
+        int numUniquePeptides = 0;
+        int numSpectra = 0;
+        int numIdentSpectra = 0;
+        if (assays != null) {
+            for (AssaySummary assay : assays) {
+                numProteins += assay.getProteinCount();
+                numPeptides += assay.getPeptideCount();
+                numUniquePeptides += assay.getUniquePeptideCount();
+                numSpectra += assay.getTotalSpectrumCount();
+                numIdentSpectra += assay.getIdentifiedSpectrumCount();
+            }
+        } else {
+            numProteins = -1;
+            numPeptides = -1;
+            numUniquePeptides = -1;
+            numSpectra = -1;
+            numIdentSpectra = -1;
+        }
+        mappedObject.setNumProteins(numProteins);
+        mappedObject.setNumPeptides(numPeptides);
+        mappedObject.setNumUniquePeptides(numUniquePeptides);
+        mappedObject.setNumSpectra(numSpectra);
+        mappedObject.setNumIdentifiedSpectra(numIdentSpectra);
 
         return mappedObject;
     }
-    public static uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummary mapProjectSearchSummary2WSProjectSummary(ProjectSearchSummary projectSearchSummary) {
-        if (projectSearchSummary == null) { return null; }
+
+    public static uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummary mapProjectSearchSummary2WSProjectSummary(ProjectSearchSummary object) {
+        if (object == null) { return null; }
 
         uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummary mappedProject = new uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummary();
 
-        mappedProject.setAccession( projectSearchSummary.getProjectAccession() );
-        mappedProject.setTitle( projectSearchSummary.getTitle() );
-        mappedProject.setProjectDescription( projectSearchSummary.getProjectDescription() );
-        mappedProject.setPublicationDate( projectSearchSummary.getPublicationDate() );
-        mappedProject.setSubmissionType(projectSearchSummary.getSubmissionType());
-        mappedProject.setNumAssays( projectSearchSummary.getNumExperiments() );
-        if (projectSearchSummary.getSpeciesNames() != null) {
-            mappedProject.getSpecies().addAll( projectSearchSummary.getSpeciesNames() );
+        mappedProject.setAccession( object.getProjectAccession() );
+        mappedProject.setTitle( object.getTitle() );
+        mappedProject.setProjectDescription( object.getProjectDescription() );
+        mappedProject.setPublicationDate( object.getPublicationDate() );
+        mappedProject.setSubmissionType(object.getSubmissionType());
+        mappedProject.setNumAssays( object.getNumExperiments() );
+        if (object.getSpeciesNames() != null) {
+            mappedProject.getSpecies().addAll( object.getSpeciesNames() );
         }
-        if (projectSearchSummary.getTissueNames() != null) {
-            mappedProject.getTissues().addAll( projectSearchSummary.getTissueNames() );
+        if (object.getTissueNames() != null) {
+            mappedProject.getTissues().addAll( object.getTissueNames() );
         }
-        if (projectSearchSummary.getPtmNames() != null) {
-            mappedProject.getPtmNames().addAll( projectSearchSummary.getPtmNames() );
+        if (object.getPtmNames() != null) {
+            mappedProject.getPtmNames().addAll( object.getPtmNames() );
         }
-        if (projectSearchSummary.getInstrumentModels() != null) {
-            mappedProject.getInstrumentNames().addAll( projectSearchSummary.getInstrumentModels() );
+        if (object.getInstrumentModels() != null) {
+            mappedProject.getInstrumentNames().addAll( object.getInstrumentModels() );
         }
-        if (projectSearchSummary.getProjectTagNames() != null) {
-            mappedProject.setProjectTags(projectSearchSummary.getProjectTagNames());
+        if (object.getProjectTagNames() != null) {
+            mappedProject.setProjectTags(object.getProjectTagNames());
         }
+        mappedProject.setNumAssays( object.getAssayAccessions() != null? object.getAssayAccessions().size() : 0);
 
-        // build keywords from some other data we have
-//        StringBuilder sb = new StringBuilder();
-//        if (projectSearchSummary.getDiseaseNames() != null) {
-//            for (String s : projectSearchSummary.getDiseaseNames()) {
-//                sb.append(s).append(", ");
-//            }
-//        }
-//        if (projectSearchSummary.getQuantificationMethods() != null) {
-//            for (String s : projectSearchSummary.getQuantificationMethods()) {
-//                sb.append(s).append(", ");
-//            }
-//        }
-//        String keywords = sb.toString();
-//        // remove the last ", "
-//        if (keywords.length() > 3) {
-//            keywords = keywords.substring(0, keywords.length() - 2);
-//        }
-//        mappedProject.setKeywords(keywords);
         return mappedProject;
     }
     public static List<uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummary> mapProjectSearchSummarys2WSProjectSummaries(Collection<ProjectSearchSummary> projects) {
