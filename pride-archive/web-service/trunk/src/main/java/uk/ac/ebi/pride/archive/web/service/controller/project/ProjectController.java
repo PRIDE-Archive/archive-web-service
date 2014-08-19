@@ -12,10 +12,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import uk.ac.ebi.pride.archive.repo.assay.service.AssaySummary;
 import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
 import uk.ac.ebi.pride.archive.repo.user.service.UserSummary;
 import uk.ac.ebi.pride.archive.search.service.ProjectSearchService;
 import uk.ac.ebi.pride.archive.search.service.ProjectSearchSummary;
+import uk.ac.ebi.pride.archive.security.assay.AssaySecureService;
 import uk.ac.ebi.pride.archive.security.project.ProjectSecureService;
 import uk.ac.ebi.pride.archive.security.user.UserSecureService;
 import uk.ac.ebi.pride.archive.web.service.error.exception.ResourceNotFoundException;
@@ -23,7 +25,6 @@ import uk.ac.ebi.pride.archive.web.service.model.project.ProjectDetail;
 import uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummaryList;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.*;
 
@@ -32,7 +33,7 @@ import java.util.*;
  * @author florian@ebi.ac.uk
  * @since 1.0.4
  */
-@Api(value = "retrieve information about projects", position = 0)
+@Api(value = "project", description = "retrieve information about projects", position = 0)
 @Controller
 @RequestMapping(value = "/project")
 public class ProjectController {
@@ -53,38 +54,41 @@ public class ProjectController {
     private ProjectSecureService projectService;
 
     @Autowired
+    private AssaySecureService assayService;
+
+    @Autowired
     private UserSecureService userServiceImpl;
 
 
-    @ApiOperation(value = "retrieve project information by accession", position = 0)
+    @ApiOperation(value = "retrieve project information by accession", position = 1, notes = "retrieve a detailed record of a specific project")
     @RequestMapping(value = "/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
     @ResponseBody
     ProjectDetail getProjectSummary(
             @ApiParam(value = "a project accession number")
-            @PathVariable("projectAccession") String accession, HttpServletRequest request) {
+            @PathVariable("projectAccession") String accession) {
         logger.info("Project " + accession + " summary requested");
 
-        // retrieve the authorization header value (if there is any)
-//        System.out.println("header value: " + request.getHeader("Authorization"));
         ProjectSummary projectSummary = projectService.findByAccession(accession);
         if (projectSummary == null) {
             throw new ResourceNotFoundException("No project found for accession: " + accession);
         }
 
+        Collection<AssaySummary> assays = assayService.findAllByProjectAccession(accession);
+
         // ToDo: retrieve assay accessions for project!
-        return ObjectMapper.mapProjectSummary2WSProjectDetail(projectSummary);
+        return ObjectMapper.mapProjectSummary2WSProjectDetail(projectSummary, assays);
     }
 
 
-    @ApiOperation(value = "list projects for given criteria", position = 1)
+    @ApiOperation(value = "list projects for given criteria", position = 2, notes = "search functionality equivalent to the search available on the PRIDE Archive web interface")
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
     @ResponseBody
     ProjectSummaryList simpleSearchProjects(
-            @ApiParam(value = "keyword to query for")
+            @ApiParam(value = "search term to query for")
             @RequestParam(value = "q", required = false, defaultValue = "") String term,
             @ApiParam(value = "how many results to show per page")
             @RequestParam(value = "show", defaultValue = DEFAULT_SHOW+"") int showResults,
@@ -163,14 +167,14 @@ public class ProjectController {
     }
 
 
-    @ApiOperation(value = "count projects for given criteria", position = 2)
+    @ApiOperation(value = "count projects for given criteria", nickname = "protein count", notes = "takes same query parameters as the /list operation; typically used to retrieve number of results before querying with /list", position = 3)
     @RequestMapping(value = "/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
     @ResponseBody
     long countSearchProjects(
-            @ApiParam(value = "keyword to query for")
-            @RequestParam(value = "q", required = false) String term,
+            @ApiParam(value = "search term to query for")
+            @RequestParam(value = "q", required = false, defaultValue = "") String term,
             @ApiParam(value = "filter by species (NCBI taxon ID or name)")
             @RequestParam(value = "speciesFilter", required = false, defaultValue = "") String[] speciesFilter,
             @ApiParam(value = "filter by PTM annotation")
@@ -436,7 +440,6 @@ public class ProjectController {
         CELLTYPE_NAMES("cell_type_as_text", 2),
         CELLTYPE_ASCENDANTS("cell_type_descendants_as_text", 1),
         SAMPLE_NAMES("sample_as_text", 2),
-        SAMPLE_ACCESSIONS("sample_accessions", 3),
         ASSAY_ACCESSIONS("assays_accession", 5),
         PROJECT_TAGS("project_tags", 5),
         PROJECT_TAGS_AS_TEXT("project_tags_as_text", 4),
@@ -460,19 +463,6 @@ public class ProjectController {
             return fieldRelevance;
         }
 
-        public static String buildIndexOrQueryString(String term) {
-            String res = "(";
-
-            for (SearchFields searchField: SearchFields.values()) {
-                res = res + searchField.getIndexName() + ":*"+term+" OR ";
-            }
-
-            // remove last OR
-            res = res.substring(0, res.length()-3);
-            res = res + ")";
-
-            return res;
-        }
     }
 
 
