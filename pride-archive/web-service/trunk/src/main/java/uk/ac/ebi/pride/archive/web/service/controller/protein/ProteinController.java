@@ -23,7 +23,7 @@ import java.util.List;
 * @author Florian Reisinger
 * @since 1.0.8
 */
-@Api(value = "retrieve protein identifications", position = 3)
+@Api(value = "protein", description = "retrieve protein identifications", position = 3)
 @Controller
 @RequestMapping(value = "/protein")
 public class ProteinController {
@@ -89,16 +89,10 @@ public class ProteinController {
             ) {
         logger.info("Proteins for project " + projectAccession + " requested");
 
-        List<ProteinDetail> resultProteins = null;
-        try {
-            List<ProteinIdentification> foundProteins = pissService.findByProjectAccession(projectAccession, new PageRequest(page, showResults)).getContent();
-//            List<ProteinIdentification> foundProteins = pissService.findByProjectAccession(projectAccession);
-            // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects
-            resultProteins = ObjectMapper.mapProteinIdentifiedListToWSProteinDetailList(foundProteins);
-        } catch (Exception e) {
-            // ToDo: handle properly!
-            System.out.println("Exception during secure protein identification search: " + e.getStackTrace());
-        }
+        List<ProteinIdentification> foundProteins = pissService.findByProjectAccession(projectAccession, new PageRequest(page, showResults)).getContent();
+
+        // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects
+        List<ProteinDetail>resultProteins = ObjectMapper.mapProteinIdentifiedListToWSProteinDetailList(foundProteins);
 
         return new ProteinDetailList(resultProteins);
     }
@@ -118,15 +112,9 @@ public class ProteinController {
             ) {
         logger.info("Proteins for assay " + assayAccession + " requested");
 
-        List<ProteinDetail> resultProteins = null;
-        try {
-            List<ProteinIdentification> foundProteins = pissService.findByAssayAccession(assayAccession, new PageRequest(page, showResults)).getContent();
-            // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects
-            resultProteins = ObjectMapper.mapProteinIdentifiedListToWSProteinDetailList(foundProteins);
-        } catch (Exception e) {
-            // ToDo: handle properly!
-            System.out.println("Exception during secure protein identification search service call " + e.getStackTrace());
-        }
+        List<ProteinIdentification> foundProteins = pissService.findByAssayAccession(assayAccession, new PageRequest(page, showResults)).getContent();
+        // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects
+        List<ProteinDetail> resultProteins = ObjectMapper.mapProteinIdentifiedListToWSProteinDetailList(foundProteins);
 
         return new ProteinDetailList(resultProteins);
     }
