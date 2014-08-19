@@ -41,7 +41,7 @@ import java.util.*;
  * @author florian@ebi.ac.uk
  * @since 1.0.4
  */
-@Api(value = "retrieve details about dataset files", position = 2)
+@Api(value = "file", description = "retrieve details about dataset files", position = 2)
 @Controller
 @RequestMapping(value = "/file")
 public class FileController {
@@ -166,16 +166,17 @@ public class FileController {
         if (isPublicResource(projectSummary)) {
             String ftpPath = buildPublicFtpPathForProject(projectSummary.getAccession(), projectSummary.getPublicationDate());
             addFtpUrls(fileDetails, ftpPath);
-        } else {
-            // ToDo: create real private FTP path links once they are available
-            // now there is not private path, so we don't add any FTP links
+        }
+//        else {
+//            // ToDo: create real private FTP path links once they are available
+//            // now there is not private path, so we don't add any FTP links
 //            // we probably need/want user specific private locations, so we retrieve data from the security context
 //            Authentication a = SecurityContextHolder.getContext().getAuthentication();
 //            UserDetails currentUser = (UserDetails)a.getPrincipal();
 //            // add private URLs for the project files
 //            ftpPath = buildPrivateFtpPathForProject(projectSummary.getAccession(), currentUser.getUsername());
 //            addFtpUrls(fileDetails, ftpPath);
-        }
+//        }
 
         Collections.sort(fileDetails, new DefaultFileComparator());
 
@@ -212,16 +213,17 @@ public class FileController {
         if (isPublicResource(projectSummary)) {
             String ftpPath = buildPublicFtpPathForProject(projectSummary.getAccession(), projectSummary.getPublicationDate());
             addFtpUrls(fileDetails, ftpPath);
-        } else {
-            // ToDo: create real private FTP path links once they are available
-            // now there is not private path, so we don't add any FTP links
+        }
+//        else {
+//            // ToDo: create real private FTP path links once they are available
+//            // now there is not private path, so we don't add any FTP links
 //            // we probably need/want user specific private locations, so we retrieve data from the security context
 //            Authentication a = SecurityContextHolder.getContext().getAuthentication();
 //            UserDetails currentUser = (UserDetails)a.getPrincipal();
 //            // add private URLs for the project files
 //            ftpPath = buildPrivateFtpPathForProject(projectSummary.getAccession(), currentUser.getUsername());
 //            addFtpUrls(fileDetails, ftpPath);
-        }
+//        }
 
         Collections.sort(fileDetails, new DefaultFileComparator());
 
@@ -284,14 +286,14 @@ public class FileController {
 
         return ftpPublicRoot + datePath + "/" + projectAccession;
     }
-    private String buildPrivateFtpPathForProject(String projectAccession, String username) {
-        return ftpPrivateRoot + getPrivateDirectoryName(projectAccession, username);
-    }
-    private String getPrivateDirectoryName(String projectAccession, String username) {
-        // ToDo: define how to generate the private directory from the provided details
-        // ToDo: should also go into a separate lib that can be used by the pipeline to contruct the directories
-        return "notImplementedYet";
-    }
+//    private String buildPrivateFtpPathForProject(String projectAccession, String username) {
+//        return ftpPrivateRoot + getPrivateDirectoryName(projectAccession, username);
+//    }
+//    private String getPrivateDirectoryName(String projectAccession, String username) {
+//        // ToDo: define how to generate the private directory from the provided details
+//        // ToDo: should also go into a separate lib that can be used by the pipeline to contruct the directories
+//        return "notImplementedYet";
+//    }
 
     private void updateAssayAccCache(Collection<FileSummary> fileSummaries) {
         for (FileSummary fileSummary : fileSummaries) {
@@ -314,9 +316,9 @@ public class FileController {
         }
     }
 
-    private void updateProjectAccCache(long projectID) {
-        updateProjectAccCache(projectID, null);
-    }
+//    private void updateProjectAccCache(long projectID) {
+//        updateProjectAccCache(projectID, null);
+//    }
     private void updateProjectAccCache(long projectID, String projectAccession) {
         if ( !IdMapper.getInstance().containsProteinId(projectID) ) {
             if (projectAccession == null || projectAccession.trim().isEmpty()) {
