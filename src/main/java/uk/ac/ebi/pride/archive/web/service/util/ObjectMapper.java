@@ -33,6 +33,7 @@ import java.util.*;
 public final class ObjectMapper {
 
     private static final String NOT_APPLICABLE = "N/A";
+    private static final String NEUTRAL_LOSS = "neutral loss";
 
 
     // Project map methods
@@ -433,7 +434,18 @@ public final class ObjectMapper {
 
         Set<ModifiedLocation> mappedObjects = new HashSet<ModifiedLocation>();
         for (T mod : objects) {
-            mappedObjects.add( new ModifiedLocation(mod.getAccession(), mod.getMainPosition()) );
+            if (mod.getMainPosition() == null || mod.getMainPosition() < 0) {
+                // we ignore modifications that don't specify a main location
+                continue;
+            }
+            // we ignore neutral loss annotations if there is a main modification accession
+            // in case there is no main modification, but there is a neutral loss annotation
+            // we add the neutral loss as main modification for the given position
+            if (mod.getAccession() == null && mod.getNeutralLoss() != null) {
+                mappedObjects.add(new ModifiedLocation(NEUTRAL_LOSS, mod.getMainPosition()));
+            } else {
+                mappedObjects.add( new ModifiedLocation(mod.getAccession(), mod.getMainPosition()) );
+            }
         }
 
         return mappedObjects;
