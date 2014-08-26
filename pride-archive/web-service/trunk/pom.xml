@@ -98,21 +98,21 @@
                             <port>9091</port>
                         </connector>
                     </connectors>
-                    <jettyConfig>${basedir}/jetty.xml</jettyConfig>
+                    <!--<jettyConfig>${basedir}/jetty.xml</jettyConfig>-->
                     <scanIntervalSeconds>10</scanIntervalSeconds>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.oracle</groupId>
-                        <artifactId>oracle-thin</artifactId>
-                        <version>11.2.0.1.0</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>commons-dbcp</groupId>
-                        <artifactId>commons-dbcp</artifactId>
-                        <version>1.2.2</version>
-                    </dependency>
-                </dependencies>
+                <!--<dependencies>-->
+                    <!--<dependency>-->
+                        <!--<groupId>com.oracle</groupId>-->
+                        <!--<artifactId>oracle-thin</artifactId>-->
+                        <!--<version>11.2.0.1.0</version>-->
+                    <!--</dependency>-->
+                    <!--<dependency>-->
+                        <!--<groupId>commons-dbcp</groupId>-->
+                        <!--<artifactId>commons-dbcp</artifactId>-->
+                        <!--<version>1.2.2</version>-->
+                    <!--</dependency>-->
+                <!--</dependencies>-->
             </plugin>
         </plugins>
     </build>
