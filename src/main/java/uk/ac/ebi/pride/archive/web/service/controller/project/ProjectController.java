@@ -72,6 +72,9 @@ public class ProjectController {
 
         ProjectSummary projectSummary = projectService.findByAccession(accession);
         if (projectSummary == null) {
+            // ToDo: actually this should never happen, since the project secure service makes sure to throw an exception
+            // ToDo: whenever the user does not have access to a requested project (even if the project does not exist)
+            // ToDo: perhaps this should be changed and the client should decide whether to throw and authorisation or not found exception?
             throw new ResourceNotFoundException("No project found for accession: " + accession);
         }
 
