@@ -62,10 +62,10 @@ public class ProteinControllerFunctionalTest {
         list.add(protein);
 
         Page<ProteinIdentification> page = new PageImpl<ProteinIdentification>(list);
-        PageRequest pageRequest = new PageRequest(1, 10);
+        PageRequest pageRequest = new PageRequest(0, 10);
         when( pissService.findByProjectAccession(PROJECT_ACCESSION, pageRequest) ).thenReturn(page);
         when( pissService.findByAssayAccession(ASSAY_ACCESSION, pageRequest) ).thenReturn(page);
-        pageRequest = new PageRequest(1, 2);
+        pageRequest = new PageRequest(0, 2);
         when( pissService.findByProjectAccession(PROJECT_ACCESSION, pageRequest) ).thenReturn(page);
         when( pissService.findByAssayAccession(ASSAY_ACCESSION, pageRequest) ).thenReturn(page);
     }
@@ -80,7 +80,7 @@ public class ProteinControllerFunctionalTest {
                 .andExpect(content().string(containsString(ASSAY_ACCESSION)))
                 .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
         // test with custom paging configuration
-        mockMvc.perform(get("/protein/list/project/" + PROJECT_ACCESSION + "?show=2&page=1"))
+        mockMvc.perform(get("/protein/list/project/" + PROJECT_ACCESSION + "?show=2&page=0"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString(PROJECT_ACCESSION)))
@@ -98,7 +98,7 @@ public class ProteinControllerFunctionalTest {
                 .andExpect(content().string(containsString(ASSAY_ACCESSION)))
                 .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
         // test with custom paging configuration
-        mockMvc.perform(get("/protein/list/assay/" + ASSAY_ACCESSION + "?show=2&page=1"))
+        mockMvc.perform(get("/protein/list/assay/" + ASSAY_ACCESSION + "?show=2&page=0"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString(PROJECT_ACCESSION)))

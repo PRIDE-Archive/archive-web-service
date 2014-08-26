@@ -35,7 +35,7 @@ public class ProteinController {
     private static final Logger logger = LoggerFactory.getLogger(ProteinController.class);
 
     protected static final int DEFAULT_SHOW = 10;
-    protected static final int DEFAULT_PAGE = 1;
+    protected static final int DEFAULT_PAGE = 0;
 
 
     @Autowired
