@@ -32,7 +32,7 @@ public class PsmController {
     private static final Logger logger = LoggerFactory.getLogger(PsmController.class);
 
     protected static final int DEFAULT_SHOW = 10;
-    protected static final int DEFAULT_PAGE = 1;
+    protected static final int DEFAULT_PAGE = 0;
 
 
     @Autowired

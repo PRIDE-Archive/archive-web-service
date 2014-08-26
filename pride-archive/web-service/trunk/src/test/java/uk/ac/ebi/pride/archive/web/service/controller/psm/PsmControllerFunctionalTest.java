@@ -64,10 +64,10 @@ public class PsmControllerFunctionalTest {
 
         Page<Psm> page = new PageImpl<Psm>(list);
 
-        PageRequest pageRequest = new PageRequest(1, 10, Sort.Direction.ASC, "peptide_sequence");
+        PageRequest pageRequest = new PageRequest(0, 10, Sort.Direction.ASC, "peptide_sequence");
         when( psmSearchService.findByProjectAccession(PROJECT_ACCESSION, pageRequest) ).thenReturn(page);
         when( psmSearchService.findByAssayAccession(ASSAY_ACCESSION, pageRequest) ).thenReturn(page);
-        pageRequest = new PageRequest(1, 2, Sort.Direction.ASC, "peptide_sequence");
+        pageRequest = new PageRequest(0, 2, Sort.Direction.ASC, "peptide_sequence");
         when( psmSearchService.findByProjectAccession(PROJECT_ACCESSION, pageRequest) ).thenReturn(page);
         when( psmSearchService.findByAssayAccession(ASSAY_ACCESSION, pageRequest) ).thenReturn(page);
     }
@@ -82,7 +82,7 @@ public class PsmControllerFunctionalTest {
                 .andExpect(content().string(containsString(ASSAY_ACCESSION)))
                 .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
         // test with custom paging configuration
-        mockMvc.perform(get("/peptide/list/project/" + PROJECT_ACCESSION + "?show=2&page=1"))
+        mockMvc.perform(get("/peptide/list/project/" + PROJECT_ACCESSION + "?show=2&page=0"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString(PROJECT_ACCESSION)))
@@ -100,7 +100,7 @@ public class PsmControllerFunctionalTest {
                 .andExpect(content().string(containsString(ASSAY_ACCESSION)))
                 .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
         // test with custom paging configuration
-        mockMvc.perform(get("/peptide/list/assay/" + ASSAY_ACCESSION + "?show=2&page=1"))
+        mockMvc.perform(get("/peptide/list/assay/" + ASSAY_ACCESSION + "?show=2&page=0"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString(PROJECT_ACCESSION)))

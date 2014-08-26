@@ -45,7 +45,7 @@ public class ProjectController {
     protected static final String SCORE_SORTING_CRITERIA = "score";
     protected static final String DESCENDING_ORDER = "desc";
     protected static final int DEFAULT_SHOW = 100;
-    protected static final int DEFAULT_PAGE = 1;
+    protected static final int DEFAULT_PAGE = 0;
 
     @Autowired
     private ProjectSearchService projectSearchService;
