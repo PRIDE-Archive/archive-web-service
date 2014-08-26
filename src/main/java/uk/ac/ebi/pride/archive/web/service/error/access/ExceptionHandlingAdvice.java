@@ -1,5 +1,6 @@
 package uk.ac.ebi.pride.archive.web.service.error.access;
 
+import javassist.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.social.InternalServerErrorException;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import uk.ac.ebi.pride.archive.web.service.error.exception.InvalidDataException;
 import uk.ac.ebi.pride.archive.web.service.error.exception.ResourceNotFoundException;
 import uk.ac.ebi.pride.web.util.exception.RestError;
 import uk.ac.ebi.pride.web.util.exception.RestErrorRegistry;
@@ -24,18 +26,25 @@ public class ExceptionHandlingAdvice {
 
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AccessDeniedException.class)
-    public
+    private
     @ResponseBody
     RestError handleAccessDeniedException(AccessDeniedException ex, Principal principal) {
-        RestError accessDeny = RestErrorRegistry.getRestErrorByClass(AccessDeniedException.class);
-
-        if (principal != null) {
-            accessDeny.setDeveloperMessage("Access denied for user " + principal.getName());
+        // distinguish two cases:
+        //      request for private data, but no user credentials present
+        //      user credentials present, but access forbidden for user
+        if (principal == null) {
+            return new RestError(HttpStatus.UNAUTHORIZED,
+                    HttpStatus.UNAUTHORIZED.value(),
+                    "Private data! Please log in.",
+                    "Authorisation required.",
+                    "http://www.ebi.ac.uk/pride/archive/login",
+                    null);
         } else {
-            accessDeny.setDeveloperMessage("Access denied for unknown user details.");
+            return new RestError(HttpStatus.FORBIDDEN,
+                    HttpStatus.FORBIDDEN.value(),
+                    "Access denied for user " + principal.getName(),
+                    null);
         }
-
-        return accessDeny;
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
@@ -43,16 +52,41 @@ public class ExceptionHandlingAdvice {
     public
     @ResponseBody
     RestError handleResourceNotFoundException(ResourceNotFoundException ex) {
-        // ToDo: perhaps add to RestErrorRegistry in the web utils package
-        return new RestError(HttpStatus.NOT_FOUND, 99999, ex.getMessage(), null);
+        return new RestError(HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value(),
+                "Not found: " + ex.getMessage(),
+                "Repository search returned no result.",
+                "If this record should exist, please contact pride-support@ebi.ac.uk",
+                null);
     }
 
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(InternalServerErrorException.class)
-    public
+    @ExceptionHandler(Exception.class)
+    private
     @ResponseBody
-    RestError handleInternalServerErrorException(InternalServerErrorException ex) {
-        // ToDo: perhaps add to RestErrorRegistry in the web utils package
-        return new RestError(HttpStatus.INTERNAL_SERVER_ERROR, 99998, ex.getMessage(), null);
+    RestError handleAnyOtherException(Exception ex) {
+        return new RestError(HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error: " + ex.getMessage(),
+                "Please report to pride-support@ebi.ac.uk",
+                null,
+                null);
     }
+
+
+
+    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(InvalidDataException.class)
+    private
+    @ResponseBody
+    RestError handleIllegalArgumentException(InvalidDataException ex) {
+        return new RestError(HttpStatus.UNPROCESSABLE_ENTITY,
+                HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                "Invalid data." + ex.getMessage(),
+                null);
+    }
+
+
+
+
 }
