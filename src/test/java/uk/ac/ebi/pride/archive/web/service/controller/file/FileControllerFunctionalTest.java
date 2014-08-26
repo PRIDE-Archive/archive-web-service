@@ -89,6 +89,7 @@ public class FileControllerFunctionalTest {
         ProjectSummary projectSummary = new ProjectSummary();
         projectSummary.setId(PROJECT_ID);
         projectSummary.setAccession(PROJECT_ACCESSION);
+        projectSummary.setPublicProject(true);
         // set a date, so the FTP download path can be created (needs to match the FTP path defined above)
         Date date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).parse("2010-01-30");
         projectSummary.setPublicationDate(date);

@@ -1,6 +1,7 @@
 package uk.ac.ebi.pride.archive.web.service.util;
 
 import uk.ac.ebi.pride.archive.dataprovider.assay.instrument.InstrumentProvider;
+import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileSource;
 import uk.ac.ebi.pride.archive.dataprovider.identification.ModificationProvider;
 import uk.ac.ebi.pride.archive.dataprovider.param.CvParamProvider;
 import uk.ac.ebi.pride.archive.dataprovider.person.Title;
@@ -16,7 +17,6 @@ import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
 import uk.ac.ebi.pride.archive.web.service.model.common.ModifiedLocation;
 import uk.ac.ebi.pride.archive.web.service.model.contact.ContactDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
-import uk.ac.ebi.pride.archive.web.service.model.file.FileType;
 import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetail;
 import uk.ac.ebi.pride.archive.web.service.model.project.ProjectDetail;
 import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetail;
@@ -288,6 +288,7 @@ public final class ObjectMapper {
 
 
     // File map methods
+    // Map File details (but don't provide a download link, that is done separately!)
     public static FileDetail mapFileSummaryToWSFileDetail(FileSummary fileSummary) {
         if (fileSummary == null) { return null; }
 
@@ -304,7 +305,8 @@ public final class ObjectMapper {
         }
         mappedObject.setFileName( fileSummary.getFileName() );
         mappedObject.setFileSize( fileSummary.getFileSize() );
-        mappedObject.setFileType( FileType.findForName(fileSummary.getFileType().name()) );
+        mappedObject.setFileType( fileSummary.getFileType() );
+        mappedObject.setFileSource( fileSummary.getFileSource() );
 
         return mappedObject;
     }
@@ -314,6 +316,10 @@ public final class ObjectMapper {
 
         List<FileDetail> mappedObjects = new ArrayList<FileDetail>(fileSummaries.size());
         for (FileSummary fileSummary : fileSummaries) {
+            if (fileSummary.getFileSource() == ProjectFileSource.INTERNAL) {
+                // we skip internal files
+                continue;
+            }
             mappedObjects.add( mapFileSummaryToWSFileDetail(fileSummary) );
         }
         return mappedObjects;
