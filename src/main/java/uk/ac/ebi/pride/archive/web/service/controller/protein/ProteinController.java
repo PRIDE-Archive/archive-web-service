@@ -28,10 +28,6 @@ import java.util.List;
 @RequestMapping(value = "/protein")
 public class ProteinController {
 
-
-    // ToDo: before we can use this service for a public interface, the methods have to be secured, which currently is not easily possible
-
-
     private static final Logger logger = LoggerFactory.getLogger(ProteinController.class);
 
     protected static final int DEFAULT_SHOW = 10;
@@ -97,7 +93,20 @@ public class ProteinController {
         return new ProteinDetailList(resultProteins);
     }
 
-    @ApiOperation(value = "retrieve protein identifications by assay accession", position = 3)
+    @ApiOperation(value = "count protein identifications by project accession", position = 3)
+    @RequestMapping(value = "/count/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public
+    @ResponseBody
+    Long countProteinsByProject(
+            @ApiParam(value = "a project accession")
+            @PathVariable("projectAccession") String projectAccession
+    ) {
+        logger.info("Protein count for project " + projectAccession + " requested");
+        return pissService.countByProjectAccession(projectAccession);
+    }
+
+    @ApiOperation(value = "retrieve protein identifications by assay accession", position = 4)
     @RequestMapping(value = "/list/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
@@ -117,6 +126,19 @@ public class ProteinController {
         List<ProteinDetail> resultProteins = ObjectMapper.mapProteinIdentifiedListToWSProteinDetailList(foundProteins);
 
         return new ProteinDetailList(resultProteins);
+    }
+
+    @ApiOperation(value = "count protein identifications by assay accession", position = 4)
+    @RequestMapping(value = "/count/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public
+    @ResponseBody
+    Long countProteinsByAssay(
+            @ApiParam(value = "an assay accession")
+            @PathVariable("assayAccession") String assayAccession
+    ) {
+        logger.info("Proteins for assay " + assayAccession + " requested");
+        return pissService.countByAssayAccession(assayAccession);
     }
 
 }
