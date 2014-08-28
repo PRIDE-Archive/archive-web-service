@@ -321,6 +321,10 @@ public final class ObjectMapper {
                 // we skip internal files
                 continue;
             }
+            if (fileSummary.getFileSource() == ProjectFileSource.GENERATED) {
+                // for now also skip generated files, until we decide to make them public
+                continue;
+            }
             mappedObjects.add( mapFileSummaryToWSFileDetail(fileSummary) );
         }
         return mappedObjects;
