@@ -107,6 +107,21 @@ public class AssayController {
 
         return new AssayDetailList(assayDetails);
     }
+    @ApiOperation(value = "list assays for a project", position = 3)
+    @RequestMapping(value = "/count/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public
+    @ResponseBody
+    Long countByProjectAccession(
+            @ApiParam(value = "a project accession number")
+            @PathVariable("projectAccession") String accession) {
+
+        logger.info("Assay count required for project " + accession);
+
+        Long assayCount = assayService.countByProjectAccession(accession);
+
+        return assayCount;
+    }
 
     private void updateAssayAccCache(long assayID, String assayAccession) {
         if ( !IdMapper.getInstance().containsAssayId(assayID) ) {
