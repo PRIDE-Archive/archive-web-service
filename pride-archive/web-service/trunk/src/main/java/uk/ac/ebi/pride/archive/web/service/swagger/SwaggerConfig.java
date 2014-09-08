@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileSource;
+
+import java.net.URL;
 
 /**
  * @author florian@ebi.ac.uk.
@@ -35,6 +38,8 @@ public class SwaggerConfig {
                 // try the default RelativeSwaggerPathProvider ToDo: test with public deployment
                 //.pathProvider(new DocuPathProvider())
                 .apiListingReferenceOrdering(new ResourceListingPositionalOrdering())
+                .directModelSubstitute(URL.class, String.class) // don't document URL as complex object, but as simple string
+                .directModelSubstitute(ProjectFileSource.class, String.class) // don't all enum values (as some will never make it to the client), just us string and use description to show possible values
                 .apiDescriptionOrdering(new ApiDescriptionPositionOrdering())
                 .includePatterns("/.*");
     }
