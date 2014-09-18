@@ -24,6 +24,7 @@ import uk.ac.ebi.pride.archive.web.service.error.exception.ResourceNotFoundExcep
 import uk.ac.ebi.pride.archive.web.service.model.project.ProjectDetail;
 import uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummaryList;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
+import uk.ac.ebi.pride.archive.web.service.util.WsUtils;
 
 import java.security.Principal;
 import java.util.*;
@@ -44,8 +45,6 @@ public class ProjectController {
     private static final String DATE_SORTING_CRITERIA = "publication_date";
     protected static final String SCORE_SORTING_CRITERIA = "score";
     protected static final String DESCENDING_ORDER = "desc";
-    protected static final int DEFAULT_SHOW = 100;
-    protected static final int DEFAULT_PAGE = 0;
 
     @Autowired
     private ProjectSearchService projectSearchService;
@@ -93,10 +92,10 @@ public class ProjectController {
     ProjectSummaryList simpleSearchProjects(
             @ApiParam(value = "search term to query for")
             @RequestParam(value = "q", required = false, defaultValue = "") String term,
-            @ApiParam(value = "how many results to show per page")
-            @RequestParam(value = "show", defaultValue = DEFAULT_SHOW+"") int showResults,
-            @ApiParam(value = "which page of the result to return")
-            @RequestParam(value = "page", defaultValue = DEFAULT_PAGE+"") int page,
+            @ApiParam(value = "how many results to return per page")
+            @RequestParam(value = "show", defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
+            @ApiParam(value = "which page (starting from 1) of the result to return")
+            @RequestParam(value = "page", defaultValue = WsUtils.DEFAULT_PAGE+"") int page,
             @ApiParam(value = "the field to sort on")
             @RequestParam(value = "sort", required = false, defaultValue = "") String sortBy,
             @ApiParam(value = "the sorting order (asc or desc)")
@@ -120,6 +119,8 @@ public class ProjectController {
             @ApiParam(value = "filter by project tags")
             @RequestParam(value = "projectTagFilter", required = false, defaultValue = "") String[] projectTagFilter
             ) throws org.apache.solr.common.SolrException {
+
+        // Note: since the search service expects 1 based paging, we don't need to adjust the page parameter
 
         // nonsense request, but can happen...
         if (showResults < 1) {
