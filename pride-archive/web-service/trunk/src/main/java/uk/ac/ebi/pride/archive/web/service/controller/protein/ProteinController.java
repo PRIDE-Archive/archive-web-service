@@ -16,6 +16,7 @@ import uk.ac.ebi.pride.archive.security.protein.ProteinIdentificationSecureSearc
 import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetail;
 import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetailList;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
+import uk.ac.ebi.pride.archive.web.service.util.WsUtils;
 import uk.ac.ebi.pride.proteinidentificationindex.search.model.ProteinIdentification;
 
 import java.util.List;
@@ -31,9 +32,6 @@ import java.util.Set;
 public class ProteinController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProteinController.class);
-
-    protected static final int DEFAULT_SHOW = 10;
-    protected static final int DEFAULT_PAGE = 0;
 
 
     @Autowired
@@ -80,12 +78,13 @@ public class ProteinController {
     ProteinDetailList getProteinsByProject(
             @ApiParam(value = "a project accession")
             @PathVariable("projectAccession") String projectAccession,
-            @ApiParam(value = "how many results to show per page")
-            @RequestParam(value = "show", required = false, defaultValue = DEFAULT_SHOW+"") int showResults,
-            @ApiParam(value = "which page of the result to return")
-            @RequestParam(value = "page", required = false, defaultValue = DEFAULT_PAGE+"") int page
+            @ApiParam(value = "how many results to return per page")
+            @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
+            @ApiParam(value = "which page (starting from 1) of the result to return")
+            @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
             ) {
         logger.info("Proteins for project " + projectAccession + " requested");
+        page = WsUtils.adjustPage(page);
 
         List<ProteinIdentification> foundProteins = pissService.findByProjectAccession(projectAccession, new PageRequest(page, showResults)).getContent();
 
@@ -116,12 +115,13 @@ public class ProteinController {
     ProteinDetailList getProteinsByAssay(
             @ApiParam(value = "an assay accession")
             @PathVariable("assayAccession") String assayAccession,
-            @ApiParam(value = "how many results to show per page")
-            @RequestParam(value = "show", required = false, defaultValue = DEFAULT_SHOW+"") int showResults,
-            @ApiParam(value = "which page of the result to return")
-            @RequestParam(value = "page", required = false, defaultValue = DEFAULT_PAGE+"") int page
+            @ApiParam(value = "how many results to return per page")
+            @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
+            @ApiParam(value = "which page (starting from 1) of the result to return")
+            @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
             ) {
         logger.info("Proteins for assay " + assayAccession + " requested");
+        page = WsUtils.adjustPage(page);
 
         List<ProteinIdentification> foundProteins = pissService.findByAssayAccession(assayAccession, new PageRequest(page, showResults)).getContent();
         // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects

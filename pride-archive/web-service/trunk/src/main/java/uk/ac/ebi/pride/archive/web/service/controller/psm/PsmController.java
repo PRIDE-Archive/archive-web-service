@@ -16,6 +16,7 @@ import uk.ac.ebi.pride.archive.security.psm.PsmSecureSearchService;
 import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetail;
 import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetailList;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
+import uk.ac.ebi.pride.archive.web.service.util.WsUtils;
 import uk.ac.ebi.pride.psmindex.search.model.Psm;
 
 import java.util.List;
@@ -30,9 +31,6 @@ import java.util.List;
 public class PsmController {
 
     private static final Logger logger = LoggerFactory.getLogger(PsmController.class);
-
-    protected static final int DEFAULT_SHOW = 10;
-    protected static final int DEFAULT_PAGE = 0;
 
 
     @Autowired
@@ -92,12 +90,13 @@ public class PsmController {
     PsmDetailList getPsmsByProject(
             @ApiParam(value = "a project accession")
             @PathVariable("projectAccession") String projectAccession,
-            @ApiParam(value = "how many results to show per page")
-            @RequestParam(value = "show", required = false, defaultValue = DEFAULT_SHOW+"") int showResults,
-            @ApiParam(value = "which page of the result to return")
-            @RequestParam(value = "page", required = false, defaultValue = DEFAULT_PAGE+"") int page
+            @ApiParam(value = "how many results to return per page")
+            @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
+            @ApiParam(value = "which page (starting from 1) of the result to return")
+            @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
     ) {
         logger.info("Peptides for project " + projectAccession + " requested");
+        page = WsUtils.adjustPage(page);
 
         List<Psm> foundPsms = psmSecureSearchService.findByProjectAccession(projectAccession, new PageRequest(page, showResults, Sort.Direction.ASC, "peptide_sequence")).getContent();
 
@@ -172,12 +171,14 @@ public class PsmController {
     PsmDetailList getPsmsByAssay(
             @ApiParam(value = "an assay accession")
             @PathVariable("assayAccession") String assayAccession,
-            @ApiParam(value = "how many results to show per page")
-            @RequestParam(value = "show", required = false, defaultValue = DEFAULT_SHOW+"") int showResults,
-            @ApiParam(value = "which page of the result to return")
-            @RequestParam(value = "page", required = false, defaultValue = DEFAULT_PAGE+"") int page
+            @ApiParam(value = "how many results to return per page")
+            @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
+            @ApiParam(value = "which page (starting from 1) of the result to return")
+            @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
     ) {
         logger.info("PSMs for assay " + assayAccession + " requested");
+        page = WsUtils.adjustPage(page);
+
 
         List<Psm> foundPsms = psmSecureSearchService.findByAssayAccession(assayAccession, new PageRequest(page, showResults, Sort.Direction.ASC, "peptide_sequence")).getContent();
 
@@ -186,6 +187,7 @@ public class PsmController {
 
         return new PsmDetailList(resultPsms);
     }
+
 
     @ApiOperation(value = "count peptide identifications by assay accession", position = 5)
     @RequestMapping(value = "/count/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
