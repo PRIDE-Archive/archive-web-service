@@ -119,7 +119,7 @@ public class AssayController {
         logger.info("Assay count required for project " + accession);
 
         Long assayCount = assayService.countByProjectAccession(accession);
-
+        logger.debug("Retrieved " + assayCount +" assays for project " + accession);
         return assayCount;
     }
 
