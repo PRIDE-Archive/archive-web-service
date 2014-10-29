@@ -45,11 +45,11 @@
     </bean>
 
     <!-- Protein repository -->
-    <bean id="solrProteinRepositoryFactory" class="uk.ac.ebi.pride.proteinindex.search.search.repository.SolrProteinIdentificationRepositoryFactory">
+    <bean id="solrProteinRepositoryFactory" class="uk.ac.ebi.pride.proteinidentificationindex.search.service.repository.SolrProteinIdentificationRepositoryFactory">
         <constructor-arg ref="proteinSolrTemplate"/>
     </bean>
 
-    <bean id="proteinSearchService" class="uk.ac.ebi.pride.proteinindex.search.search.service.ProteinIdentificationSearchService">
+    <bean id="proteinSearchService" class="uk.ac.ebi.pride.proteinidentificationindex.search.service.ProteinIdentificationSearchService">
         <constructor-arg value="#{ solrProteinRepositoryFactory.create() }"/>
     </bean>
 
