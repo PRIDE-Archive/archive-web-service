@@ -340,11 +340,22 @@ public final class ObjectMapper {
         for (ProteinIdentification proteinIdentified : proteins) {
             ProteinDetail mappedObject = new ProteinDetail();
             mappedObject.setAccession(proteinIdentified.getAccession());
-            mappedObject.setSynonyms(proteinIdentified.getSynonyms());
+            Set<String> synonyms = new HashSet<String>(2);
+            if (proteinIdentified.getEnsemblMapping() != null) {
+                synonyms.add(proteinIdentified.getEnsemblMapping());
+            }
+            if (proteinIdentified.getUniprotMapping() != null) {
+                synonyms.add(proteinIdentified.getUniprotMapping());
+            }
+            mappedObject.setSynonyms(synonyms);
             mappedObject.setProjectAccession(proteinIdentified.getProjectAccession());
             mappedObject.setAssayAccession(proteinIdentified.getAssayAccession());
             mappedObject.setDescription(proteinIdentified.getDescription());
-            mappedObject.setSequence(proteinIdentified.getSequence());
+            String sequence = proteinIdentified.getSubmittedSequence();
+            if (sequence == null) {
+                sequence = proteinIdentified.getInferredSequence();
+            }
+            mappedObject.setSequence(sequence);
             mappedObjects.add(mappedObject);
         }
 
