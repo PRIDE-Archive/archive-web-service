@@ -84,7 +84,6 @@ public class ProteinController {
             @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
             ) {
         logger.info("Proteins for project " + projectAccession + " requested");
-        page = WsUtils.adjustPage(page);
 
         List<ProteinIdentification> foundProteins = pissService.findByProjectAccession(projectAccession, new PageRequest(page, showResults)).getContent();
 
@@ -121,7 +120,6 @@ public class ProteinController {
             @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
             ) {
         logger.info("Proteins for assay " + assayAccession + " requested");
-        page = WsUtils.adjustPage(page);
 
         List<ProteinIdentification> foundProteins = pissService.findByAssayAccession(assayAccession, new PageRequest(page, showResults)).getContent();
         // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects
