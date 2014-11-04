@@ -150,7 +150,7 @@ public class ProjectController {
                 Arrays.asList(projectTagFilter)
         );
 
-        int start = showResults * (page - 1);
+        int start = showResults * (page);
 
         Collection<ProjectSearchSummary> projects = projectSearchService.searchProjects(
                 queryTerm,

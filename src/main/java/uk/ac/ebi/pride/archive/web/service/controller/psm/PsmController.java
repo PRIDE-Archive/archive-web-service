@@ -96,7 +96,6 @@ public class PsmController {
             @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
     ) {
         logger.info("Peptides for project " + projectAccession + " requested");
-        page = WsUtils.adjustPage(page);
 
         List<Psm> foundPsms = psmSecureSearchService.findByProjectAccession(projectAccession, new PageRequest(page, showResults, Sort.Direction.ASC, "peptide_sequence")).getContent();
 
@@ -177,8 +176,6 @@ public class PsmController {
             @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
     ) {
         logger.info("PSMs for assay " + assayAccession + " requested");
-        page = WsUtils.adjustPage(page);
-
 
         List<Psm> foundPsms = psmSecureSearchService.findByAssayAccession(assayAccession, new PageRequest(page, showResults, Sort.Direction.ASC, "peptide_sequence")).getContent();
 
