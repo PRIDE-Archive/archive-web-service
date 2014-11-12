@@ -338,28 +338,38 @@ public final class ObjectMapper {
 
         List<ProteinDetail> mappedObjects = new ArrayList<ProteinDetail>();
         for (ProteinIdentification proteinIdentified : proteins) {
-            ProteinDetail mappedObject = new ProteinDetail();
-            mappedObject.setAccession(proteinIdentified.getAccession());
-            Set<String> synonyms = new HashSet<String>(2);
-            if (proteinIdentified.getEnsemblMapping() != null) {
-                synonyms.add(proteinIdentified.getEnsemblMapping());
-            }
-            if (proteinIdentified.getUniprotMapping() != null) {
-                synonyms.add(proteinIdentified.getUniprotMapping());
-            }
-            mappedObject.setSynonyms(synonyms);
-            mappedObject.setProjectAccession(proteinIdentified.getProjectAccession());
-            mappedObject.setAssayAccession(proteinIdentified.getAssayAccession());
-            mappedObject.setDescription(proteinIdentified.getDescription());
-            String sequence = proteinIdentified.getSubmittedSequence();
-            if (sequence == null) {
-                sequence = proteinIdentified.getInferredSequence();
-            }
-            mappedObject.setSequence(sequence);
+            ProteinDetail mappedObject = mapProteinIdentifiedToWSProteinDetail(proteinIdentified);
             mappedObjects.add(mappedObject);
         }
 
         return mappedObjects;
+    }
+
+    private static ProteinDetail mapProteinIdentifiedToWSProteinDetail(ProteinIdentification proteinIdentified) {
+        ProteinDetail mappedObject = new ProteinDetail();
+        mappedObject.setAccession(proteinIdentified.getAccession());
+        Set<String> synonyms = new HashSet<String>(2);
+        if (proteinIdentified.getEnsemblMapping() != null) {
+            synonyms.add(proteinIdentified.getEnsemblMapping());
+        }
+        if (proteinIdentified.getUniprotMapping() != null) {
+            synonyms.add(proteinIdentified.getUniprotMapping());
+        }
+        mappedObject.setSynonyms(synonyms);
+        mappedObject.setProjectAccession(proteinIdentified.getProjectAccession());
+        mappedObject.setAssayAccession(proteinIdentified.getAssayAccession());
+        mappedObject.setDescription(proteinIdentified.getDescription());
+        if (proteinIdentified.getSubmittedSequence() != null) {
+            mappedObject.setSequence(proteinIdentified.getSubmittedSequence());
+            mappedObject.setSequenceType(ProteinDetail.SequenceType.SUBMITTED);
+        } else if (proteinIdentified.getInferredSequence() != null) {
+            mappedObject.setSequence(proteinIdentified.getInferredSequence());
+            mappedObject.setSequenceType(ProteinDetail.SequenceType.INFERRED);
+        } else {
+            mappedObject.setSequence(null);
+            mappedObject.setSequenceType(ProteinDetail.SequenceType.NOT_AVAILABLE);
+        }
+        return mappedObject;
     }
 
 
