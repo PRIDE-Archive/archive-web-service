@@ -17,6 +17,7 @@
 
     <!-- Callback filter for cross server query support -->
     <bean class="uk.ac.ebi.pride.web.util.callback.filter.JsonpCallbackFilter" id="jsonpCallbackFilter"/>
+    <bean class="uk.ac.ebi.pride.archive.web.service.util.filter.SimpleCORSFilter" id="corsFilter"/>
 
     <bean id="filePathBuilder" class="uk.ac.ebi.pride.archive.utils.config.FilePathBuilderPride3"/>
 
