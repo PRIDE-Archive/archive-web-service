@@ -10,6 +10,7 @@ import javax.servlet.ServletContext;
  * @author Florian Reisinger
  * @since 1.0.4
  */
+@Deprecated
 public class DocuPathProvider {}
 //        implements SwaggerPathProvider {
 //
