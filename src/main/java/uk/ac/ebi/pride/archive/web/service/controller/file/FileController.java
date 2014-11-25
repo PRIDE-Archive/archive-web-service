@@ -267,6 +267,8 @@ public class FileController {
     }
 
 
+    // ToDo: count method for assay file list
+
     /**
      * Annotate the FileDetail object in the provided collection with the FTP download link for a given project.
      * This uses a pre-configured FTP domain URL as basis.
