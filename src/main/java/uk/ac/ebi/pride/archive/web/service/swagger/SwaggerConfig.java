@@ -35,19 +35,23 @@ public class SwaggerConfig {
     public SwaggerSpringMvcPlugin customImplementation(){
         return new SwaggerSpringMvcPlugin(this.springSwaggerConfig)
                 .apiInfo(apiInfo())
-                // try the default RelativeSwaggerPathProvider ToDo: test with public deployment
-                //.pathProvider(new DocuPathProvider())
+                // PRIDE Archive RESTful API version
+                .apiVersion("1.1")
+                // try the default RelativeSwaggerPathProvider
                 .apiListingReferenceOrdering(new ResourceListingPositionalOrdering())
+                // direct overwrites of model classes
                 .directModelSubstitute(URL.class, String.class) // don't document URL as complex object, but as simple string
-                .directModelSubstitute(ProjectFileSource.class, String.class) // don't all enum values (as some will never make it to the client), just us string and use description to show possible values
+                .directModelSubstitute(ProjectFileSource.class, String.class) // don't list all enum values (as some will never make it to the client), just use string and use API description annotation to show possible values
+                // overwrite the default ordering of description annotations
                 .apiDescriptionOrdering(new ApiDescriptionPositionOrdering())
                 .includePatterns("/.*");
     }
 
     private ApiInfo apiInfo() {
         return new ApiInfo(
-                "PRIDE Archive web service API",
-                "Programmatic access to the PRIDE Archive data via RESTful Web Services.",
+                "PRIDE Archive RESTful web service API",
+                "For more details and examples please see the <a href=\"/pride/help/archive/access/webservice\">additional documentation pages</a>",
+                //"Programmatic access to the PRIDE Archive data via RESTful Web Services.",
                 "http://www.ebi.ac.uk/about/terms-of-use",
                 "pride-support@ebi.ac.uk",
                 "Apache 2.0",
