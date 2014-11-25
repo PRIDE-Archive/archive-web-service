@@ -14,11 +14,15 @@ import uk.ac.ebi.pride.archive.repo.file.service.FileSummary;
 import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
 import uk.ac.ebi.pride.archive.security.file.FileSecureService;
 import uk.ac.ebi.pride.archive.security.project.ProjectSecureService;
+import uk.ac.ebi.pride.archive.web.service.controller.file.FileController;
+import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
+import uk.ac.ebi.pride.archive.web.service.model.file.FileDetailList;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
 import uk.ac.ebi.pride.archive.utils.config.FilePathBuilder;
 import uk.ac.ebi.pride.archive.utils.streaming.FileUtils;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Collection;
 
 /**
@@ -57,7 +61,7 @@ public class CheckController {
     private ProjectSecureService projectService;
 
     @Autowired
-    private FileSecureService fileService;
+    private FileController fileController;
 
     @Autowired
     private FileUtils fileUtils;
@@ -116,22 +120,28 @@ public class CheckController {
 
     private boolean testQueryForProjectFile() {
         try {
-            // streaming the file to client
-            ProjectSummary projectSummary = projectService.findByAccession(TEST_PROJECT_ACCESSION);
-            if (projectSummary == null) { return false; }
+            // retrieve the file records for the test project
+            FileDetailList projectFiles = fileController.getFilesByProjectAccession(TEST_PROJECT_ACCESSION);
+            if (projectFiles == null || projectFiles.getList() == null || projectFiles.getList().isEmpty()) { return false; }
 
-            Collection<FileSummary> projectFiles = fileService.findAllByProjectAccession(TEST_PROJECT_ACCESSION);
-            if (projectFiles == null || projectFiles.isEmpty()) { return false; }
+            // get the first file to run some more checks
+            FileDetail fileDetail = projectFiles.getList().iterator().next();
 
-            FileSummary fileSummary = projectFiles.iterator().next();
+            // there has to be a non-empty file name
+            String fileName = fileDetail.getFileName();
+            if (fileName == null || fileName.trim().isEmpty()) { return false; }
 
-            String filePath = filePathBuilder.buildPublicationFilePath(fileLocationPrefix, projectSummary, fileSummary);
-            if (filePath == null || filePath.trim().isEmpty()) { return false; }
+            // there has to be a download URL (since we are testing a public project)
+            URL fileUrl = fileDetail.getDownloadLink();
+            if (fileUrl == null) { return false; }
 
-            File fileToStream = fileUtils.findFileToStream(filePath);
-            if (fileToStream == null) { return false; }
+            // the download URL has to end in the file name
+            String fileString = fileUrl.getFile();
+            if (fileString == null || !fileString.endsWith(fileName)) { return false; }
 
-            // if there is no exception, we assume all is OK
+            // we don't test if the file is actually available at the provided URL
+
+            // if all checks passed and there is no exception, we assume all is OK
             return true;
 
         } catch (Exception ex) {
