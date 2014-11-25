@@ -184,6 +184,41 @@ public class FileController {
         return new FileDetailList(fileDetails);
     }
 
+    @ApiOperation(value = "list files for a project", position = 1)
+    @RequestMapping(value = "/count/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public
+    @ResponseBody
+    int countFilesByProjectAccession(
+            @ApiParam(value = "a project accession number")
+            @PathVariable("projectAccession") String projectAccession) throws MalformedURLException {
+
+        ProjectSummary projectSummary = projectService.findByAccession(projectAccession);
+        if (projectSummary == null) {
+            throw new ResourceNotFoundException("No project found for accession: " + projectAccession);
+        }
+
+        // Note: for a correct file mapping assay and project accessions are needed, which are not available
+        //       from the FileSummary object. Therefore the IdMapper singleton needs to be updated for each
+        //       assay/project to be used by the ObjectMapper.
+        updateProjectAccCache(projectSummary.getId(), projectSummary.getAccession());
+        // ToDo: add count method to file service
+        Collection<FileSummary> fileSummaries = fileService.findAllByProjectAccession(projectAccession);
+
+        if (fileSummaries == null || fileSummaries.isEmpty()) {
+            throw new ResourceNotFoundException("No files found for project: " + projectAccession);
+        }
+
+        int fileCount = 0;
+        for (FileSummary fileSummary : fileSummaries) {
+            if (fileSummary.getFileSource().equals(ProjectFileSource.SUBMITTED)) {
+                fileCount++;
+            }
+        }
+
+        return fileCount;
+    }
+
 
     @ApiOperation(value = "list files for an assay", position = 2)
     @RequestMapping(value = "/list/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
