@@ -94,7 +94,7 @@ public class ProjectController {
             @RequestParam(value = "q", required = false, defaultValue = "") String term,
             @ApiParam(value = "how many results to return per page")
             @RequestParam(value = "show", defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
-            @ApiParam(value = "which page (starting from 1) of the result to return")
+            @ApiParam(value = "which page (starting from 0) of the result to return")
             @RequestParam(value = "page", defaultValue = WsUtils.DEFAULT_PAGE+"") int page,
             @ApiParam(value = "the field to sort on")
             @RequestParam(value = "sort", required = false, defaultValue = "") String sortBy,

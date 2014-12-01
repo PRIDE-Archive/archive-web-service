@@ -80,7 +80,7 @@ public class ProteinController {
             @PathVariable("projectAccession") String projectAccession,
             @ApiParam(value = "how many results to return per page")
             @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
-            @ApiParam(value = "which page (starting from 1) of the result to return")
+            @ApiParam(value = "which page (starting from 0) of the result to return")
             @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
             ) {
         logger.info("Proteins for project " + projectAccession + " requested");
@@ -116,7 +116,7 @@ public class ProteinController {
             @PathVariable("assayAccession") String assayAccession,
             @ApiParam(value = "how many results to return per page")
             @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
-            @ApiParam(value = "which page (starting from 1) of the result to return")
+            @ApiParam(value = "which page (starting from 0) of the result to return")
             @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
             ) {
         logger.info("Proteins for assay " + assayAccession + " requested");
