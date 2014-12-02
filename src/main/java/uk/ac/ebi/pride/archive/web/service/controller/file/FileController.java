@@ -75,67 +75,7 @@ public class FileController {
     private String ftpPublicRoot;
     @Value("#{fileConfig['ftp.private.base.path']}")
     private String ftpPrivateRoot;
-
-    @ApiIgnore
-    @Deprecated // ToDo: this method should be removed (at least for public resources) once we have a private access solution for aspera/LDC also for private resources
-    @RequestMapping(value = "/{projectAccession}/{fileName:.+}", method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
-    public void downloadFile(@PathVariable String projectAccession,
-                              @PathVariable String fileName,
-                              HttpServletResponse response) {
-
-        Collection<FileSummary> files = fileService.findAllByProjectAccession(projectAccession);
-        if (files == null || files.isEmpty()) {
-            throw new ResourceNotFoundException("Requested file not found!");
-        }
-
-        FileSummary requestedFile = null;
-        for (FileSummary file : files) {
-            if ( matchFileName(file.getFileName(), fileName) ) {
-                requestedFile = file;
-                break; // no need for further checks, we have found our file
-            }
-        }
-
-        if (requestedFile == null) {
-            throw new ResourceNotFoundException("Requested file not found!");
-        }
-
-        try {
-            // streaming the file to client
-            ProjectSummary projectSummary = projectService.findById(requestedFile.getProjectId());
-
-            String filePath = filePathBuilder.buildPublicationFilePath(fileLocationPrefix, projectSummary, requestedFile);
-
-            File fileToStream = fileUtils.findFileToStream(filePath);
-            fileUtils.streamFile(response, fileToStream);
-        } catch (FileNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
-        } catch (IOException e) {
-            String msg = "Failed to read the file from PRIDE";
-            logger.error(msg, e);
-        }
-    }
-
-    private boolean matchFileName(String fileName1, String fileName2) {
-
-        if (fileName1.equalsIgnoreCase(fileName2)) {
-            return true;
-        }
-        // if they don't match there could be an issue with the compression extension
-        if (fileName1.endsWith(".gz")) {
-            fileName1 = fileName1.substring(0, fileName1.length()-3);
-        }
-        if (fileName2.endsWith(".gz")) {
-            fileName2 = fileName2.substring(0, fileName2.length()-3);
-        }
-        if (fileName1.equalsIgnoreCase(fileName2)) {
-            return true;
-        }
-        // if the file names still don't match they are probably different
-        return false;
-    }
-
+    private String httpPrivateRoot = "http://www.ebi.ac.uk/pride/archive/files/";
 
     @ApiOperation(value = "list files for a project", position = 1)
     @RequestMapping(value = "/list/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -167,24 +107,25 @@ public class FileController {
         if (projectSummary.isPublicProject()) {
             URL url = buildPublicFtpUrlForProject(projectSummary.getAccession(), projectSummary.getPublicationDate());
             addFtpUrls(fileDetails, url);
-        }
-//        else {
-//            // ToDo: create real private FTP path links once they are available
-//            // now there is not private path, so we don't add any FTP links
-//            // we probably need/want user specific private locations, so we retrieve data from the security context
+        } else {
+            // now there is no private path, so we don't add any FTP links
+            // we can only use the http streaming method currently provided by the web
+            addPrivateFileUrls(fileDetails, fileSummaries);
+
+            // we probably need/want user specific private locations, so we retrieve data from the security context
 //            Authentication a = SecurityContextHolder.getContext().getAuthentication();
 //            UserDetails currentUser = (UserDetails)a.getPrincipal();
 //            // add private URLs for the project files
 //            ftpPath = buildPrivateFtpPathForProject(projectSummary.getAccession(), currentUser.getUsername());
 //            addFtpUrls(fileDetails, ftpPath);
-//        }
+        }
 
         Collections.sort(fileDetails, new DefaultFileComparator());
 
         return new FileDetailList(fileDetails);
     }
 
-    @ApiOperation(value = "list files for a project", position = 1)
+    @ApiOperation(value = "count files for a project", position = 2)
     @RequestMapping(value = "/count/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public
@@ -209,18 +150,12 @@ public class FileController {
             throw new ResourceNotFoundException("No files found for project: " + projectAccession);
         }
 
-        int fileCount = 0;
-        for (FileSummary fileSummary : fileSummaries) {
-            if (fileSummary.getFileSource().equals(ProjectFileSource.SUBMITTED)) {
-                fileCount++;
-            }
-        }
-
-        return fileCount;
+        // count the files taking criteria like FileSource into account
+        return countFiles(fileSummaries);
     }
 
 
-    @ApiOperation(value = "list files for an assay", position = 2)
+    @ApiOperation(value = "list files for an assay", position = 3)
     @RequestMapping(value = "/list/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public
@@ -249,6 +184,10 @@ public class FileController {
         if (projectSummary.isPublicProject()) {
             URL url = buildPublicFtpUrlForProject(projectSummary.getAccession(), projectSummary.getPublicationDate());
             addFtpUrls(fileDetails, url);
+        } else {
+            // now there is no private path, so we don't add any FTP links
+            // we can only use the http streaming method currently provided by the web
+            addPrivateFileUrls(fileDetails, fileSummaries);
         }
 //        else {
 //            // ToDo: create real private FTP path links once they are available
@@ -267,7 +206,34 @@ public class FileController {
     }
 
 
-    // ToDo: count method for assay file list
+    @ApiOperation(value = "count files for an assay", position = 4)
+    @RequestMapping(value = "/count/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public
+    @ResponseBody
+    int countFilesByAssayAccession(
+            @ApiParam(value = "a project accession number")
+            @PathVariable("assayAccession") String assayAccession) throws MalformedURLException {
+
+        Collection<FileSummary> fileSummaries = fileService.findAllByAssayAccession(assayAccession);
+
+        if (fileSummaries == null || fileSummaries.isEmpty()) {
+            throw new ResourceNotFoundException("No files found for assay: " + assayAccession);
+        }
+
+        // count the files taking criteria like FileSource into account
+        return countFiles(fileSummaries);
+    }
+
+    private int countFiles(Collection<FileSummary> fileSummaries) {
+        int fileCount = 0;
+        for (FileSummary fileSummary : fileSummaries) {
+            if (fileSummary.getFileSource().equals(ProjectFileSource.SUBMITTED)) {
+                fileCount++;
+            }
+        }
+        return fileCount;
+    }
 
     /**
      * Annotate the FileDetail object in the provided collection with the FTP download link for a given project.
@@ -295,6 +261,31 @@ public class FileController {
             }
             fileDetail.setDownloadLink(fileUrl);
         }
+    }
+
+    private void addPrivateFileUrls(Collection<FileDetail> fileDetails, Collection<FileSummary> fileSummaries) throws MalformedURLException {
+        // for each FileDetail record add a private download URL
+        // the private file download is currently only possible via the PRIDE Archive web using the internal file ID
+        // this file ID has to be retrieved from the file records of the DB (FileSummary)
+        for (FileDetail fileDetail : fileDetails) {
+            FileSummary requestedFile = null;
+            for (FileSummary file : fileSummaries) {
+                if ( fileDetail.getFileName().equalsIgnoreCase(file.getFileName()) ) {
+                    requestedFile = file;
+                    break; // no need for further checks, we have found our file
+                }
+            }
+
+            if (requestedFile == null) {
+                throw new ResourceNotFoundException("Requested file not found: " + fileDetail.getFileName());
+            }
+
+            // generate and add the private download link
+            URL privateUrl = new URL(httpPrivateRoot + requestedFile.getId());
+            fileDetail.setDownloadLink(privateUrl);
+        }
+
+
     }
 
     // ToDo: these FTP URL build methods should perhaps be moved to the FilePathBuilder?
