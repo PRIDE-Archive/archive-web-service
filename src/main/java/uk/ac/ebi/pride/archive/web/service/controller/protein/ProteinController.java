@@ -37,7 +37,6 @@ public class ProteinController {
     @Autowired
     ProteinIdentificationSecureSearchService pissService; // ToDo: find a better name ;)
 
-    // ToDo: count methods once available in the service
     // ToDo: performance tests (page sizes, security impact), and perhaps max number of retrievable (page size) results
 
 
