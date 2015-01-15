@@ -65,7 +65,7 @@ public class ProjectController {
     public
     @ResponseBody
     ProjectDetail getProjectSummary(
-            @ApiParam(value = "a project accession number")
+            @ApiParam(value = "a project accession number (example: PXD000001)")
             @PathVariable("projectAccession") String accession) {
         logger.info("Project " + accession + " summary requested");
 
@@ -90,33 +90,33 @@ public class ProjectController {
     public
     @ResponseBody
     ProjectSummaryList simpleSearchProjects(
-            @ApiParam(value = "search term to query for")
+            @ApiParam(value = "search term to query for (example: kinase)")
             @RequestParam(value = "q", required = false, defaultValue = "") String term,
             @ApiParam(value = "how many results to return per page")
             @RequestParam(value = "show", defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
             @ApiParam(value = "which page (starting from 0) of the result to return")
             @RequestParam(value = "page", defaultValue = WsUtils.DEFAULT_PAGE+"") int page,
-            @ApiParam(value = "the field to sort on")
+            @ApiParam(value = "the field to sort on (e.g. score, publication_date, id or project_title)")
             @RequestParam(value = "sort", required = false, defaultValue = "") String sortBy,
             @ApiParam(value = "the sorting order (asc or desc)")
             @RequestParam(value = "order", defaultValue = DESCENDING_ORDER) String order,
-            @ApiParam(value = "filter by species (NCBI taxon ID or name)")
+            @ApiParam(value = "filter by species (NCBI taxon ID, example: 9606 for human)")
             @RequestParam(value = "speciesFilter", required = false, defaultValue = "") String[] speciesFilter,
-            @ApiParam(value = "filter by PTM annotation")
+            @ApiParam(value = "filter by PTM annotation (example: phosphorylation)")
             @RequestParam(value = "ptmsFilter", required = false, defaultValue = "") String[] ptmsFilter,
-            @ApiParam(value = "filter by tissue annotation")
+            @ApiParam(value = "filter by tissue annotation (example: brain)")
             @RequestParam(value = "tissueFilter", required = false, defaultValue = "") String[] tissueFilter,
-            @ApiParam(value = "filter by disease annotation")
+            @ApiParam(value = "filter by disease annotation (example: cancer)")
             @RequestParam(value = "diseaseFilter", required = false, defaultValue = "") String[] diseaseFilter,
-            @ApiParam(value = "filter the title for keywords")
+            @ApiParam(value = "filter the title for keywords (example: stress)")
             @RequestParam(value = "titleFilter", required = false, defaultValue = "") String[] titleFilter,
-            @ApiParam(value = "filter for instrument names or keywords")
+            @ApiParam(value = "filter for instrument names or keywords (example: ltq)")
             @RequestParam(value = "instrumentFilter", required = false, defaultValue = "") String[] instrumentFilter,
-            @ApiParam(value = "filter by experiment type")
+            @ApiParam(value = "filter by experiment type (example: shotgun)")
             @RequestParam(value = "experimentTypeFilter", required = false, defaultValue = "") String[] experimentTypeFilter,
-            @ApiParam(value = "filter by quantification annotation")
+            @ApiParam(value = "filter by quantification annotation (example: label-free)")
             @RequestParam(value = "quantificationFilter", required = false, defaultValue = "") String[] quantificationFilter,
-            @ApiParam(value = "filter by project tags")
+            @ApiParam(value = "filter by project tags (example: Biomedical)")
             @RequestParam(value = "projectTagFilter", required = false, defaultValue = "") String[] projectTagFilter
             ) throws org.apache.solr.common.SolrException {
 
@@ -177,25 +177,25 @@ public class ProjectController {
     public
     @ResponseBody
     long countSearchProjects(
-            @ApiParam(value = "search term to query for")
+            @ApiParam(value = "search term to query for (example: kinase)")
             @RequestParam(value = "q", required = false, defaultValue = "") String term,
-            @ApiParam(value = "filter by species (NCBI taxon ID or name)")
+            @ApiParam(value = "filter by species (NCBI taxon ID, example: 9606 for human)")
             @RequestParam(value = "speciesFilter", required = false, defaultValue = "") String[] speciesFilter,
-            @ApiParam(value = "filter by PTM annotation")
+            @ApiParam(value = "filter by PTM annotation (example: phosphorylation)")
             @RequestParam(value = "ptmsFilter", required = false, defaultValue = "") String[] ptmsFilter,
-            @ApiParam(value = "filter by tissue annotation")
+            @ApiParam(value = "filter by tissue annotation (example: brain)")
             @RequestParam(value = "tissueFilter", required = false, defaultValue = "") String[] tissueFilter,
-            @ApiParam(value = "filter by disease annotation")
+            @ApiParam(value = "filter by disease annotation (example: cancer)")
             @RequestParam(value = "diseaseFilter", required = false, defaultValue = "") String[] diseaseFilter,
-            @ApiParam(value = "filter the title for keywords")
+            @ApiParam(value = "filter the title for keywords (example: stress)")
             @RequestParam(value = "titleFilter", required = false, defaultValue = "") String[] titleFilter,
-            @ApiParam(value = "filter for instrument names or keywords")
+            @ApiParam(value = "filter for instrument names or keywords (example: ltq)")
             @RequestParam(value = "instrumentFilter", required = false, defaultValue = "") String[] instrumentFilter,
-            @ApiParam(value = "filter by experiment type")
+            @ApiParam(value = "filter by experiment type (example: shotgun)")
             @RequestParam(value = "experimentTypeFilter", required = false, defaultValue = "") String[] experimentTypeFilter,
-            @ApiParam(value = "filter by quantification annotation")
+            @ApiParam(value = "filter by quantification annotation (example: label-free)")
             @RequestParam(value = "quantificationFilter", required = false, defaultValue = "") String[] quantificationFilter,
-            @ApiParam(value = "filter by project tags")
+            @ApiParam(value = "filter by project tags (example: Biomedical)")
             @RequestParam(value = "projectTagFilter", required = false, defaultValue = "") String[] projectTagFilter
             ) throws org.apache.solr.common.SolrException {
 

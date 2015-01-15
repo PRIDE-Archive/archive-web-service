@@ -1,5 +1,6 @@
 package uk.ac.ebi.pride.archive.web.service.controller.psm;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -19,7 +20,9 @@ import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
 import uk.ac.ebi.pride.archive.web.service.util.WsUtils;
 import uk.ac.ebi.pride.psmindex.search.model.Psm;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
 * @author Florian Reisinger
@@ -82,13 +85,13 @@ public class PsmController {
 //    }
 
 
-    @ApiOperation(value = "retrieve peptide identifications by project accession", position = 0)
+    @ApiOperation(value = "retrieve peptide identifications by project accession", position = 1)
     @RequestMapping(value = "/list/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
     @ResponseBody
     PsmDetailList getPsmsByProject(
-            @ApiParam(value = "a project accession")
+            @ApiParam(value = "a project accession (example: PXD000001)")
             @PathVariable("projectAccession") String projectAccession,
             @ApiParam(value = "how many results to return per page")
             @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
@@ -111,7 +114,7 @@ public class PsmController {
     public
     @ResponseBody
     Long countPsmsByProject(
-            @ApiParam(value = "a project accession")
+            @ApiParam(value = "a project accession (example: PXD000001)")
             @PathVariable("projectAccession") String projectAccession
     ) {
         logger.info("PSM count for assay " + projectAccession + " requested");
@@ -122,15 +125,41 @@ public class PsmController {
         return foundPsms;
     }
 
+    @ApiIgnore
+    @ApiOperation(value = "retrieve peptide sequences by project accession", position = 0)
+    @RequestMapping(value = "/list/project/{projectAccession}.seq", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public
+    @ResponseBody
+    Set<String> getPsmSequencesByProject(
+            @ApiParam(value = "a project accession (example: PXD000001)")
+            @PathVariable("projectAccession") String projectAccession,
+            @ApiParam(value = "how many results to return per page")
+            @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
+            @ApiParam(value = "which page (starting from 0) of the result to return")
+            @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
+    ) {
+        logger.info("Peptide Sequences for project " + projectAccession + " requested");
+
+        // ToDo: should use paging
+        List<String> foundPsms = psmSecureSearchService.findPeptideSequencesByProjectAccession(projectAccession);
+        System.out.println("number of results: " + foundPsms.size());
+        Set<String> uniqueSeqs = new HashSet<String>();
+        uniqueSeqs.addAll(foundPsms);
+        System.out.println("number of unique results: " + uniqueSeqs.size());
+
+        return uniqueSeqs;
+    }
+
     @ApiOperation(value = "retrieve peptide identifications by project accession and peptide sequence", position = 2)
     @RequestMapping(value = "/list/project/{projectAccession}/sequence/{sequence}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
     @ResponseBody
     PsmDetailList getPsmsByProjectAndSequence(
-            @ApiParam(value = "a project accession")
+            @ApiParam(value = "a project accession (example: PXD000001)")
             @PathVariable("projectAccession") String projectAccession,
-            @ApiParam(value = "the peptide sequence to limit the query on")
+            @ApiParam(value = "the peptide sequence to limit the query on (example: GIANSILIK)")
             @PathVariable("sequence") String sequence
     ) {
         logger.info("Request for peptides for project " + projectAccession + " with sequence: " + sequence);
@@ -149,9 +178,9 @@ public class PsmController {
     public
     @ResponseBody
     Long countPsmsByProjectAndSequence(
-            @ApiParam(value = "a project accession")
+            @ApiParam(value = "a project accession (example: PXD000001)")
             @PathVariable("projectAccession") String projectAccession,
-            @ApiParam(value = "the peptide sequence to limit the query on")
+            @ApiParam(value = "the peptide sequence to limit the query on (example: GIANSILIK)")
             @PathVariable("sequence") String sequence
     ) {
         logger.info("PSM count for assay " + projectAccession + " requested");
@@ -168,7 +197,7 @@ public class PsmController {
     public
     @ResponseBody
     PsmDetailList getPsmsByAssay(
-            @ApiParam(value = "an assay accession")
+            @ApiParam(value = "an assay accession (example: 22134)")
             @PathVariable("assayAccession") String assayAccession,
             @ApiParam(value = "how many results to return per page")
             @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
@@ -192,7 +221,7 @@ public class PsmController {
     public
     @ResponseBody
     Long countPsmsByAssay(
-            @ApiParam(value = "an assay accession")
+            @ApiParam(value = "an assay accession (example: 22134)")
             @PathVariable("assayAccession") String assayAccession
             ) {
         logger.info("PSM count for assay " + assayAccession + " requested");
@@ -209,9 +238,9 @@ public class PsmController {
     public
     @ResponseBody
     PsmDetailList getPsmsByAssayAndSequence(
-            @ApiParam(value = "a assay accession")
+            @ApiParam(value = "a assay accession (example: 22134)")
             @PathVariable("assayAccession") String assayAccession,
-            @ApiParam(value = "the peptide sequence to limit the query on")
+            @ApiParam(value = "the peptide sequence to limit the query on (example: GIANSILIK)")
             @PathVariable("sequence") String sequence
     ) {
         logger.info("Request for peptides for assay " + assayAccession + " with sequence: " + sequence);
@@ -230,9 +259,9 @@ public class PsmController {
     public
     @ResponseBody
     Long countPsmsByAssayAndSequence(
-            @ApiParam(value = "a assay accession")
+            @ApiParam(value = "a assay accession (example: 22134)")
             @PathVariable("assayAccession") String assayAccession,
-            @ApiParam(value = "the peptide sequence to limit the query on")
+            @ApiParam(value = "the peptide sequence to limit the query on (example: GIANSILIK)")
             @PathVariable("sequence") String sequence
     ) {
         logger.info("PSM count for assay " + assayAccession + " requested");

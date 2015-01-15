@@ -50,7 +50,7 @@ public class AssayController {
     public
     @ResponseBody
     AssayDetail findAllByAssayAccession(
-            @ApiParam(value = "an assay accession number")
+            @ApiParam(value = "an assay accession number (example: 22134)")
             @PathVariable("assayAccession") String assayAccession) {
         logger.info("Assay " + assayAccession + " summary requested");
 
@@ -78,7 +78,7 @@ public class AssayController {
     public
     @ResponseBody
     AssayDetailList findAllByProjectAccession(
-            @ApiParam(value = "a project accession number")
+            @ApiParam(value = "a project accession number (example: PXD000001)")
             @PathVariable("projectAccession") String accession) {
 
         logger.info("Assay list required for project " + accession);
@@ -113,7 +113,7 @@ public class AssayController {
     public
     @ResponseBody
     Long countByProjectAccession(
-            @ApiParam(value = "a project accession number")
+            @ApiParam(value = "a project accession number (example: PXD000001)")
             @PathVariable("projectAccession") String accession) {
 
         logger.info("Assay count required for project " + accession);
