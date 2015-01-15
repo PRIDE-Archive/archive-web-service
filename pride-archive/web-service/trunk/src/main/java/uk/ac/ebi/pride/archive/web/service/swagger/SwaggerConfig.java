@@ -51,7 +51,6 @@ public class SwaggerConfig {
         return new ApiInfo(
                 "PRIDE Archive RESTful web service API",
                 "For more details and examples please see the <a href=\"/pride/help/archive/access/webservice\">additional documentation pages</a>",
-                //"Programmatic access to the PRIDE Archive data via RESTful Web Services.",
                 "http://www.ebi.ac.uk/about/terms-of-use",
                 "pride-support@ebi.ac.uk",
                 "Apache 2.0",
