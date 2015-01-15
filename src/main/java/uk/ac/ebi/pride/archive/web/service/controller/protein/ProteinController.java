@@ -75,7 +75,7 @@ public class ProteinController {
     public
     @ResponseBody
     ProteinDetailList getProteinsByProject(
-            @ApiParam(value = "a project accession")
+            @ApiParam(value = "a project accession (example: PXD000001)")
             @PathVariable("projectAccession") String projectAccession,
             @ApiParam(value = "how many results to return per page")
             @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
@@ -98,7 +98,7 @@ public class ProteinController {
     public
     @ResponseBody
     Long countProteinsByProject(
-            @ApiParam(value = "a project accession")
+            @ApiParam(value = "a project accession (example: PXD000001)")
             @PathVariable("projectAccession") String projectAccession
     ) {
         logger.info("Protein count for project " + projectAccession + " requested");
@@ -111,7 +111,7 @@ public class ProteinController {
     public
     @ResponseBody
     ProteinDetailList getProteinsByAssay(
-            @ApiParam(value = "an assay accession")
+            @ApiParam(value = "an assay accession (example: 22134)")
             @PathVariable("assayAccession") String assayAccession,
             @ApiParam(value = "how many results to return per page")
             @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
@@ -133,7 +133,7 @@ public class ProteinController {
     public
     @ResponseBody
     Long countProteinsByAssay(
-            @ApiParam(value = "an assay accession")
+            @ApiParam(value = "an assay accession (example: 22134)")
             @PathVariable("assayAccession") String assayAccession
     ) {
         logger.info("Proteins for assay " + assayAccession + " requested");
@@ -147,7 +147,7 @@ public class ProteinController {
     public
     @ResponseBody
     String getProteinListForAssay(
-            @ApiParam(value = "an assay accession")
+            @ApiParam(value = "an assay accession (example: 22134)")
             @PathVariable("assayAccession") String assayAccession,
             @ApiParam(value = "filter accessions (to remove decoy, reverse, etc accessions)")
             @RequestParam(value = "filter", required = false, defaultValue = "true") boolean filter
@@ -171,7 +171,7 @@ public class ProteinController {
     public
     @ResponseBody
     String getProteinListForProject(
-            @ApiParam(value = "an project accession")
+            @ApiParam(value = "an project accession (example: PXD000001)")
             @PathVariable("projectAccession") String projectAccession,
             @ApiParam(value = "filter accessions (to remove decoy, reverse, etc accessions)")
             @RequestParam(value = "filter", required = false, defaultValue = "true") boolean filter

@@ -83,7 +83,7 @@ public class FileController {
     public
     @ResponseBody
     FileDetailList getFilesByProjectAccession(
-            @ApiParam(value = "a project accession number")
+            @ApiParam(value = "a project accession number (example: PXD000001)")
             @PathVariable("projectAccession") String projectAccession) throws MalformedURLException {
 
         ProjectSummary projectSummary = projectService.findByAccession(projectAccession);
@@ -131,7 +131,7 @@ public class FileController {
     public
     @ResponseBody
     int countFilesByProjectAccession(
-            @ApiParam(value = "a project accession number")
+            @ApiParam(value = "a project accession number (example: PXD000001)")
             @PathVariable("projectAccession") String projectAccession) throws MalformedURLException {
 
         ProjectSummary projectSummary = projectService.findByAccession(projectAccession);
@@ -161,7 +161,7 @@ public class FileController {
     public
     @ResponseBody
     FileDetailList getFilesByAssayAccession(
-            @ApiParam(value = "an assay accession number")
+            @ApiParam(value = "an assay accession number (example: 22134)")
             @PathVariable("assayAccession") String assayAccession) throws MalformedURLException {
 
         // find the files for the provided assay accession
@@ -212,7 +212,7 @@ public class FileController {
     public
     @ResponseBody
     int countFilesByAssayAccession(
-            @ApiParam(value = "a project accession number")
+            @ApiParam(value = "an assay accession number (example: 22134)")
             @PathVariable("assayAccession") String assayAccession) throws MalformedURLException {
 
         Collection<FileSummary> fileSummaries = fileService.findAllByAssayAccession(assayAccession);
