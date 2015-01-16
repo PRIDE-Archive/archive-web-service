@@ -90,8 +90,8 @@ public class ProjectController {
     public
     @ResponseBody
     ProjectSummaryList simpleSearchProjects(
-            @ApiParam(value = "search term to query for (example: kinase)")
-            @RequestParam(value = "q", required = false, defaultValue = "") String term,
+            @ApiParam(value = "search term to query for (example: stress)")
+            @RequestParam(value = "query", required = false, defaultValue = "") String term,
             @ApiParam(value = "how many results to return per page")
             @RequestParam(value = "show", defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
             @ApiParam(value = "which page (starting from 0) of the result to return")
@@ -177,8 +177,8 @@ public class ProjectController {
     public
     @ResponseBody
     long countSearchProjects(
-            @ApiParam(value = "search term to query for (example: kinase)")
-            @RequestParam(value = "q", required = false, defaultValue = "") String term,
+            @ApiParam(value = "search term to query for (example: stress)")
+            @RequestParam(value = "query", required = false, defaultValue = "") String term,
             @ApiParam(value = "filter by species (NCBI taxon ID, example: 9606 for human)")
             @RequestParam(value = "speciesFilter", required = false, defaultValue = "") String[] speciesFilter,
             @ApiParam(value = "filter by PTM annotation (example: phosphorylation)")
