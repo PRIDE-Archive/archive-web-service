@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileSource;
 
 import java.net.URL;
+import java.util.Date;
 
 /**
  * @author florian@ebi.ac.uk.
@@ -42,6 +43,7 @@ public class SwaggerConfig {
                 // direct overwrites of model classes
                 .directModelSubstitute(URL.class, String.class) // don't document URL as complex object, but as simple string
                 .directModelSubstitute(ProjectFileSource.class, String.class) // don't list all enum values (as some will never make it to the client), just use string and use API description annotation to show possible values
+                .directModelSubstitute(Date.class, String.class) // keep the date a simple string
                 // overwrite the default ordering of description annotations
                 .apiDescriptionOrdering(new ApiDescriptionPositionOrdering())
                 .includePatterns("/.*");
