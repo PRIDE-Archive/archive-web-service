@@ -15,6 +15,7 @@ import uk.ac.ebi.pride.archive.repo.user.service.UserSummary;
 import uk.ac.ebi.pride.archive.search.service.ProjectSearchSummary;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
 import uk.ac.ebi.pride.archive.web.service.model.common.ModifiedLocation;
+import uk.ac.ebi.pride.archive.web.service.model.common.Pair;
 import uk.ac.ebi.pride.archive.web.service.model.contact.ContactDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
 import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetail;
@@ -394,7 +395,7 @@ public final class ObjectMapper {
             mappedObject.setPostAA(psm.getPostAminoAcid());
             mappedObject.setRetentionTime(psm.getRetentionTime());
             mappedObject.setSearchEngines(getCvParamNames(psm.getSearchEngines()));
-            mappedObject.setSearchEngineScores(getCvParamNames(psm.getSearchEngineScores()));
+            mappedObject.setSearchEngineScores(getCvParamNameValuePairs(psm.getSearchEngineScores()) );
             mappedObject.setSpectrumID( psm.getSpectrumId() );
             mappedObject.setId(psm.getId());
             mappedObject.setReportedID( psm.getReportedId() );
@@ -451,6 +452,23 @@ public final class ObjectMapper {
             nameSet.add( cvParamSummary.getName() );
         }
         return nameSet;
+    }
+    private static <T extends CvParamProvider> Set<Pair<String, Double>> getCvParamNameValuePairs(Iterable<T> objects) {
+        if (objects == null || objects.iterator() == null) { return null; }
+        if (!objects.iterator().hasNext()) { return new HashSet<Pair<String, Double>>(0); }
+
+        Set<Pair<String, Double>> set = new HashSet<Pair<String, Double>>();
+        for (T cvParamSummary : objects) {
+            String key = cvParamSummary.getName();
+            Double value;
+            try {
+                value = Double.parseDouble(cvParamSummary.getValue());
+            } catch (NumberFormatException nfe) {
+                value = Double.NaN;
+            }
+            set.add(new Pair<String, Double>(key, value));
+        }
+        return set;
     }
 
     private static <T extends ModificationProvider> Set<ModifiedLocation> getModifiedLocations(Iterable<T> objects) {
