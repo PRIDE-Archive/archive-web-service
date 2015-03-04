@@ -10,12 +10,14 @@ import uk.ac.ebi.pride.archive.repo.file.service.FileSummary;
 import uk.ac.ebi.pride.archive.repo.param.service.CvParamSummary;
 import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
 import uk.ac.ebi.pride.archive.repo.project.service.ProjectTagSummary;
+import uk.ac.ebi.pride.archive.repo.project.service.ReferenceSummary;
 import uk.ac.ebi.pride.archive.repo.user.service.ContactSummary;
 import uk.ac.ebi.pride.archive.repo.user.service.UserSummary;
 import uk.ac.ebi.pride.archive.search.service.ProjectSearchSummary;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
 import uk.ac.ebi.pride.archive.web.service.model.common.ModifiedLocation;
 import uk.ac.ebi.pride.archive.web.service.model.common.Pair;
+import uk.ac.ebi.pride.archive.web.service.model.common.Reference;
 import uk.ac.ebi.pride.archive.web.service.model.contact.ContactDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
 import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetail;
@@ -71,11 +73,11 @@ public final class ObjectMapper {
         }
         mappedObject.setNumAssays( object.getNumAssays() );
         // ToDo: define the mapping of cvparams to strings
-        mappedObject.setSpecies( getCvParamNames(object.getSpecies()) );
-        mappedObject.setTissues( getCvParamNames(object.getTissues()) );
-        mappedObject.setPtmNames( getCvParamNames(object.getPtms()) );
-        mappedObject.setInstrumentNames( getCvParamNames(object.getInstruments()) );
-        mappedObject.setProjectTags( mapProjectTags(object.getProjectTags()) );
+        mappedObject.setSpecies(getCvParamNames(object.getSpecies()));
+        mappedObject.setTissues(getCvParamNames(object.getTissues()));
+        mappedObject.setPtmNames(getCvParamNames(object.getPtms()));
+        mappedObject.setInstrumentNames(getCvParamNames(object.getInstruments()));
+        mappedObject.setProjectTags(mapProjectTags(object.getProjectTags()));
 
         return mappedObject;
     }
@@ -125,6 +127,7 @@ public final class ObjectMapper {
         mappedObject.setNumUniquePeptides(numUniquePeptides);
         mappedObject.setNumSpectra(numSpectra);
         mappedObject.setNumIdentifiedSpectra(numIdentSpectra);
+        mappedObject.setReferences(mapProjectRefs(object.getReferences()));
 
         return mappedObject;
     }
@@ -493,4 +496,19 @@ public final class ObjectMapper {
 
         return mappedObjects;
     }
+
+    private static Set<Reference> mapProjectRefs(Collection<ReferenceSummary> references) {
+        Set<Reference> set = new HashSet<Reference>();
+        if (references == null || references.isEmpty()) { return set; }
+        for (ReferenceSummary object : references) {
+            Reference mappedObject = new Reference();
+            mappedObject.setIds(new HashSet<String>(2)); // for now we have DOI and PUBMED ids
+            mappedObject.setDesc(object.getReferenceLine());
+            mappedObject.getIds().add("DOI:" + object.getDoi());
+            mappedObject.getIds().add("PMID:" + object.getPubmedId());
+            set.add(mappedObject);
+        }
+        return set;
+    }
+
 }

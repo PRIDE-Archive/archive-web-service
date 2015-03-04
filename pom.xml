@@ -32,7 +32,7 @@
      -->
 
     <properties>
-        <archive.ws.model.version>0.2.10</archive.ws.model.version>
+        <archive.ws.model.version>0.2.11-SNAPSHOT</archive.ws.model.version>
         <archive.security.version>0.1.2</archive.security.version>
         <archive.search.version>1.0.3</archive.search.version>
         <archive.utils.version>0.1.10</archive.utils.version>
