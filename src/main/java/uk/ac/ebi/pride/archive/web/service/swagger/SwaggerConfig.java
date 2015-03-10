@@ -37,7 +37,7 @@ public class SwaggerConfig {
         return new SwaggerSpringMvcPlugin(this.springSwaggerConfig)
                 .apiInfo(apiInfo())
                 // PRIDE Archive RESTful API version
-                .apiVersion("1.1")
+                .apiVersion("1.2")
                 // try the default RelativeSwaggerPathProvider
                 .apiListingReferenceOrdering(new ResourceListingPositionalOrdering())
                 // direct overwrites of model classes
