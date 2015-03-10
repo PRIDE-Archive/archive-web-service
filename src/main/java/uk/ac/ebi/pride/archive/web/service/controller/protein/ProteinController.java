@@ -69,7 +69,7 @@ public class ProteinController {
 //    }
 
 
-    @ApiOperation(value = "retrieve protein identifications by project accession", position = 2)
+    @ApiOperation(value = "retrieve protein identifications by project accession", position = 1)
     @RequestMapping(value = "/list/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
@@ -85,6 +85,27 @@ public class ProteinController {
         logger.info("Proteins for project " + projectAccession + " requested");
 
         List<ProteinIdentification> foundProteins = pissService.findByProjectAccession(projectAccession, new PageRequest(page, showResults)).getContent();
+
+        // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects
+        List<ProteinDetail>resultProteins = ObjectMapper.mapProteinIdentifiedListToWSProteinDetailList(foundProteins);
+
+        return new ProteinDetailList(resultProteins);
+    }
+
+    @ApiOperation(value = "retrieve protein identifications by project accession and protein accession", position = 2)
+    @RequestMapping(value = "/list/project/{projectAccession}/protein/{accession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public
+    @ResponseBody
+    ProteinDetailList getProteinsByProjectAndAccession(
+            @ApiParam(value = "a project accession (example: PXD001536)")
+            @PathVariable("projectAccession") String projectAccession,
+            @ApiParam(value = "a protein accession (example: P38398)")
+            @PathVariable("accession") String accession
+    ) {
+        logger.info("Proteins for project " + projectAccession + "and accession " + accession + " requested");
+
+        List<ProteinIdentification> foundProteins = pissService.findByProjectAccessionAndAnyMapping(projectAccession, accession);
 
         // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects
         List<ProteinDetail>resultProteins = ObjectMapper.mapProteinIdentifiedListToWSProteinDetailList(foundProteins);
