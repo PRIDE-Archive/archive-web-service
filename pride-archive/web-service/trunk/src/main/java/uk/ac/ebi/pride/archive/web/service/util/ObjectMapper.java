@@ -16,8 +16,8 @@ import uk.ac.ebi.pride.archive.repo.user.service.UserSummary;
 import uk.ac.ebi.pride.archive.search.service.ProjectSearchSummary;
 import uk.ac.ebi.pride.archive.web.service.model.assay.AssayDetail;
 import uk.ac.ebi.pride.archive.web.service.model.common.ModifiedLocation;
-import uk.ac.ebi.pride.archive.web.service.model.common.Pair;
 import uk.ac.ebi.pride.archive.web.service.model.common.Reference;
+import uk.ac.ebi.pride.archive.web.service.model.common.SearchEngineScore;
 import uk.ac.ebi.pride.archive.web.service.model.contact.ContactDetail;
 import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
 import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetail;
@@ -456,20 +456,17 @@ public final class ObjectMapper {
         }
         return nameSet;
     }
-    private static <T extends CvParamProvider> Set<Pair<String, Double>> getCvParamNameValuePairs(Iterable<T> objects) {
+    private static <T extends CvParamProvider> Set<SearchEngineScore> getCvParamNameValuePairs(Iterable<T> objects) {
         if (objects == null || objects.iterator() == null) { return null; }
-        if (!objects.iterator().hasNext()) { return new HashSet<Pair<String, Double>>(0); }
+        if (!objects.iterator().hasNext()) { return new HashSet<SearchEngineScore>(0); }
 
-        Set<Pair<String, Double>> set = new HashSet<Pair<String, Double>>();
+        Set<SearchEngineScore> set = new HashSet<SearchEngineScore>();
         for (T cvParamSummary : objects) {
             String key = cvParamSummary.getName();
-            Double value;
-            try {
-                value = Double.parseDouble(cvParamSummary.getValue());
-            } catch (NumberFormatException nfe) {
-                value = Double.NaN;
+            String value = cvParamSummary.getValue();
+            if (key != null && value != null) {
+                set.add(new SearchEngineScore(key, value));
             }
-            set.add(new Pair<String, Double>(key, value));
         }
         return set;
     }
