@@ -23,6 +23,7 @@ public class SimpleCORSFilter implements Filter {
         response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers", "x-requested-with,Content-Type");
+        response.setHeader("X-Clacks-Overhead", "GNU Terry Pratchett");
         chain.doFilter(req, res);
     }
 
