@@ -113,7 +113,30 @@ public class ProteinController {
         return new ProteinDetailList(resultProteins);
     }
 
-    @ApiOperation(value = "count protein identifications by project accession", position = 3)
+    @ApiOperation(value = "count protein identifications by project accession and protein accession", position = 3)
+    @RequestMapping(value = "/count/project/{projectAccession}/protein/{accession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK) // 200
+    public
+    @ResponseBody
+    Long countProteinsByProjectAndAccession(
+            @ApiParam(value = "a project accession (example: PXD001536)")
+            @PathVariable("projectAccession") String projectAccession,
+            @ApiParam(value = "a protein accession (example: P38398)")
+            @PathVariable("accession") String accession
+    ) {
+        logger.info("Protein count for project " + projectAccession + "and accession " + accession + " requested");
+
+        List<ProteinIdentification> foundProteins = pissService.findByProjectAccessionAndAnyMapping(projectAccession, accession);
+        long count = 0;
+        if (foundProteins != null && !foundProteins.isEmpty()) {
+            count = foundProteins.size();
+        }
+
+        return count;
+    }
+
+
+    @ApiOperation(value = "count protein identifications by project accession", position = 4)
     @RequestMapping(value = "/count/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
@@ -126,7 +149,7 @@ public class ProteinController {
         return pissService.countByProjectAccession(projectAccession);
     }
 
-    @ApiOperation(value = "retrieve protein identifications by assay accession", position = 4)
+    @ApiOperation(value = "retrieve protein identifications by assay accession", position = 5)
     @RequestMapping(value = "/list/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
@@ -148,7 +171,7 @@ public class ProteinController {
         return new ProteinDetailList(resultProteins);
     }
 
-    @ApiOperation(value = "count protein identifications by assay accession", position = 4)
+    @ApiOperation(value = "count protein identifications by assay accession", position = 6)
     @RequestMapping(value = "/count/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK) // 200
     public
