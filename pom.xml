@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -12,7 +10,7 @@
 
     <groupId>uk.ac.ebi.pride.archive</groupId>
     <artifactId>web-service</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>pride-archive-webservice</name><!-- used for the finalName of the generated artifact -->
 
@@ -30,6 +28,14 @@
           NOTE: If configured via JNDI, the server has to provide the connection details.
                 To run locally, for example with jetty, a local server configuration is needed.
      -->
+
+    <!--scm git config-->
+    <scm>
+        <connection>scm:git:github.com/PRIDE-Archive/web-service.git</connection>
+        <developerConnection>scm:git:git@github.com:PRIDE-Archive/web-service.git</developerConnection>
+        <url>https://github.com/PRIDE-Archive/web-service.git</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <archive.ws.model.version>0.2.12</archive.ws.model.version>
