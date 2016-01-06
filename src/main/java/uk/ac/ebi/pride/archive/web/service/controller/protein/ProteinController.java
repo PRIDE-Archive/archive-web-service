@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.pride.archive.security.protein.ProteinIdentificationSecureSearchService;
+import uk.ac.ebi.pride.archive.web.service.error.exception.MaxPageSizeReachedException;
 import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetail;
 import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetailList;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
@@ -77,12 +78,17 @@ public class ProteinController {
     ProteinDetailList getProteinsByProject(
             @ApiParam(value = "a project accession (example: PXD000001)")
             @PathVariable("projectAccession") String projectAccession,
-            @ApiParam(value = "how many results to return per page")
+            @ApiParam(value = "how many results to return per page. Maximum page size is: " + WsUtils.MAX_PAGE_SIZE)
             @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
             @ApiParam(value = "which page (starting from 0) of the result to return")
             @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
             ) {
         logger.info("Proteins for project " + projectAccession + " requested");
+
+        if(showResults > WsUtils.MAX_PAGE_SIZE){
+            logger.error("Maximum size of page reach");
+            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page");
+        }
 
         List<ProteinIdentification> foundProteins = pissService.findByProjectAccession(projectAccession, new PageRequest(page, showResults)).getContent();
 
@@ -157,12 +163,17 @@ public class ProteinController {
     ProteinDetailList getProteinsByAssay(
             @ApiParam(value = "an assay accession (example: 22134)")
             @PathVariable("assayAccession") String assayAccession,
-            @ApiParam(value = "how many results to return per page")
+            @ApiParam(value = "how many results to return per page. Maximum page size is: " + WsUtils.MAX_PAGE_SIZE)
             @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
             @ApiParam(value = "which page (starting from 0) of the result to return")
             @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
             ) {
         logger.info("Proteins for assay " + assayAccession + " requested");
+
+        if(showResults > WsUtils.MAX_PAGE_SIZE){
+            logger.error("Maximum size of page reach");
+            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page");
+        }
 
         List<ProteinIdentification> foundProteins = pissService.findByAssayAccession(assayAccession, new PageRequest(page, showResults)).getContent();
         // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects

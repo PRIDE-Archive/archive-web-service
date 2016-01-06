@@ -15,6 +15,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.ac.ebi.pride.archive.web.service.util.WsUtils;
 import uk.ac.ebi.pride.psmindex.search.model.Psm;
 import uk.ac.ebi.pride.psmindex.search.service.PsmSearchService;
 
@@ -90,6 +91,13 @@ public class PsmControllerFunctionalTest {
                 .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
     }
 
+    @Test // /peptide/list/project/{projectAccession}
+    public void getPsmByProjectAccessionMaxPageSizeExpecetion() throws Exception {
+        // test with custom paging configuration
+        mockMvc.perform(get("/peptide/list/project/" + PROJECT_ACCESSION + "?show=" + (WsUtils.MAX_PAGE_SIZE + 1) + "&page=0"))
+                .andExpect(status().isForbidden());
+    }
+
     @Test // /peptide/list/assay/{assayAccession}
     public void getPsmByAssayAccession() throws Exception {
         // test default use case
@@ -107,5 +115,13 @@ public class PsmControllerFunctionalTest {
                 .andExpect(content().string(containsString(ASSAY_ACCESSION)))
                 .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
     }
+
+    @Test // /peptide/list/assay/{assayAccession}
+    public void getPsmByAssaytAccessionMaxPageSizeException() throws Exception {
+        // test with custom paging configuration
+        mockMvc.perform(get("/peptide/list/assay/" + ASSAY_ACCESSION + "?show="+ (WsUtils.MAX_PAGE_SIZE + 1)+"&page=0"))
+                .andExpect(status().isForbidden());
+    }
+
 
 }

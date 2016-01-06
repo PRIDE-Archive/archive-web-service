@@ -20,6 +20,7 @@ import uk.ac.ebi.pride.archive.search.service.ProjectSearchSummary;
 import uk.ac.ebi.pride.archive.security.assay.AssaySecureService;
 import uk.ac.ebi.pride.archive.security.project.ProjectSecureService;
 import uk.ac.ebi.pride.archive.security.user.UserSecureService;
+import uk.ac.ebi.pride.archive.web.service.error.exception.MaxPageSizeReachedException;
 import uk.ac.ebi.pride.archive.web.service.error.exception.ResourceNotFoundException;
 import uk.ac.ebi.pride.archive.web.service.model.project.ProjectDetail;
 import uk.ac.ebi.pride.archive.web.service.model.project.ProjectSummaryList;
@@ -92,7 +93,7 @@ public class ProjectController {
     ProjectSummaryList simpleSearchProjects(
             @ApiParam(value = "search term to query for (example: stress)")
             @RequestParam(value = "query", required = false, defaultValue = "") String term,
-            @ApiParam(value = "how many results to return per page")
+            @ApiParam(value = "how many results to return per page. Maximum page size is: " + WsUtils.MAX_PAGE_SIZE)
             @RequestParam(value = "show", defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
             @ApiParam(value = "which page (starting from 0) of the result to return")
             @RequestParam(value = "page", defaultValue = WsUtils.DEFAULT_PAGE+"") int page,
@@ -126,6 +127,11 @@ public class ProjectController {
         if (showResults < 1) {
             // ToDo: perhaps handle with 'wrong input' exception
             return null;
+        }
+
+        if(showResults > WsUtils.MAX_PAGE_SIZE){
+            logger.error("Maximum size of page reach");
+            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page");
         }
 
         // if no search term is provided, and therefore score is not very relevant, date has to be the sorting criteria

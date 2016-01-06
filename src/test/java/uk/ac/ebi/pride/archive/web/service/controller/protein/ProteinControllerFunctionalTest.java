@@ -14,6 +14,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.ac.ebi.pride.archive.web.service.util.WsUtils;
 import uk.ac.ebi.pride.proteinidentificationindex.search.model.ProteinIdentification;
 import uk.ac.ebi.pride.proteinidentificationindex.search.service.ProteinIdentificationSearchService;
 
@@ -88,6 +89,14 @@ public class ProteinControllerFunctionalTest {
                 .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
     }
 
+    @Test // /protein/list/project/{projectAccession}
+    public void ProteinByProjectAccessionMaxPageSizeException() throws Exception {
+        // test with custom paging configuration
+        mockMvc.perform(get("/protein/list/project/" + PROJECT_ACCESSION + "?show="+ (WsUtils.MAX_PAGE_SIZE + 1)+"&page=0"))
+                .andExpect(status().isForbidden());
+    }
+
+
     @Test // /protein/list/assay/{assayAccession}
     public void getProteinByAssayAccession() throws Exception {
         // test default use case
@@ -106,4 +115,10 @@ public class ProteinControllerFunctionalTest {
                 .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
     }
 
+    @Test // /protein/list/assay/{assayAccession}
+    public void ProteinByAssayAccessionMaxPageSizeException() throws Exception {
+        // test with custom paging configuration
+        mockMvc.perform(get("/protein/list/assay/" + ASSAY_ACCESSION + "?show="+ (WsUtils.MAX_PAGE_SIZE + 1)+"&page=0"))
+                .andExpect(status().isForbidden());
+    }
 }

@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.pride.archive.security.psm.PsmSecureSearchService;
+import uk.ac.ebi.pride.archive.web.service.error.exception.MaxPageSizeReachedException;
 import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetail;
 import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetailList;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
@@ -93,12 +94,17 @@ public class PsmController {
     PsmDetailList getPsmsByProject(
             @ApiParam(value = "a project accession (example: PXD000001)")
             @PathVariable("projectAccession") String projectAccession,
-            @ApiParam(value = "how many results to return per page")
+            @ApiParam(value = "how many results to return per page. Maximum page size is: " + WsUtils.MAX_PAGE_SIZE)
             @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
             @ApiParam(value = "which page (starting from 0) of the result to return")
             @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
     ) {
         logger.info("Peptides for project " + projectAccession + " requested");
+
+        if(showResults > WsUtils.MAX_PAGE_SIZE){
+            logger.error("Maximum size of page reach");
+            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page");
+        }
 
         List<Psm> foundPsms = psmSecureSearchService.findByProjectAccession(projectAccession, new PageRequest(page, showResults, Sort.Direction.ASC, "peptide_sequence")).getContent();
 
@@ -134,12 +140,17 @@ public class PsmController {
     Set<String> getPsmSequencesByProject(
             @ApiParam(value = "a project accession (example: PXD000001)")
             @PathVariable("projectAccession") String projectAccession,
-            @ApiParam(value = "how many results to return per page")
+            @ApiParam(value = "how many results to return per page. Maximum page size is: " + WsUtils.MAX_PAGE_SIZE)
             @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
             @ApiParam(value = "which page (starting from 0) of the result to return")
             @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
     ) {
         logger.info("Peptide Sequences for project " + projectAccession + " requested");
+
+//        if(showResults > WsUtils.MAX_PAGE_SIZE){
+//            logger.error("Maximum size of page reach");
+//            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page");
+//        }
 
         // ToDo: should use paging
         List<String> foundPsms = psmSecureSearchService.findPeptideSequencesByProjectAccession(projectAccession);
@@ -199,12 +210,17 @@ public class PsmController {
     PsmDetailList getPsmsByAssay(
             @ApiParam(value = "an assay accession (example: 22134)")
             @PathVariable("assayAccession") String assayAccession,
-            @ApiParam(value = "how many results to return per page")
+            @ApiParam(value = "how many results to return per page. Maximum page size is: " + WsUtils.MAX_PAGE_SIZE)
             @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
             @ApiParam(value = "which page (starting from 0) of the result to return")
             @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
     ) {
         logger.info("PSMs for assay " + assayAccession + " requested");
+
+        if(showResults > WsUtils.MAX_PAGE_SIZE){
+            logger.error("Maximum size of page reach");
+            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page");
+        }
 
         List<Psm> foundPsms = psmSecureSearchService.findByAssayAccession(assayAccession, new PageRequest(page, showResults, Sort.Direction.ASC, "peptide_sequence")).getContent();
 

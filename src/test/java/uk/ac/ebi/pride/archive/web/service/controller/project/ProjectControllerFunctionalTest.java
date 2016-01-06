@@ -18,6 +18,7 @@ import uk.ac.ebi.pride.archive.repo.user.service.UserSummary;
 import uk.ac.ebi.pride.archive.search.service.ProjectSearchService;
 import uk.ac.ebi.pride.archive.search.service.ProjectSearchSummary;
 import uk.ac.ebi.pride.archive.security.project.ProjectSecureServiceImpl;
+import uk.ac.ebi.pride.archive.web.service.util.WsUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -109,4 +110,10 @@ public class ProjectControllerFunctionalTest {
                 .andExpect(content().string(containsString(""+NUM_COUNT_RESULTS)));
     }
 
+    @Test // //project/list
+    public void ProteinByAssayAccessionMaxPageSizeException() throws Exception {
+        // test with custom paging configuration
+        mockMvc.perform(get("/project/list"+ "?show="+ (WsUtils.MAX_PAGE_SIZE + 1)+"&page=0"))
+                .andExpect(status().isForbidden());
+    }
 }

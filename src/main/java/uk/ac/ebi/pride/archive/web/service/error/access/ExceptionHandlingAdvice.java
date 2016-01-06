@@ -1,17 +1,15 @@
 package uk.ac.ebi.pride.archive.web.service.error.access;
 
-import javassist.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.social.InternalServerErrorException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.ebi.pride.archive.web.service.error.exception.InvalidDataException;
+import uk.ac.ebi.pride.archive.web.service.error.exception.MaxPageSizeReachedException;
 import uk.ac.ebi.pride.archive.web.service.error.exception.ResourceNotFoundException;
 import uk.ac.ebi.pride.web.util.exception.RestError;
-import uk.ac.ebi.pride.web.util.exception.RestErrorRegistry;
 
 import java.security.Principal;
 
@@ -86,6 +84,16 @@ public class ExceptionHandlingAdvice {
                 null);
     }
 
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ExceptionHandler(MaxPageSizeReachedException.class)
+    private
+    @ResponseBody
+    RestError handleMaxPageSizeReachedException(MaxPageSizeReachedException ex) {
+        return new RestError(HttpStatus.FORBIDDEN,
+                HttpStatus.FORBIDDEN.value(),
+                "Invalid request. " + ex.getMessage(),
+                null);
+    }
 
 
 
