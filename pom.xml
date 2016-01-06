@@ -10,7 +10,7 @@
 
     <groupId>uk.ac.ebi.pride.archive</groupId>
     <artifactId>web-service</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>pride-archive-webservice</name><!-- used for the finalName of the generated artifact -->
 
@@ -34,7 +34,7 @@
         <connection>scm:git:github.com/PRIDE-Archive/web-service.git</connection>
         <developerConnection>scm:git:git@github.com:PRIDE-Archive/web-service.git</developerConnection>
         <url>https://github.com/PRIDE-Archive/web-service.git</url>
-        <tag>web-service-1.0.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
