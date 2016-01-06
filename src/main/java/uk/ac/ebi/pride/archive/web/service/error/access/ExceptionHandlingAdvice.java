@@ -92,7 +92,7 @@ public class ExceptionHandlingAdvice {
         return new RestError(HttpStatus.FORBIDDEN,
                 HttpStatus.FORBIDDEN.value(),
                 "Invalid request. " + ex.getMessage(),
-                null);
+                "http://www.ebi.ac.uk/pride/help/archive/access/webservice");
     }
 
 
