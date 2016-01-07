@@ -87,7 +87,7 @@ public class ProteinController {
 
         if(showResults > WsUtils.MAX_PAGE_SIZE){
             logger.error("Maximum size of page reach");
-            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page");
+            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
         }
 
         List<ProteinIdentification> foundProteins = pissService.findByProjectAccession(projectAccession, new PageRequest(page, showResults)).getContent();
@@ -172,7 +172,7 @@ public class ProteinController {
 
         if(showResults > WsUtils.MAX_PAGE_SIZE){
             logger.error("Maximum size of page reach");
-            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page");
+            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
         }
 
         List<ProteinIdentification> foundProteins = pissService.findByAssayAccession(assayAccession, new PageRequest(page, showResults)).getContent();

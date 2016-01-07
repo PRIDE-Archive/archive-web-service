@@ -131,7 +131,7 @@ public class ProjectController {
 
         if(showResults > WsUtils.MAX_PAGE_SIZE){
             logger.error("Maximum size of page reach");
-            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page");
+            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
         }
 
         // if no search term is provided, and therefore score is not very relevant, date has to be the sorting criteria

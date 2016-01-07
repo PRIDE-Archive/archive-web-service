@@ -103,7 +103,7 @@ public class PsmController {
 
         if(showResults > WsUtils.MAX_PAGE_SIZE){
             logger.error("Maximum size of page reach");
-            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page");
+            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
         }
 
         List<Psm> foundPsms = psmSecureSearchService.findByProjectAccession(projectAccession, new PageRequest(page, showResults, Sort.Direction.ASC, "peptide_sequence")).getContent();
@@ -149,7 +149,7 @@ public class PsmController {
 
 //        if(showResults > WsUtils.MAX_PAGE_SIZE){
 //            logger.error("Maximum size of page reach");
-//            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page");
+//            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
 //        }
 
         // ToDo: should use paging
@@ -219,7 +219,7 @@ public class PsmController {
 
         if(showResults > WsUtils.MAX_PAGE_SIZE){
             logger.error("Maximum size of page reach");
-            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page");
+            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
         }
 
         List<Psm> foundPsms = psmSecureSearchService.findByAssayAccession(assayAccession, new PageRequest(page, showResults, Sort.Direction.ASC, "peptide_sequence")).getContent();
