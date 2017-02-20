@@ -5,7 +5,7 @@
     <parent>
         <groupId>uk.ac.ebi.pride.maven</groupId>
         <artifactId>pride-base-master</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.5</version>
     </parent>
 
     <groupId>uk.ac.ebi.pride.archive</groupId>
@@ -29,19 +29,11 @@
                 To run locally, for example with jetty, a local server configuration is needed.
      -->
 
-    <!--scm git config-->
-    <scm>
-        <connection>scm:git:github.com/PRIDE-Archive/web-service.git</connection>
-        <developerConnection>scm:git:git@github.com:PRIDE-Archive/web-service.git</developerConnection>
-        <url>https://github.com/PRIDE-Archive/web-service.git</url>
-        <tag>HEAD</tag>
-    </scm>
-
     <properties>
-        <archive.ws.model.version>0.2.12</archive.ws.model.version>
+        <archive.ws.model.version>0.2.13</archive.ws.model.version>
         <archive.security.version>0.1.2</archive.security.version>
-        <archive.search.version>1.0.3</archive.search.version>
-        <archive.utils.version>0.1.10</archive.utils.version>
+        <archive.search.version>1.0.8</archive.search.version>
+        <archive.utils.version>0.1.21</archive.utils.version>
         <pride.web.utils.version>1.3.10</pride.web.utils.version>
         <solr.solrj.version>4.2.0</solr.solrj.version>
         <swagger.version>0.8.6</swagger.version>
@@ -257,10 +249,12 @@
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
+            <version>1.3.1</version>
         </dependency>
 
         <!-- REST documentation (Swagger) -->
@@ -287,22 +281,25 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
         </dependency>
-
-
     </dependencies>
 
     <repositories>
-        <!-- EBI repo -->
         <repository>
-            <id>nexus-ebi-repo</id>
-            <name>The EBI internal repository</name>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo/</url>
-            <releases>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <id>nexus-ebi-release-repo</id>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-repo/</url>
+        </repository>
+        <repository>
+            <id>nexus-ebi-snapshot-repo</id>
+            <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-snapshots/</url>
         </repository>
     </repositories>
+
+    <!--scm git config-->
+    <scm>
+        <connection>scm:git:https://github.com/PRIDE-Archive/web-service.git</connection>
+        <developerConnection>scm:git:https://github.com/PRIDE-Archive/web-service.gi</developerConnection>
+        <url>https://github.com/PRIDE-Archive/web-service.git</url>
+        <tag>HEAD</tag>
+    </scm>
 
 </project>
