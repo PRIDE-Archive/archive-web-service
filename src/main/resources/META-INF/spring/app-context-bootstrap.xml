@@ -29,6 +29,8 @@
 
     <util:properties id="databaseConfig" location="classpath:META-INF/props/db.properties"/>
 
+    <util:properties id="redisConfig" location="classpath:META-INF/props/redis.properties"/>
+
     <bean id="userWebServiceUrl" class="uk.ac.ebi.pride.archive.repo.user.service.url.UserWebServiceUrl">
         <constructor-arg name="signUpUrl" value="${user.signup.url}"/>
         <constructor-arg name="passwordResetUrl" value="${user.reset.password.url}"/>
