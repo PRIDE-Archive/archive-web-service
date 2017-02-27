@@ -16,6 +16,7 @@
 
     <util:properties id="fileConfig" location="classpath:META-INF/props/file.properties"/>
     <util:properties id="buildConfig" location="classpath:META-INF/props/build.properties"/>
+    <util:properties id="redisConfig" location="classpath:META-INF/props/redis.properties"/>
 
     <!--<util:properties id="databaseConfig" location="classpath:META-INF/props/db.properties"/>-->
 
