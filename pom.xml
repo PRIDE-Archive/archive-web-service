@@ -154,6 +154,10 @@
                     <groupId>org.apache.solr</groupId>
                     <artifactId>solr-test-framework</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -168,6 +172,12 @@
             <groupId>uk.ac.ebi.pride.archive</groupId>
             <artifactId>archive-security</artifactId>
             <version>${archive.security.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- pride-web-utils -->
