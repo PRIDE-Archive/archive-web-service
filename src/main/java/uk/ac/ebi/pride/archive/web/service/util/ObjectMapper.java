@@ -321,15 +321,9 @@ public final class ObjectMapper {
 
         List<FileDetail> mappedObjects = new ArrayList<FileDetail>(fileSummaries.size());
         for (FileSummary fileSummary : fileSummaries) {
-            if (fileSummary.getFileSource() == ProjectFileSource.INTERNAL) {
-                // we skip internal files
-                continue;
-            }
-            if (fileSummary.getFileSource() == ProjectFileSource.GENERATED) {
-                // for now also skip generated files, until we decide to make them public
-                continue;
-            }
-            mappedObjects.add( mapFileSummaryToWSFileDetail(fileSummary) );
+            if (fileSummary.getFileSource() != ProjectFileSource.INTERNAL) {
+                mappedObjects.add( mapFileSummaryToWSFileDetail(fileSummary) );
+            } // skip internal files
         }
         return mappedObjects;
     }
