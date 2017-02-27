@@ -10,7 +10,7 @@
 
     <groupId>uk.ac.ebi.pride.archive</groupId>
     <artifactId>web-service</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.0.5</version>
     <packaging>war</packaging>
     <name>pride-archive-webservice</name><!-- used for the finalName of the generated artifact -->
 
