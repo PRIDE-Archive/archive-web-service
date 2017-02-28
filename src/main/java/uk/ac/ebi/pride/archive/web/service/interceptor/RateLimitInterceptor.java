@@ -61,7 +61,8 @@ public class RateLimitInterceptor extends HandlerInterceptorAdapter {
       String address = request.getHeader("requestx-forwarded-for");
       if (address == null || address.length() == 0 || "unknown".equalsIgnoreCase(address)) {
         address = request.getHeader("x-cluster-client-ip");
-      } else if (address == null || address.length() == 0 || "unknown".equalsIgnoreCase(address)) {
+      }
+      if (address == null || address.length() == 0 || "unknown".equalsIgnoreCase(address)) {
         address = request.getRemoteAddr();
       }
       int incrementUserGetCount = rateLimitService.incrementLimit("GET~" + address, jedisPool);
