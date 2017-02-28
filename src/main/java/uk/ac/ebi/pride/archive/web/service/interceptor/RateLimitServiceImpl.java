@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import static uk.ac.ebi.pride.archive.web.service.interceptor.RateLimitInterceptor.MAX_REQUESTS_PER_PERIOD;
+
 /**
  * This class implements the RateLimitService interface to limit users' connections.
  * Redis is used as a key/value store. The key is made up of a user's IP plus general request type (i.e. GET),
@@ -37,7 +39,9 @@ public class RateLimitServiceImpl extends GenericApplicationContext implements R
         jedis.set(userKey, "1");
         result = 1;
       }
-      jedis.expire(userKey, COUNT_EXPIRY_PERIOD_SECONDS);
+      if (result < MAX_REQUESTS_PER_PERIOD){
+        jedis.expire(userKey, COUNT_EXPIRY_PERIOD_SECONDS);
+      }
     } finally {
       if (jedis != null) {
         jedis.close();
