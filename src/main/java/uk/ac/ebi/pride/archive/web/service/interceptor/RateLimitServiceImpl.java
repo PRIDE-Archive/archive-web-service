@@ -19,7 +19,7 @@ import static uk.ac.ebi.pride.archive.web.service.interceptor.RateLimitIntercept
 @Service
 @EnableScheduling
 public class RateLimitServiceImpl extends GenericApplicationContext implements RateLimitService {
-  static final int COUNT_EXPIRY_PERIOD_SECONDS = 30;
+  public static final int COUNT_EXPIRY_PERIOD_SECONDS = 30;
 
   /**
    * This method connects to Redis to track the count of users' total requests within the defined time period.

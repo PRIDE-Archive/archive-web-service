@@ -28,7 +28,7 @@ import static uk.ac.ebi.pride.archive.web.service.interceptor.RateLimitServiceIm
 public class RateLimitInterceptor extends HandlerInterceptorAdapter {
   private static final Logger logger = LoggerFactory.getLogger(RateLimitInterceptor.class);
 
-  static final int MAX_REQUESTS_PER_PERIOD = COUNT_EXPIRY_PERIOD_SECONDS * 2;
+  public static final int MAX_REQUESTS_PER_PERIOD = COUNT_EXPIRY_PERIOD_SECONDS * 2;
   @Value("#{redisConfig['redis.host']}")
   private String redisServer;
   @Value("#{redisConfig['redis.port']}")
