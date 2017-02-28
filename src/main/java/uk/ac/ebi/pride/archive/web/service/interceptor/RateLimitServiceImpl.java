@@ -19,7 +19,7 @@ import static uk.ac.ebi.pride.archive.web.service.interceptor.RateLimitIntercept
 @Service
 @EnableScheduling
 public class RateLimitServiceImpl extends GenericApplicationContext implements RateLimitService {
-  public static final int COUNT_EXPIRY_PERIOD_SECONDS = 30;
+  public static final int COUNT_EXPIRY_PERIOD_SECONDS = 15;
 
   /**
    * This method connects to Redis to track the count of users' total requests within the defined time period.
@@ -41,6 +41,8 @@ public class RateLimitServiceImpl extends GenericApplicationContext implements R
       }
       if (result < MAX_REQUESTS_PER_PERIOD){
         jedis.expire(userKey, COUNT_EXPIRY_PERIOD_SECONDS);
+      } else if (result == MAX_REQUESTS_PER_PERIOD){
+        jedis.expire(userKey, COUNT_EXPIRY_PERIOD_SECONDS*2); // throttle users harder who hit the cap
       }
     } finally {
       if (jedis != null) {
