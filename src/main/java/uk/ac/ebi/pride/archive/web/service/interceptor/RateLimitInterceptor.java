@@ -12,6 +12,8 @@ import redis.clients.jedis.JedisPoolConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.Enumeration;
+
 import static uk.ac.ebi.pride.archive.web.service.interceptor.RateLimitServiceImpl.COUNT_EXPIRY_PERIOD_SECONDS;
 
 /**
@@ -26,7 +28,7 @@ import static uk.ac.ebi.pride.archive.web.service.interceptor.RateLimitServiceIm
 public class RateLimitInterceptor extends HandlerInterceptorAdapter {
   private static final Logger logger = LoggerFactory.getLogger(RateLimitInterceptor.class);
 
-  private static final int MAX_REQUESTS_PER_PERIOD = COUNT_EXPIRY_PERIOD_SECONDS * 2;
+  static final int MAX_REQUESTS_PER_PERIOD = COUNT_EXPIRY_PERIOD_SECONDS * 2;
   @Value("#{redisConfig['redis.host']}")
   private String redisServer;
   @Value("#{redisConfig['redis.port']}")
@@ -53,16 +55,41 @@ public class RateLimitInterceptor extends HandlerInterceptorAdapter {
       jedisPool = new JedisPool(new JedisPoolConfig(), redisServer, Integer.parseInt(redisPort), 0, redisPassword);
     }
     if ("GET".equalsIgnoreCase(request.getMethod())) {
-      int incrementUserGetCount = rateLimitService.incrementLimit("GET~" + request.getRemoteAddr(), jedisPool);
-      logger.debug("Current count for user: " + request.getRemoteAddr() + " is: " + incrementUserGetCount);
+      if (logger.isDebugEnabled()) {
+        debugRequestHeaders(request);
+      }
+      String address = request.getHeader("requestx-forwarded-for");
+      if (address == null || address.length() == 0 || "unknown".equalsIgnoreCase(address)) {
+        address = request.getHeader("x-cluster-client-ip");
+      } else if (address == null || address.length() == 0 || "unknown".equalsIgnoreCase(address)) {
+        address = request.getRemoteAddr();
+      }
+      int incrementUserGetCount = rateLimitService.incrementLimit("GET~" + address, jedisPool);
+      logger.debug("Current count for user: " + address + " is: " + incrementUserGetCount);
       if (incrementUserGetCount >= MAX_REQUESTS_PER_PERIOD) {
         response.sendError(429, "Rate limit exceeded (" + MAX_REQUESTS_PER_PERIOD + "), please wait " + COUNT_EXPIRY_PERIOD_SECONDS + " seconds.");
         result = false;
-        logger.info("Throttled connections for user: " + request.getRemoteAddr());
+        logger.info("Throttled connections for user: " + address);
       } else {
         response.addIntHeader("Remaining request count", MAX_REQUESTS_PER_PERIOD - incrementUserGetCount);
       }
     }
     return result;
+  }
+
+  /**
+   * This method outputs the HTTP request headers to the debug logger.
+   * @param request the HTTP request.
+   */
+  private void debugRequestHeaders(HttpServletRequest request) {
+    logger.debug(request.getRemoteAddr() + ": Printing all headers...");
+    logger.debug("Throttled connections for user: " + request.getRemoteAddr());
+    Enumeration headerNames = request.getHeaderNames();
+    while (headerNames.hasMoreElements()) {
+      String headerName = (String) headerNames.nextElement();
+      logger.debug(request.getRemoteAddr() + ": Header name: " + headerName);
+      logger.debug(request.getRemoteAddr() + ":     Header value: " + request.getHeader(headerName));
+    }
+    logger.debug("Finished printing all headers!");
   }
 }
