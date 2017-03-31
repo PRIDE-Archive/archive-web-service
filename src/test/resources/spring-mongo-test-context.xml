@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xsi:schemaLocation=
+               "http://www.springframework.org/schema/context
+              http://www.springframework.org/schema/context/spring-context.xsd
+              http://www.springframework.org/schema/data/mongo
+              http://www.springframework.org/schema/data/mongo/spring-mongo.xsd
+              http://www.springframework.org/schema/beans
+              http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <context:annotation-config />
+
+    <context:component-scan base-package="uk.ac.ebi.pride.psmindex.mongo.search"/>
+
+    <!-- MongoDB repositories -->
+    <mongo:repositories base-package="uk.ac.ebi.pride.psmindex.mongo.search.service.repository" />
+
+    <!--Unit testing fongo configuration-->
+    <bean name="fongo" class="com.github.fakemongo.Fongo">
+        <constructor-arg value="InMemoryMongo"/>
+    </bean>
+    <bean id="mongo" factory-bean="fongo" factory-method="getMongo"/>
+
+    <!--or localhost configuration if you have your mongo db -->
+    <!--<mongo:mongo id="mongo" host="127.0.0.1" port="27017" />-->
+
+    <!--Default database name-->
+    <mongo:db-factory id="mongoDbFactory" dbname="db" />
+
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg ref="mongo" />
+        <constructor-arg value="db" />
+    </bean>
+
+</beans>
+
+
+

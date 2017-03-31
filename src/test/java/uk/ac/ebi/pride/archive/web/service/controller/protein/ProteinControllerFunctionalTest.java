@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-config.xml"})
+@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-config.xml", "classpath:spring-mongo-test-context.xml"})
 public class ProteinControllerFunctionalTest {
 
     @Autowired
