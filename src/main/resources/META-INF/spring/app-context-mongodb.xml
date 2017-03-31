@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
+
+    <context:annotation-config />
+
+    <!-- MongoDB repositories -->
+    <mongo:repositories base-package="uk.ac.ebi.pride.psmindex.mongo.search.service.repository"/>
+    <context:component-scan base-package="uk.ac.ebi.pride.psmindex.mongo.search"/>
+
+    <!--EBI configuration start-->
+    <mongo:mongo id="mongo"
+                 replica-set="${archive.mongo.app.machine.one}:${archive.mongo.app.port},${archive.mongo.app.machine.two}:${archive.mongo.app.port},${archive.mongo.app.machine.three}:${archive.mongo.app.port}"
+                 write-concern="NORMAL">
+        <mongo:options threads-allowed-to-block-for-connection-multiplier="10"
+                       connect-timeout="1000000"
+                       max-wait-time="120000"
+                       socket-keep-alive="true"
+                       socket-timeout="1000000"
+        />
+    </mongo:mongo>
+
+    <mongo:db-factory dbname="${archive.mongo.app.db}" authentication-dbname="${archive.mongo.app.authenticationDatabase}"
+                      username="${archive.mongo.app.user}" password="${archive.mongo.app.password}" port="${archive.mongo.app.port}" mongo-ref="mongo"/>
+    <!--EBI configuration end-->
+
+    <!--localhost configuration start-->
+    <!--<mongo:mongo host="127.0.0.1" port="27017" />-->
+    <!--Default database name-->
+    <!--<mongo:db-factory dbname="db"/>-->
+    <!--localhost configuration end -->
+
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+        <property name="readPreference" ref="readPreferencePrimary"/>
+    </bean>
+
+    <bean id="readPreferencePrimary" class="com.mongodb.TaggableReadPreference.PrimaryPreferredReadPreference">
+    </bean>
+
+    <!--Properties-->
+    <context:property-placeholder location="classpath:META-INF/props/mongo.properties" ignore-unresolvable="true"/>
+
+</beans>

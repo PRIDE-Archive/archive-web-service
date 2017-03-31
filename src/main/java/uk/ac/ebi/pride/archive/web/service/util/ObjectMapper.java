@@ -24,6 +24,7 @@ import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetail;
 import uk.ac.ebi.pride.archive.web.service.model.project.ProjectDetail;
 import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetail;
 import uk.ac.ebi.pride.proteinidentificationindex.search.model.ProteinIdentification;
+import uk.ac.ebi.pride.psmindex.mongo.search.model.MongoPsm;
 import uk.ac.ebi.pride.psmindex.search.model.Psm;
 
 import java.util.*;
@@ -397,6 +398,38 @@ public final class ObjectMapper {
             mappedObject.setId(psm.getId());
             mappedObject.setReportedID( psm.getReportedId() );
             mappedObject.setModifications( getModifiedLocations(psm.getModifications()) );
+            mappedObjects.add(mappedObject);
+        }
+
+        return mappedObjects;
+    }
+
+    // MongoPSM map methods
+    public static List<PsmDetail> mapMongoPsmListToWSPsmDetailList(List<MongoPsm> mongoPsms) {
+        if (mongoPsms == null) { return null; }
+        if (mongoPsms.isEmpty()) { return new ArrayList<>(0); }
+
+        List<PsmDetail> mappedObjects = new ArrayList<>();
+        for (MongoPsm mongoPsm : mongoPsms) {
+            PsmDetail mappedObject = new PsmDetail();
+            mappedObject.setSequence(mongoPsm.getPeptideSequence());
+            mappedObject.setStartPosition(mongoPsm.getStartPosition());
+            mappedObject.setEndPosition(mongoPsm.getEndPosition());
+            mappedObject.setProteinAccession(mongoPsm.getProteinAccession());
+            mappedObject.setProjectAccession(mongoPsm.getProjectAccession());
+            mappedObject.setAssayAccession(mongoPsm.getAssayAccession());
+            mappedObject.setCalculatedMZ(mongoPsm.getCalculatedMassToCharge());
+            mappedObject.setExperimentalMZ(mongoPsm.getExpMassToCharge());
+            mappedObject.setCharge(mongoPsm.getCharge());
+            mappedObject.setPreAA(mongoPsm.getPreAminoAcid());
+            mappedObject.setPostAA(mongoPsm.getPostAminoAcid());
+            mappedObject.setRetentionTime(mongoPsm.getRetentionTime());
+            mappedObject.setSearchEngines(getCvParamNames(mongoPsm.getSearchEngines()));
+            mappedObject.setSearchEngineScores(getCvParamNameValuePairs(mongoPsm.getSearchEngineScores()) );
+            mappedObject.setSpectrumID( mongoPsm.getSpectrumId() );
+            mappedObject.setId(mongoPsm.getId());
+            mappedObject.setReportedID( mongoPsm.getReportedId() );
+            mappedObject.setModifications( getModifiedLocations(mongoPsm.getModifications()) );
             mappedObjects.add(mappedObject);
         }
 
