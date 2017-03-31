@@ -65,8 +65,7 @@ public class RateLimitInterceptor extends HandlerInterceptorAdapter {
       if (address == null || address.length() == 0 || "unknown".equalsIgnoreCase(address)) {
         address = request.getRemoteAddr();
       }
-      //todo hardcoded test whitelist
-      if (!address.equals("172.22.68.40") && !address.equals("127.0.0.1") && !address.equals("0:0:0:0:0:0:0:1")) {
+      if (!address.equals("127.0.0.1") && !address.equals("0:0:0:0:0:0:0:1")) {
         int incrementUserGetCount = rateLimitService.incrementLimit("GET~" + address, jedisPool);
         logger.debug("Current count for user: " + address + " is: " + incrementUserGetCount);
         if (incrementUserGetCount >= MAX_REQUESTS_PER_PERIOD) {
