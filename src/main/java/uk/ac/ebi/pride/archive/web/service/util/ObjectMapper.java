@@ -375,32 +375,17 @@ public final class ObjectMapper {
     // PSM map methods
     public static List<PsmDetail> mapPsmListToWSPsmDetailList(List<Psm> psms) {
         if (psms == null) { return null; }
-        if (psms.isEmpty()) { return new ArrayList<PsmDetail>(0); }
-
-        List<PsmDetail> mappedObjects = new ArrayList<PsmDetail>();
+        if (psms.isEmpty()) { return new ArrayList<>(0); }
+        List<PsmDetail> mappedObjects = new ArrayList<>();
         for (Psm psm : psms) {
             PsmDetail mappedObject = new PsmDetail();
             mappedObject.setSequence(psm.getPeptideSequence());
-            mappedObject.setStartPosition(psm.getStartPosition());
-            mappedObject.setEndPosition(psm.getEndPosition());
             mappedObject.setProteinAccession(psm.getProteinAccession());
             mappedObject.setProjectAccession(psm.getProjectAccession());
             mappedObject.setAssayAccession(psm.getAssayAccession());
-            mappedObject.setCalculatedMZ(psm.getCalculatedMassToCharge());
-            mappedObject.setExperimentalMZ(psm.getExpMassToCharge());
-            mappedObject.setCharge(psm.getCharge());
-            mappedObject.setPreAA(psm.getPreAminoAcid());
-            mappedObject.setPostAA(psm.getPostAminoAcid());
-            mappedObject.setRetentionTime(psm.getRetentionTime());
-            mappedObject.setSearchEngines(getCvParamNames(psm.getSearchEngines()));
-            mappedObject.setSearchEngineScores(getCvParamNameValuePairs(psm.getSearchEngineScores()) );
-            mappedObject.setSpectrumID( psm.getSpectrumId() );
             mappedObject.setId(psm.getId());
-            mappedObject.setReportedID( psm.getReportedId() );
-            mappedObject.setModifications( getModifiedLocations(psm.getModifications()) );
             mappedObjects.add(mappedObject);
         }
-
         return mappedObjects;
     }
 
@@ -408,7 +393,6 @@ public final class ObjectMapper {
     public static List<PsmDetail> mapMongoPsmListToWSPsmDetailList(List<MongoPsm> mongoPsms) {
         if (mongoPsms == null) { return null; }
         if (mongoPsms.isEmpty()) { return new ArrayList<>(0); }
-
         List<PsmDetail> mappedObjects = new ArrayList<>();
         for (MongoPsm mongoPsm : mongoPsms) {
             PsmDetail mappedObject = new PsmDetail();
@@ -432,7 +416,6 @@ public final class ObjectMapper {
             mappedObject.setModifications( getModifiedLocations(mongoPsm.getModifications()) );
             mappedObjects.add(mappedObject);
         }
-
         return mappedObjects;
     }
 
