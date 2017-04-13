@@ -22,9 +22,7 @@ import uk.ac.ebi.pride.archive.web.service.util.WsUtils;
 import uk.ac.ebi.pride.psmindex.search.model.Psm;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -48,52 +46,6 @@ public class PsmController {
   @Autowired
   MongoPsmSecureSearchService mongoPsmSecureSearchService;
 
-
-  // ToDo: performance tests (page sizes, security impact), and perhaps max number of retrievable (page size) results
-
-  // ToDo: method not available, as not secured
-//    @ApiOperation(value = "retrieve peptide identifications by sequence and project accession", position = 1)
-//    @RequestMapping(value = "/list/{sequence}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//    @ResponseStatus(HttpStatus.OK) // 200
-//    public
-//    @ResponseBody
-//    PsmDetailList getPsmsBySequence(
-//            @ApiParam(value = "a peptide sequence")
-//            @PathVariable("sequence") String sequence
-//    ) {
-//        logger.info("Query for PSMs with sequence: " + sequence);
-//
-//        List<Psm> foundPsms;
-//            foundPsms = psmSecureSearchService.findByPeptideSequence(sequence);
-//
-//        // convert the searches List of Psm objects into the WS PsmDetail objects
-//        List<PsmDetail> resultPsms = ObjectMapper.mapPsmListToWSPsmDetailList(foundPsms);
-//
-//        return new PsmDetailList(resultPsms);
-//    }
-
-  // ToDo: method not available, as not secured
-//    @ApiOperation(value = "retrieve peptide identifications by protein accession", position = 4)
-//    @RequestMapping(value = "/list/protein/{proteinAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//    @ResponseStatus(HttpStatus.OK) // 200
-//    public
-//    @ResponseBody
-//    PsmDetailList getPsmsByProtein(
-//            @ApiParam(value = "an assay accession")
-//            @PathVariable("proteinAccession") String proteinAccession
-//    ) {
-//        logger.info("Peptides for protein " + proteinAccession + " requested");
-//
-//        // ToDo: this should probably allow a search expansion using the proteins synonyms
-//        List<Psm> foundPsms = psmSecureSearchService.findByProteinAccession(proteinAccession);
-//
-//        // convert the searches List of Psm objects into the WS PsmDetail objects
-//        List<PsmDetail> resultPsms = ObjectMapper.mapPsmListToWSPsmDetailList(foundPsms);
-//
-//        return new PsmDetailList(resultPsms);
-//    }
-
-
   @ApiOperation(value = "retrieve peptide identifications by project accession", position = 1)
   @RequestMapping(value = "/list/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK) // 200
@@ -112,8 +64,9 @@ public class PsmController {
       logger.error("Maximum size of page reach");
       throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
     }
-    List<Psm> foundPsms = psmSecureSearchService.findByProjectAccession(projectAccession, new PageRequest(page, showResults, Sort.Direction.ASC, SOLR_PEPTIDE_SEQUENCE_FIELD, SOLR_ID_FIELD)).getContent();
-    return getPsmDetailList(foundPsms);
+    return getPsmDetailList(psmSecureSearchService.findByProjectAccession(
+        projectAccession, new PageRequest(page, showResults, Sort.Direction.ASC, SOLR_PEPTIDE_SEQUENCE_FIELD, SOLR_ID_FIELD)).
+        getContent());
   }
 
   @ApiOperation(value = "count peptide identifications by project accession", position = 1)
@@ -131,34 +84,6 @@ public class PsmController {
     return foundPsms;
   }
 
-  @ApiIgnore
-  @ApiOperation(value = "retrieve peptide sequences by project accession", position = 0)
-  @RequestMapping(value = "/list/project/{projectAccession}.seq", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  @ResponseStatus(HttpStatus.OK) // 200
-  public
-  @ResponseBody
-  Set<String> getPsmSequencesByProject(
-      @ApiParam(value = "a project accession (example: PXD000001)")
-      @PathVariable("projectAccession") String projectAccession,
-      @ApiParam(value = "how many results to return per page. Maximum page size is: " + WsUtils.MAX_PAGE_SIZE)
-      @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
-      @ApiParam(value = "which page (starting from 0) of the result to return")
-      @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
-  ) {
-    logger.info("Peptide Sequences for project " + projectAccession + " requested");
-
-//        if(showResults > WsUtils.MAX_PAGE_SIZE){
-//            logger.error("Maximum size of page reach");
-//            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
-//        }
-
-    // ToDo: should use paging
-    List<String> foundPsms = psmSecureSearchService.findPeptideSequencesByProjectAccession(projectAccession);
-    Set<String> uniqueSeqs = new HashSet<String>();
-    uniqueSeqs.addAll(foundPsms);
-    return uniqueSeqs;
-  }
-
   @ApiOperation(value = "retrieve peptide identifications by project accession and peptide sequence", position = 2)
   @RequestMapping(value = "/list/project/{projectAccession}/sequence/{sequence}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK) // 200
@@ -168,11 +93,16 @@ public class PsmController {
       @ApiParam(value = "a project accession (example: PXD000001)")
       @PathVariable("projectAccession") String projectAccession,
       @ApiParam(value = "the peptide sequence to limit the query on (example: GIANSILIK)")
-      @PathVariable("sequence") String sequence
+      @PathVariable("sequence") String sequence,
+      @ApiParam(value = "how many results to return per page. Maximum page size is: " + WsUtils.MAX_PAGE_SIZE)
+      @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
+      @ApiParam(value = "which page (starting from 0) of the result to return")
+      @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
   ) {
     logger.info("Request for peptides for project " + projectAccession + " with sequence: " + sequence);
-    List<Psm> foundPsms = psmSecureSearchService.findByPeptideSequenceAndProjectAccession(sequence, projectAccession);
-    return getPsmDetailList(foundPsms);
+    return getPsmDetailList(psmSecureSearchService.findByPeptideSequenceAndProjectAccession(
+        sequence, projectAccession, new PageRequest(page, showResults, Sort.Direction.ASC, SOLR_PEPTIDE_SEQUENCE_FIELD, SOLR_ID_FIELD)).
+        getContent());
   }
 
   @ApiOperation(value = "count peptide identifications by project accession and peptide sequence", position = 3)
@@ -210,8 +140,9 @@ public class PsmController {
       logger.error("Maximum size of page reach");
       throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
     }
-    List<Psm> foundPsms = psmSecureSearchService.findByAssayAccession(assayAccession, new PageRequest(page, showResults, Sort.Direction.ASC, SOLR_PEPTIDE_SEQUENCE_FIELD, SOLR_ID_FIELD)).getContent();
-    return getPsmDetailList(foundPsms);
+    return getPsmDetailList( psmSecureSearchService.findByAssayAccession(
+        assayAccession, new PageRequest(page, showResults, Sort.Direction.ASC, SOLR_PEPTIDE_SEQUENCE_FIELD, SOLR_ID_FIELD)).
+        getContent());
   }
 
   @ApiOperation(value = "count peptide identifications by assay accession", position = 5)
@@ -239,11 +170,16 @@ public class PsmController {
       @ApiParam(value = "a assay accession (example: 22134)")
       @PathVariable("assayAccession") String assayAccession,
       @ApiParam(value = "the peptide sequence to limit the query on (example: GIANSILIK)")
-      @PathVariable("sequence") String sequence
+      @PathVariable("sequence") String sequence,
+      @ApiParam(value = "how many results to return per page. Maximum page size is: " + WsUtils.MAX_PAGE_SIZE)
+      @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
+      @ApiParam(value = "which page (starting from 0) of the result to return")
+      @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
   ) {
     logger.info("Request for peptides for assay " + assayAccession + " with sequence: " + sequence);
-    List<Psm> foundPsms = psmSecureSearchService.findByPeptideSequenceAndAssayAccession(sequence, assayAccession);
-    return getPsmDetailList(foundPsms);
+    return getPsmDetailList(psmSecureSearchService.findByPeptideSequenceAndAssayAccession(
+        sequence, assayAccession, new PageRequest(page, showResults, Sort.Direction.ASC, SOLR_PEPTIDE_SEQUENCE_FIELD, SOLR_ID_FIELD)).
+        getContent());
   }
 
   @ApiOperation(value = "count peptide identifications by assay accession and peptide sequence", position = 7)
