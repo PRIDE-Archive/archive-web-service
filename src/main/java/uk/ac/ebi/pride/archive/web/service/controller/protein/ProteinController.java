@@ -60,7 +60,7 @@ public class ProteinController {
     return getPsmDetailList(proteinIdService.findByProjectAccession(projectAccession, new PageRequest(page, showResults)).getContent());
   }
 
-  @ApiOperation(value = "count protein identifications by project accession", position = 4)
+  @ApiOperation(value = "count protein identifications by project accession", position = 2)
   @RequestMapping(value = "/count/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK) // 200
   public
@@ -73,7 +73,7 @@ public class ProteinController {
     return proteinIdService.countByProjectAccession(projectAccession);
   }
 
-  @ApiOperation(value = "retrieve protein identifications by project accession and protein accession", position = 2)
+  @ApiOperation(value = "retrieve protein identifications by project accession and protein accession", position = 3)
   @RequestMapping(value = "/list/project/{projectAccession}/protein/{accession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK) // 200
   public
@@ -88,7 +88,7 @@ public class ProteinController {
     return getPsmDetailList(proteinIdService.findByProjectAccessionAndAccession(projectAccession, accession));
   }
 
-  @ApiOperation(value = "count protein identifications by project accession and protein accession", position = 3)
+  @ApiOperation(value = "count protein identifications by project accession and protein accession", position = 4)
   @RequestMapping(value = "/count/project/{projectAccession}/protein/{accession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK) // 200
   public

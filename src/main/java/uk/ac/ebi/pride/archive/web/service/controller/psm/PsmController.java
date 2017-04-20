@@ -68,7 +68,7 @@ public class PsmController {
         getContent());
   }
 
-  @ApiOperation(value = "count peptide identifications by project accession", position = 1)
+  @ApiOperation(value = "count peptide identifications by project accession", position = 2)
   @RequestMapping(value = "/count/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK) // 200
   public
@@ -83,7 +83,7 @@ public class PsmController {
     return foundPsms;
   }
 
-  @ApiOperation(value = "retrieve peptide identifications by project accession and peptide sequence", position = 2)
+  @ApiOperation(value = "retrieve peptide identifications by project accession and peptide sequence", position = 3)
   @RequestMapping(value = "/list/project/{projectAccession}/sequence/{sequence}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK) // 200
   public
@@ -104,7 +104,7 @@ public class PsmController {
         getContent());
   }
 
-  @ApiOperation(value = "count peptide identifications by project accession and peptide sequence", position = 3)
+  @ApiOperation(value = "count peptide identifications by project accession and peptide sequence", position = 4)
   @RequestMapping(value = "/count/project/{projectAccession}/sequence/{sequence}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK) // 200
   public
@@ -121,7 +121,7 @@ public class PsmController {
     return foundPsms;
   }
 
-  @ApiOperation(value = "retrieve peptide identifications by assay accession", position = 4)
+  @ApiOperation(value = "retrieve peptide identifications by assay accession", position = 5)
   @RequestMapping(value = "/list/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK) // 200
   public
@@ -144,7 +144,7 @@ public class PsmController {
         getContent());
   }
 
-  @ApiOperation(value = "count peptide identifications by assay accession", position = 5)
+  @ApiOperation(value = "count peptide identifications by assay accession", position = 6)
   @RequestMapping(value = "/count/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK) // 200
   public
@@ -160,7 +160,7 @@ public class PsmController {
   }
 
 
-  @ApiOperation(value = "retrieve peptide identifications by assay accession and peptide sequence", position = 6)
+  @ApiOperation(value = "retrieve peptide identifications by assay accession and peptide sequence", position = 7)
   @RequestMapping(value = "/list/assay/{assayAccession}/sequence/{sequence}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK) // 200
   public
@@ -181,7 +181,7 @@ public class PsmController {
         getContent());
   }
 
-  @ApiOperation(value = "count peptide identifications by assay accession and peptide sequence", position = 7)
+  @ApiOperation(value = "count peptide identifications by assay accession and peptide sequence", position = 8)
   @RequestMapping(value = "/count/assay/{assayAccession}/sequence/{sequence}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK) // 200
   public
