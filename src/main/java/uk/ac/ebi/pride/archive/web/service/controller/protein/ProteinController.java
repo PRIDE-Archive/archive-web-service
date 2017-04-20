@@ -60,6 +60,19 @@ public class ProteinController {
     return getPsmDetailList(proteinIdService.findByProjectAccession(projectAccession, new PageRequest(page, showResults)).getContent());
   }
 
+  @ApiOperation(value = "count protein identifications by project accession", position = 4)
+  @RequestMapping(value = "/count/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK) // 200
+  public
+  @ResponseBody
+  Long countProteinsByProject(
+      @ApiParam(value = "a project accession (example: PXD000001)")
+      @PathVariable("projectAccession") String projectAccession
+  ) {
+    logger.info("Protein count for project " + projectAccession + " requested");
+    return proteinIdService.countByProjectAccession(projectAccession);
+  }
+
   @ApiOperation(value = "retrieve protein identifications by project accession and protein accession", position = 2)
   @RequestMapping(value = "/list/project/{projectAccession}/protein/{accession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK) // 200
@@ -88,20 +101,6 @@ public class ProteinController {
   ) {
     logger.info("Protein count for project " + projectAccession + "and accession " + accession + " requested");
     return proteinIdService.countByProjectAccessionAndAccession(projectAccession, accession);
-  }
-
-
-  @ApiOperation(value = "count protein identifications by project accession", position = 4)
-  @RequestMapping(value = "/count/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  @ResponseStatus(HttpStatus.OK) // 200
-  public
-  @ResponseBody
-  Long countProteinsByProject(
-      @ApiParam(value = "a project accession (example: PXD000001)")
-      @PathVariable("projectAccession") String projectAccession
-  ) {
-    logger.info("Protein count for project " + projectAccession + " requested");
-    return proteinIdService.countByProjectAccession(projectAccession);
   }
 
   @ApiOperation(value = "retrieve protein identifications by assay accession", position = 5)
