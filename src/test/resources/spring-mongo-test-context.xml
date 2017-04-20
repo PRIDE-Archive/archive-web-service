@@ -13,10 +13,9 @@
 
     <context:annotation-config />
 
-    <context:component-scan base-package="uk.ac.ebi.pride.psmindex.mongo.search"/>
-
+    <context:component-scan base-package="uk.ac.ebi.pride.psmindex.mongo.search, uk.ac.ebi.pride.proteinidentificationindex.mongo.search"/>
     <!-- MongoDB repositories -->
-    <mongo:repositories base-package="uk.ac.ebi.pride.psmindex.mongo.search.service.repository" />
+    <mongo:repositories base-package="uk.ac.ebi.pride.psmindex.mongo.search.service.repository, uk.ac.ebi.pride.proteinidentificationindex.mongo.search.service.repository" />
 
     <!--Unit testing fongo configuration-->
     <bean name="fongo" class="com.github.fakemongo.Fongo">
