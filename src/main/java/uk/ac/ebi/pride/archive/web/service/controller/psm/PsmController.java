@@ -1,6 +1,5 @@
 package uk.ac.ebi.pride.archive.web.service.controller.psm;
 
-import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -35,7 +34,7 @@ import java.util.stream.Collectors;
 public class PsmController {
 
   private static final Logger logger = LoggerFactory.getLogger(PsmController.class);
-  private static final Sort MONGO_SORT = new Sort(Sort.Direction.ASC, "peptideSequence", "_id");
+  private static final Sort SEQ_MONGO_SORT = new Sort(Sort.Direction.ASC, "peptideSequence", "_id");
   private static final String SOLR_PEPTIDE_SEQUENCE_FIELD = "peptide_sequence";
   private static final String SOLR_ID_FIELD = "id";
 
@@ -206,6 +205,6 @@ public class PsmController {
                 foundPsms.stream().
                     map(Psm::getId).
                     collect(Collectors.toCollection(ArrayList<String>::new)),
-                MONGO_SORT)));
+                SEQ_MONGO_SORT)));
   }
 }
