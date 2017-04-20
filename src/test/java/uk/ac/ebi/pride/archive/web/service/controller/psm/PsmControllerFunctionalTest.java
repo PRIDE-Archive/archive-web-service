@@ -21,6 +21,7 @@ import uk.ac.ebi.pride.indexutils.modifications.Modification;
 import uk.ac.ebi.pride.psmindex.mongo.search.model.MongoPsm;
 import uk.ac.ebi.pride.psmindex.mongo.search.service.MongoPsmIndexService;
 import uk.ac.ebi.pride.psmindex.mongo.search.service.MongoPsmSearchService;
+import uk.ac.ebi.pride.psmindex.mongo.search.service.repository.MongoPsmRepository;
 import uk.ac.ebi.pride.psmindex.search.model.Psm;
 import uk.ac.ebi.pride.psmindex.search.service.PsmSearchService;
 
@@ -28,6 +29,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.when;
 import static org.hamcrest.Matchers.containsString;
@@ -51,11 +53,14 @@ public class PsmControllerFunctionalTest {
   @Autowired
   private PsmSearchService psmSearchService;
 
-  @Resource
+  @Autowired
   private MongoPsmIndexService mongoPsmIndexService;
 
   @Autowired
   private MongoPsmSearchService mongoPsmSearchService;
+
+  @Resource
+  private MongoPsmRepository mongoPsmRepository;
 
   private MockMvc mockMvc;
   private static final String ID = "PXTEST1_1234";
