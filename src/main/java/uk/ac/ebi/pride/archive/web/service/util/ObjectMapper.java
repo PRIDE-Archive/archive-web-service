@@ -23,6 +23,7 @@ import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
 import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetail;
 import uk.ac.ebi.pride.archive.web.service.model.project.ProjectDetail;
 import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetail;
+import uk.ac.ebi.pride.proteinidentificationindex.mongo.search.model.MongoProteinIdentification;
 import uk.ac.ebi.pride.proteinidentificationindex.search.model.ProteinIdentification;
 import uk.ac.ebi.pride.psmindex.mongo.search.model.MongoPsm;
 import uk.ac.ebi.pride.psmindex.search.model.Psm;
@@ -330,63 +331,42 @@ public final class ObjectMapper {
     }
 
 
-    // Protein map methods
-    public static List<ProteinDetail> mapProteinIdentifiedListToWSProteinDetailList(Iterable<ProteinIdentification> proteins) {
-        if (proteins == null || proteins.iterator() == null) { return null; }
-        if (!proteins.iterator().hasNext()) { return new ArrayList<ProteinDetail>(0); }
-
-        List<ProteinDetail> mappedObjects = new ArrayList<ProteinDetail>();
-        for (ProteinIdentification proteinIdentified : proteins) {
-            ProteinDetail mappedObject = mapProteinIdentifiedToWSProteinDetail(proteinIdentified);
-            mappedObjects.add(mappedObject);
+    // MongoProtein map methods
+    public static List<ProteinDetail> mapMongoProteinIdentifiedListToWSProteinDetailList(Iterable<MongoProteinIdentification> mongoProteins) {
+        List<ProteinDetail> result = new ArrayList<>();
+        if (mongoProteins!=null && mongoProteins.iterator().hasNext()) {
+            for(MongoProteinIdentification mongoProteinIdentification : mongoProteins) {
+                result.add(mapMongoProteinIdentifiedToWSProteinDetail(mongoProteinIdentification));
+            }
         }
-
-        return mappedObjects;
+        return result;
     }
 
-    private static ProteinDetail mapProteinIdentifiedToWSProteinDetail(ProteinIdentification proteinIdentified) {
-        ProteinDetail mappedObject = new ProteinDetail();
-        mappedObject.setAccession(proteinIdentified.getAccession());
-        Set<String> synonyms = new HashSet<String>(2);
-        if (proteinIdentified.getEnsemblMapping() != null) {
-            synonyms.add(proteinIdentified.getEnsemblMapping());
+    private static ProteinDetail mapMongoProteinIdentifiedToWSProteinDetail(MongoProteinIdentification mongoProteinIdentified) {
+        ProteinDetail result = new ProteinDetail();
+        result.setAccession(mongoProteinIdentified.getAccession());
+        Set<String> synonyms = new HashSet<>(2);
+        if (mongoProteinIdentified.getEnsemblMapping() != null) {
+            synonyms.add(mongoProteinIdentified.getEnsemblMapping());
         }
-        if (proteinIdentified.getUniprotMapping() != null) {
-            synonyms.add(proteinIdentified.getUniprotMapping());
+        if (mongoProteinIdentified.getUniprotMapping() != null) {
+            synonyms.add(mongoProteinIdentified.getUniprotMapping());
         }
-        mappedObject.setSynonyms(synonyms);
-        mappedObject.setProjectAccession(proteinIdentified.getProjectAccession());
-        mappedObject.setAssayAccession(proteinIdentified.getAssayAccession());
-        mappedObject.setDescription(proteinIdentified.getDescription());
-        if (proteinIdentified.getSubmittedSequence() != null) {
-            mappedObject.setSequence(proteinIdentified.getSubmittedSequence());
-            mappedObject.setSequenceType(ProteinDetail.SequenceType.SUBMITTED);
-        } else if (proteinIdentified.getInferredSequence() != null) {
-            mappedObject.setSequence(proteinIdentified.getInferredSequence());
-            mappedObject.setSequenceType(ProteinDetail.SequenceType.INFERRED);
+        result.setSynonyms(synonyms);
+        result.setProjectAccession(mongoProteinIdentified.getProjectAccession());
+        result.setAssayAccession(mongoProteinIdentified.getAssayAccession());
+        result.setDescription(mongoProteinIdentified.getDescription());
+        if (mongoProteinIdentified.getSubmittedSequence() != null) {
+            result.setSequence(mongoProteinIdentified.getSubmittedSequence());
+            result.setSequenceType(ProteinDetail.SequenceType.SUBMITTED);
+        } else if (mongoProteinIdentified.getInferredSequence() != null) {
+            result.setSequence(mongoProteinIdentified.getInferredSequence());
+            result.setSequenceType(ProteinDetail.SequenceType.INFERRED);
         } else {
-            mappedObject.setSequence(null);
-            mappedObject.setSequenceType(ProteinDetail.SequenceType.NOT_AVAILABLE);
+            result.setSequence(null);
+            result.setSequenceType(ProteinDetail.SequenceType.NOT_AVAILABLE);
         }
-        return mappedObject;
-    }
-
-
-    // PSM map methods
-    public static List<PsmDetail> mapPsmListToWSPsmDetailList(List<Psm> psms) {
-        if (psms == null) { return null; }
-        if (psms.isEmpty()) { return new ArrayList<>(0); }
-        List<PsmDetail> mappedObjects = new ArrayList<>();
-        for (Psm psm : psms) {
-            PsmDetail mappedObject = new PsmDetail();
-            mappedObject.setSequence(psm.getPeptideSequence());
-            mappedObject.setProteinAccession(psm.getProteinAccession());
-            mappedObject.setProjectAccession(psm.getProjectAccession());
-            mappedObject.setAssayAccession(psm.getAssayAccession());
-            mappedObject.setId(psm.getId());
-            mappedObjects.add(mappedObject);
-        }
-        return mappedObjects;
+        return result;
     }
 
     // MongoPSM map methods

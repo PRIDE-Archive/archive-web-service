@@ -32,11 +32,14 @@
 
     <properties>
         <archive.ws.model.version>0.2.13</archive.ws.model.version>
-        <archive.security.version>0.1.5-PSM_REDUCED_SCHEMA_SNAPSHOT</archive.security.version>
-        <archive.search.version>1.1.0-SNAPSHOT</archive.search.version>
+        <archive.security.version>0.1.5-PSM_PROT_REDUCED_SCHEMA_MONGO_SNAPSHOT</archive.security.version>
+        <archive.search.version>1.0.11-PSM_PROT_REDUCED_SCHEMA_MONGO_SNAPSHOT</archive.search.version>
         <archive.utils.version>0.1.21</archive.utils.version>
         <pride.web.utils.version>1.3.10</pride.web.utils.version>
         <psm.index.search.version>1.0.1-REDUCED_SCHEMA-SNAPSHOT</psm.index.search.version>
+        <mongo.psm.index.search.version>1.0.0-SNAPSHOT</mongo.psm.index.search.version>
+        <mongo.protein.identification.index.search.version>1.0.0-SNAPSHOT</mongo.protein.identification.index.search.version>
+
     </properties>
 
     <build>
@@ -184,7 +187,13 @@
         <dependency>
             <groupId>uk.ac.ebi.pride</groupId>
             <artifactId>mongo-psm-index-search</artifactId>
-            <version>${psm.index.search.version}</version>
+            <version>${mongo.psm.index.search.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.pride</groupId>
+            <artifactId>mongo-protein-identification-index-search</artifactId>
+            <version>${mongo.protein.identification.index.search.version}</version>
         </dependency>
 
         <!-- pride-web-utils -->
