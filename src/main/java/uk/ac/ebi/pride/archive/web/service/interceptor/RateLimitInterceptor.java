@@ -68,8 +68,9 @@ public class RateLimitInterceptor extends HandlerInterceptorAdapter {
       if (!address.equals("127.0.0.1") && !address.equals("0:0:0:0:0:0:0:1")) {
         int incrementUserGetCount = rateLimitService.incrementLimit("GET~" + address, jedisPool);
         logger.debug("Current count for user: " + address + " is: " + incrementUserGetCount);
-        if (incrementUserGetCount >= MAX_REQUESTS_PER_PERIOD) {
-          response.sendError(429, "Rate limit exceeded: " + MAX_REQUESTS_PER_PERIOD + " requests per " + COUNT_EXPIRY_PERIOD_SECONDS + " seconds. Please wait " + COUNT_EXPIRY_PERIOD_SECONDS * 2 + " seconds to try again.");
+        if (incrementUserGetCount > MAX_REQUESTS_PER_PERIOD) { // temp ban user
+          response.sendError(429, "Rate limit exceeded: " + MAX_REQUESTS_PER_PERIOD + " requests per " +
+              COUNT_EXPIRY_PERIOD_SECONDS + " seconds. Please wait " + COUNT_EXPIRY_PERIOD_SECONDS * 2 + " seconds to try again.");
           result = false;
           logger.info("Throttled connections for user: " + address);
         } else {
