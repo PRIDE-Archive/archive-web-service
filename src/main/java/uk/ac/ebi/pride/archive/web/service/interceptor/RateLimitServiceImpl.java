@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import java.time.Instant;
+
 import static uk.ac.ebi.pride.archive.web.service.interceptor.RateLimitInterceptor.MAX_REQUESTS_PER_PERIOD;
 
 /**
@@ -29,23 +31,33 @@ public class RateLimitServiceImpl extends GenericApplicationContext implements R
    */
   @Override
   public int incrementLimit(String userKey, JedisPool jedisPool) {
-    int result;
+    int result = 0;
     Jedis jedis = jedisPool.getResource();
-    try {
-      if (jedis.exists(userKey)) {
-        jedis.incr(userKey);
-        result = Integer.parseInt(jedis.get(userKey));
-      } else {
-        jedis.set(userKey, "1");
-        result = 1;
-      }
-      if (result < MAX_REQUESTS_PER_PERIOD){
-        jedis.expire(userKey, COUNT_EXPIRY_PERIOD_SECONDS);
-      } else if (result == MAX_REQUESTS_PER_PERIOD){
-        jedis.expire(userKey, COUNT_EXPIRY_PERIOD_SECONDS*2); // throttle users harder who hit the cap
-      }
-    } finally {
-      if (jedis != null) {
+    if (jedis.exists(userKey)) {
+      result = Integer.parseInt(jedis.get(userKey)); // user has already been flagged at the limit
+    } else {
+      long currentTimeStampSeconds = Instant.now().getEpochSecond();
+      String timedUserKey = userKey + ":" + currentTimeStampSeconds;
+      try {
+        for (int i=1; i<=COUNT_EXPIRY_PERIOD_SECONDS; i++) {
+          String keyToTry = userKey + ":" + (currentTimeStampSeconds - i);
+          if (jedis.exists(keyToTry)) {
+            result += Integer.parseInt(jedis.get(keyToTry));
+          }
+        }
+        if (jedis.exists(timedUserKey)) {
+          jedis.incr(timedUserKey);
+          result += Integer.parseInt(jedis.get(timedUserKey));
+        } else {
+          jedis.set(timedUserKey, "1");
+          jedis.expire(timedUserKey, COUNT_EXPIRY_PERIOD_SECONDS*2);
+          result++;
+        }
+        if (result >= MAX_REQUESTS_PER_PERIOD){
+          jedis.set(userKey, "" + result); // flag user
+          jedis.expire(userKey, COUNT_EXPIRY_PERIOD_SECONDS*2); // throttle users harder who hit the cap
+        }
+      } finally {
         jedis.close();
       }
     }
