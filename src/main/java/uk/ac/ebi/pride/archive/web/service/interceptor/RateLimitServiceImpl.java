@@ -30,15 +30,17 @@ public class RateLimitServiceImpl extends GenericApplicationContext implements R
    * @return the user's current count of requests within the latest time period.
    */
   @Override
-  public int incrementLimit(String userKey, JedisPool jedisPool) {
+  public int incrementLimit(String userKey, JedisPool jedisPool) throws Exception {
     int result = 0;
-    Jedis jedis = jedisPool.getResource();
-    if (jedis.exists(userKey)) {
-      result = Integer.parseInt(jedis.get(userKey)); // user has already been flagged at the limit
-    } else {
-      long currentTimeStampSeconds = Instant.now().getEpochSecond();
-      String timedUserKey = userKey + ":" + currentTimeStampSeconds;
-      try {
+    Jedis jedis = null;
+    try {
+      jedis = jedisPool.getResource();
+      if (jedis.exists(userKey)) {
+        logger.debug("Jedis user key exists, has been flagged for rate limit");
+        result = Integer.parseInt(jedis.get(userKey)); // user has already been flagged at the limit
+      } else {
+        long currentTimeStampSeconds = Instant.now().getEpochSecond();
+        String timedUserKey = userKey + ":" + currentTimeStampSeconds;
         for (int i=1; i<=COUNT_EXPIRY_PERIOD_SECONDS; i++) {
           String keyToTry = userKey + ":" + (currentTimeStampSeconds - i);
           if (jedis.exists(keyToTry)) {
@@ -53,11 +55,15 @@ public class RateLimitServiceImpl extends GenericApplicationContext implements R
           jedis.expire(timedUserKey, COUNT_EXPIRY_PERIOD_SECONDS*2);
           result++;
         }
-        if (result >= MAX_REQUESTS_PER_PERIOD){
-          jedis.set(userKey, "" + result); // flag user
+        logger.debug("Current count for user:" + timedUserKey + " - " + result);
+        if (result > MAX_REQUESTS_PER_PERIOD){
+          logger.debug("Reached user, flagging as reached limit");
+          jedis.set(userKey, "" + ++result); // flag user
           jedis.expire(userKey, COUNT_EXPIRY_PERIOD_SECONDS*2); // throttle users harder who hit the cap
         }
-      } finally {
+      }
+    } finally {
+      if (jedis!=null) {
         jedis.close();
       }
     }

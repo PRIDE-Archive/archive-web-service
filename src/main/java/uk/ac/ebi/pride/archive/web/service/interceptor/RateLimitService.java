@@ -8,5 +8,5 @@ import redis.clients.jedis.JedisPool;
  */
 public interface RateLimitService {
 
-  public int incrementLimit(String userKey, JedisPool jedisPool);
+  public int incrementLimit(String userKey, JedisPool jedisPool) throws Exception;
 }

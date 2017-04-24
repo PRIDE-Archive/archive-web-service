@@ -65,16 +65,24 @@ public class RateLimitInterceptor extends HandlerInterceptorAdapter {
       if (address == null || address.length() == 0 || "unknown".equalsIgnoreCase(address)) {
         address = request.getRemoteAddr();
       }
+      if (address == null || address.length() == 0 || "unknown".equalsIgnoreCase(address)) {
+        address = "127.0.0.1";
+      }
       if (!address.equals("127.0.0.1") && !address.equals("0:0:0:0:0:0:0:1")) {
-        int incrementUserGetCount = rateLimitService.incrementLimit("GET~" + address, jedisPool);
-        logger.debug("Current count for user: " + address + " is: " + incrementUserGetCount);
-        if (incrementUserGetCount > MAX_REQUESTS_PER_PERIOD) { // temp ban user
-          response.sendError(429, "Rate limit exceeded: " + MAX_REQUESTS_PER_PERIOD + " requests per " +
-              COUNT_EXPIRY_PERIOD_SECONDS + " seconds. Please wait " + COUNT_EXPIRY_PERIOD_SECONDS * 2 + " seconds to try again.");
-          result = false;
-          logger.info("Throttled connections for user: " + address);
-        } else {
-          response.addIntHeader("Remaining request count", MAX_REQUESTS_PER_PERIOD - incrementUserGetCount);
+        try {
+          logger.debug("About to increment count for user: " + address);
+          int incrementUserGetCount = rateLimitService.incrementLimit("GET~" + address, jedisPool);
+          logger.debug("Current count for user: " + address + " is: " + incrementUserGetCount);
+          if (incrementUserGetCount >= MAX_REQUESTS_PER_PERIOD) { // temp ban user
+            response.sendError(429, "Rate limit exceeded: " + MAX_REQUESTS_PER_PERIOD + " requests per " +
+                COUNT_EXPIRY_PERIOD_SECONDS + " seconds. Please wait " + COUNT_EXPIRY_PERIOD_SECONDS * 2 + " seconds to try again.");
+            result = false;
+            logger.info("Throttled connections for user: " + address);
+          } else {
+            response.addIntHeader("Remaining request count", MAX_REQUESTS_PER_PERIOD - incrementUserGetCount);
+          }
+        } catch (Exception e) {
+          logger.error("PROBLEM DEALING WITH RATE LIMITER: ", e);
         }
       }
     }
