@@ -1,6 +1,5 @@
 package uk.ac.ebi.pride.archive.web.service.controller.protein;
 
-import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -12,245 +11,143 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import uk.ac.ebi.pride.archive.security.protein.MongoProteinIdentificationSecureSearchService;
 import uk.ac.ebi.pride.archive.security.protein.ProteinIdentificationSecureSearchService;
 import uk.ac.ebi.pride.archive.web.service.error.exception.MaxPageSizeReachedException;
-import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetail;
 import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetailList;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
 import uk.ac.ebi.pride.archive.web.service.util.WsUtils;
 import uk.ac.ebi.pride.proteinidentificationindex.search.model.ProteinIdentification;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
-* @author Florian Reisinger
-* @since 1.0.8
-*/
+ * @author Florian Reisinger
+ * @since 1.0.8
+ */
 @Api(value = "protein", description = "retrieve protein identifications", position = 3)
 @Controller
 @RequestMapping(value = "/protein")
 public class ProteinController {
+  private static final Logger logger = LoggerFactory.getLogger(ProteinController.class);
 
-    private static final Logger logger = LoggerFactory.getLogger(ProteinController.class);
+  @Autowired
+  ProteinIdentificationSecureSearchService proteinIdService;
 
+  @Autowired
+  MongoProteinIdentificationSecureSearchService mongoProteinIdService;
 
-    @Autowired
-    ProteinIdentificationSecureSearchService pissService; // ToDo: find a better name ;)
-
-    // ToDo: performance tests (page sizes, security impact), and perhaps max number of retrievable (page size) results
-
-
-
-//    not available as not secured yet
-//    @ApiOperation(value = "retrieve protein identifications by protein identifier", position = 1)
-//    @RequestMapping(value = "/{proteinId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//    @ResponseStatus(HttpStatus.OK) // 200
-//    public
-//    @ResponseBody
-//    ProteinDetailList getProteinSummary(
-//            @ApiParam(value = "a protein identifier")
-//            @PathVariable("proteinId") String id,
-//            @ApiParam(value = "whether to include alternative protein ids")
-//            @RequestParam(value = "includeSynonyms", required = false, defaultValue = "false") boolean includeSynonyms
-//            ) {
-//        logger.info("Protein " + id + " summary requested");
-//
-//        List<ProteinIdentified> foundProteins;
-//        if (includeSynonyms) {
-//            foundProteins = proteinIdentificationSearchService.findBySynonyms(id);
-//        } else {
-//            foundProteins = proteinIdentificationSearchService.findByAccession(id);
-//        }
-//
-//        // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects
-//        List<ProteinDetail> resultProteins = ObjectMapper.mapProteinIdentifiedListToWSProteinDetailList(foundProteins);
-//
-//        return new ProteinDetailList(resultProteins);
-//    }
-
-
-    @ApiOperation(value = "retrieve protein identifications by project accession", position = 1)
-    @RequestMapping(value = "/list/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    public
-    @ResponseBody
-    ProteinDetailList getProteinsByProject(
-            @ApiParam(value = "a project accession (example: PXD000001)")
-            @PathVariable("projectAccession") String projectAccession,
-            @ApiParam(value = "how many results to return per page. Maximum page size is: " + WsUtils.MAX_PAGE_SIZE)
-            @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
-            @ApiParam(value = "which page (starting from 0) of the result to return")
-            @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
-            ) {
-        logger.info("Proteins for project " + projectAccession + " requested");
-
-        if(showResults > WsUtils.MAX_PAGE_SIZE){
-            logger.error("Maximum size of page reach");
-            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
-        }
-
-        List<ProteinIdentification> foundProteins = pissService.findByProjectAccession(projectAccession, new PageRequest(page, showResults)).getContent();
-
-        // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects
-        List<ProteinDetail>resultProteins = ObjectMapper.mapProteinIdentifiedListToWSProteinDetailList(foundProteins);
-
-        return new ProteinDetailList(resultProteins);
+  @ApiOperation(value = "retrieve protein identifications by project accession", position = 1)
+  @RequestMapping(value = "/list/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK) // 200
+  public
+  @ResponseBody
+  ProteinDetailList getProteinsByProject(
+      @ApiParam(value = "a project accession (example: PXD000001)")
+      @PathVariable("projectAccession") String projectAccession,
+      @ApiParam(value = "how many results to return per page. Maximum page size is: " + WsUtils.MAX_PAGE_SIZE)
+      @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
+      @ApiParam(value = "which page (starting from 0) of the result to return")
+      @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
+  ) {
+    logger.info("Proteins for project " + projectAccession + " requested");
+    if(showResults > WsUtils.MAX_PAGE_SIZE){
+      logger.error("Maximum size of page reach");
+      throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
     }
+    return getPsmDetailList(proteinIdService.findByProjectAccession(projectAccession, new PageRequest(page, showResults)).getContent());
+  }
 
-    @ApiOperation(value = "retrieve protein identifications by project accession and protein accession", position = 2)
-    @RequestMapping(value = "/list/project/{projectAccession}/protein/{accession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    public
-    @ResponseBody
-    ProteinDetailList getProteinsByProjectAndAccession(
-            @ApiParam(value = "a project accession (example: PXD001536)")
-            @PathVariable("projectAccession") String projectAccession,
-            @ApiParam(value = "a protein accession (example: P38398)")
-            @PathVariable("accession") String accession
-    ) {
-        logger.info("Proteins for project " + projectAccession + "and accession " + accession + " requested");
+  @ApiOperation(value = "count protein identifications by project accession", position = 2)
+  @RequestMapping(value = "/count/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK) // 200
+  public
+  @ResponseBody
+  Long countProteinsByProject(
+      @ApiParam(value = "a project accession (example: PXD000001)")
+      @PathVariable("projectAccession") String projectAccession
+  ) {
+    logger.info("Protein count for project " + projectAccession + " requested");
+    return proteinIdService.countByProjectAccession(projectAccession);
+  }
 
-        List<ProteinIdentification> foundProteins = pissService.findByProjectAccessionAndAnyMapping(projectAccession, accession);
+  @ApiOperation(value = "retrieve protein identifications by project accession and protein accession", position = 3)
+  @RequestMapping(value = "/list/project/{projectAccession}/protein/{accession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK) // 200
+  public
+  @ResponseBody
+  ProteinDetailList getProteinsByProjectAndAccession(
+      @ApiParam(value = "a project accession (example: PXD001536)")
+      @PathVariable("projectAccession") String projectAccession,
+      @ApiParam(value = "a protein accession (example: P38398)")
+      @PathVariable("accession") String accession
+  ) {
+    logger.info("Proteins for project " + projectAccession + "and accession " + accession + " requested");
+    return getPsmDetailList(proteinIdService.findByProjectAccessionAndAccession(projectAccession, accession));
+  }
 
-        // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects
-        List<ProteinDetail>resultProteins = ObjectMapper.mapProteinIdentifiedListToWSProteinDetailList(foundProteins);
+  @ApiOperation(value = "count protein identifications by project accession and protein accession", position = 4)
+  @RequestMapping(value = "/count/project/{projectAccession}/protein/{accession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK) // 200
+  public
+  @ResponseBody
+  Long countProteinsByProjectAndAccession(
+      @ApiParam(value = "a project accession (example: PXD001536)")
+      @PathVariable("projectAccession") String projectAccession,
+      @ApiParam(value = "a protein accession (example: P38398)")
+      @PathVariable("accession") String accession
+  ) {
+    logger.info("Protein count for project " + projectAccession + "and accession " + accession + " requested");
+    return proteinIdService.countByProjectAccessionAndAccession(projectAccession, accession);
+  }
 
-        return new ProteinDetailList(resultProteins);
+  @ApiOperation(value = "retrieve protein identifications by assay accession", position = 5)
+  @RequestMapping(value = "/list/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK) // 200
+  public
+  @ResponseBody
+  ProteinDetailList getProteinsByAssay(
+      @ApiParam(value = "an assay accession (example: 22134)")
+      @PathVariable("assayAccession") String assayAccession,
+      @ApiParam(value = "how many results to return per page. Maximum page size is: " + WsUtils.MAX_PAGE_SIZE)
+      @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
+      @ApiParam(value = "which page (starting from 0) of the result to return")
+      @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
+  ) {
+    logger.info("Proteins for assay " + assayAccession + " requested");
+    if(showResults > WsUtils.MAX_PAGE_SIZE){
+      logger.error("Maximum size of page reach");
+      throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
     }
+    return getPsmDetailList(proteinIdService.findByAssayAccession(assayAccession, new PageRequest(page, showResults)).getContent());
+  }
 
-    @ApiOperation(value = "count protein identifications by project accession and protein accession", position = 3)
-    @RequestMapping(value = "/count/project/{projectAccession}/protein/{accession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    public
-    @ResponseBody
-    Long countProteinsByProjectAndAccession(
-            @ApiParam(value = "a project accession (example: PXD001536)")
-            @PathVariable("projectAccession") String projectAccession,
-            @ApiParam(value = "a protein accession (example: P38398)")
-            @PathVariable("accession") String accession
-    ) {
-        logger.info("Protein count for project " + projectAccession + "and accession " + accession + " requested");
+  @ApiOperation(value = "count protein identifications by assay accession", position = 6)
+  @RequestMapping(value = "/count/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK) // 200
+  public
+  @ResponseBody
+  Long countProteinsByAssay(
+      @ApiParam(value = "an assay accession (example: 22134)")
+      @PathVariable("assayAccession") String assayAccession
+  ) {
+    logger.info("Proteins for assay " + assayAccession + " requested");
+    return proteinIdService.countByAssayAccession(assayAccession);
+  }
 
-        List<ProteinIdentification> foundProteins = pissService.findByProjectAccessionAndAnyMapping(projectAccession, accession);
-        long count = 0;
-        if (foundProteins != null && !foundProteins.isEmpty()) {
-            count = foundProteins.size();
-        }
+  private static boolean isValidAccession(String accession) {
+    // ToDo: extend with more cases!
+    return !accession.toUpperCase().contains("DECOY") && !accession.toUpperCase().contains("REVERSE");
+  }
 
-        return count;
-    }
-
-
-    @ApiOperation(value = "count protein identifications by project accession", position = 4)
-    @RequestMapping(value = "/count/project/{projectAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    public
-    @ResponseBody
-    Long countProteinsByProject(
-            @ApiParam(value = "a project accession (example: PXD000001)")
-            @PathVariable("projectAccession") String projectAccession
-    ) {
-        logger.info("Protein count for project " + projectAccession + " requested");
-        return pissService.countByProjectAccession(projectAccession);
-    }
-
-    @ApiOperation(value = "retrieve protein identifications by assay accession", position = 5)
-    @RequestMapping(value = "/list/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    public
-    @ResponseBody
-    ProteinDetailList getProteinsByAssay(
-            @ApiParam(value = "an assay accession (example: 22134)")
-            @PathVariable("assayAccession") String assayAccession,
-            @ApiParam(value = "how many results to return per page. Maximum page size is: " + WsUtils.MAX_PAGE_SIZE)
-            @RequestParam(value = "show", required = false, defaultValue = WsUtils.DEFAULT_SHOW+"") int showResults,
-            @ApiParam(value = "which page (starting from 0) of the result to return")
-            @RequestParam(value = "page", required = false, defaultValue = WsUtils.DEFAULT_PAGE+"") int page
-            ) {
-        logger.info("Proteins for assay " + assayAccession + " requested");
-
-        if(showResults > WsUtils.MAX_PAGE_SIZE){
-            logger.error("Maximum size of page reach");
-            throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
-        }
-
-        List<ProteinIdentification> foundProteins = pissService.findByAssayAccession(assayAccession, new PageRequest(page, showResults)).getContent();
-        // convert the searches List of ProteinIdentified objects into the WS ProteinDetail objects
-        List<ProteinDetail> resultProteins = ObjectMapper.mapProteinIdentifiedListToWSProteinDetailList(foundProteins);
-
-        return new ProteinDetailList(resultProteins);
-    }
-
-    @ApiOperation(value = "count protein identifications by assay accession", position = 6)
-    @RequestMapping(value = "/count/assay/{assayAccession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    public
-    @ResponseBody
-    Long countProteinsByAssay(
-            @ApiParam(value = "an assay accession (example: 22134)")
-            @PathVariable("assayAccession") String assayAccession
-    ) {
-        logger.info("Proteins for assay " + assayAccession + " requested");
-        return pissService.countByAssayAccession(assayAccession);
-    }
-
-
-    @ApiIgnore
-    @RequestMapping(value = "/list/assay/{assayAccession}.acc", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    public
-    @ResponseBody
-    String getProteinListForAssay(
-            @ApiParam(value = "an assay accession (example: 22134)")
-            @PathVariable("assayAccession") String assayAccession,
-            @ApiParam(value = "filter accessions (to remove decoy, reverse, etc accessions)")
-            @RequestParam(value = "filter", required = false, defaultValue = "true") boolean filter
-    ) {
-        logger.info("Protein accessions for assay " + assayAccession + " requested");
-        StringBuilder sb = new StringBuilder();
-        sb.append("#PRIDE assay:").append(assayAccession).append("\n");
-        Set<String> accessions = pissService.getUniqueProteinAccessionsByAssayAccession(assayAccession);
-        for (String accession : accessions) {
-            if (filter && !isValidAccession(accession)) {
-                // if filtering is enabled, we apply accession filtering to remove decoy, etc accessions
-                continue;
-            }
-            sb.append(accession).append("\n");
-        }
-        return sb.toString();
-    }
-    @ApiIgnore
-    @RequestMapping(value = "/list/project/{projectAccession}.acc", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
-    @ResponseStatus(HttpStatus.OK) // 200
-    public
-    @ResponseBody
-    String getProteinListForProject(
-            @ApiParam(value = "an project accession (example: PXD000001)")
-            @PathVariable("projectAccession") String projectAccession,
-            @ApiParam(value = "filter accessions (to remove decoy, reverse, etc accessions)")
-            @RequestParam(value = "filter", required = false, defaultValue = "true") boolean filter
-    ) {
-        logger.info("Protein accessions for project " + projectAccession + " requested");
-        StringBuilder sb = new StringBuilder();
-        sb.append("#PRIDE project:").append(projectAccession).append("\n");
-        Set<String> accessions = pissService.getUniqueProteinAccessionsByProjectAccession(projectAccession);
-        for (String accession : accessions) {
-            if (filter && !isValidAccession(accession)) {
-                // if filtering is enabled, we apply accession filtering to remove decoy, etc accessions
-                continue;
-            }
-            sb.append(accession).append("\n");
-        }
-        return sb.toString();
-    }
-
-    private static boolean isValidAccession(String accession) {
-        // ToDo: this should probably be a general utility for use in different projects
-        // ToDo: extend with more cases!
-        return !accession.toUpperCase().contains("DECOY") && !accession.toUpperCase().contains("REVERSE");
-
-    }
-
-
+  private ProteinDetailList getPsmDetailList(List<ProteinIdentification> foundProteins) {
+    return new ProteinDetailList(
+        ObjectMapper.mapMongoProteinIdentifiedListToWSProteinDetailList(
+            mongoProteinIdService.findByIdIn(
+                foundProteins.stream().
+                    map(ProteinIdentification::getId).
+                    collect(Collectors.toCollection(ArrayList<String>::new)))));
+  }
 }

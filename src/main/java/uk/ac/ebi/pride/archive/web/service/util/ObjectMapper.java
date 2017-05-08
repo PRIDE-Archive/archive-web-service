@@ -23,7 +23,9 @@ import uk.ac.ebi.pride.archive.web.service.model.file.FileDetail;
 import uk.ac.ebi.pride.archive.web.service.model.peptide.PsmDetail;
 import uk.ac.ebi.pride.archive.web.service.model.project.ProjectDetail;
 import uk.ac.ebi.pride.archive.web.service.model.protein.ProteinDetail;
+import uk.ac.ebi.pride.proteinidentificationindex.mongo.search.model.MongoProteinIdentification;
 import uk.ac.ebi.pride.proteinidentificationindex.search.model.ProteinIdentification;
+import uk.ac.ebi.pride.psmindex.mongo.search.model.MongoPsm;
 import uk.ac.ebi.pride.psmindex.search.model.Psm;
 
 import java.util.*;
@@ -329,77 +331,71 @@ public final class ObjectMapper {
     }
 
 
-    // Protein map methods
-    public static List<ProteinDetail> mapProteinIdentifiedListToWSProteinDetailList(Iterable<ProteinIdentification> proteins) {
-        if (proteins == null || proteins.iterator() == null) { return null; }
-        if (!proteins.iterator().hasNext()) { return new ArrayList<ProteinDetail>(0); }
-
-        List<ProteinDetail> mappedObjects = new ArrayList<ProteinDetail>();
-        for (ProteinIdentification proteinIdentified : proteins) {
-            ProteinDetail mappedObject = mapProteinIdentifiedToWSProteinDetail(proteinIdentified);
-            mappedObjects.add(mappedObject);
+    // MongoProtein map methods
+    public static List<ProteinDetail> mapMongoProteinIdentifiedListToWSProteinDetailList(Iterable<MongoProteinIdentification> mongoProteins) {
+        List<ProteinDetail> result = new ArrayList<>();
+        if (mongoProteins!=null && mongoProteins.iterator().hasNext()) {
+            for(MongoProteinIdentification mongoProteinIdentification : mongoProteins) {
+                result.add(mapMongoProteinIdentifiedToWSProteinDetail(mongoProteinIdentification));
+            }
         }
-
-        return mappedObjects;
+        return result;
     }
 
-    private static ProteinDetail mapProteinIdentifiedToWSProteinDetail(ProteinIdentification proteinIdentified) {
-        ProteinDetail mappedObject = new ProteinDetail();
-        mappedObject.setAccession(proteinIdentified.getAccession());
-        Set<String> synonyms = new HashSet<String>(2);
-        if (proteinIdentified.getEnsemblMapping() != null) {
-            synonyms.add(proteinIdentified.getEnsemblMapping());
+    private static ProteinDetail mapMongoProteinIdentifiedToWSProteinDetail(MongoProteinIdentification mongoProteinIdentified) {
+        ProteinDetail result = new ProteinDetail();
+        result.setAccession(mongoProteinIdentified.getAccession());
+        Set<String> synonyms = new HashSet<>(2);
+        if (mongoProteinIdentified.getEnsemblMapping() != null) {
+            synonyms.add(mongoProteinIdentified.getEnsemblMapping());
         }
-        if (proteinIdentified.getUniprotMapping() != null) {
-            synonyms.add(proteinIdentified.getUniprotMapping());
+        if (mongoProteinIdentified.getUniprotMapping() != null) {
+            synonyms.add(mongoProteinIdentified.getUniprotMapping());
         }
-        mappedObject.setSynonyms(synonyms);
-        mappedObject.setProjectAccession(proteinIdentified.getProjectAccession());
-        mappedObject.setAssayAccession(proteinIdentified.getAssayAccession());
-        mappedObject.setDescription(proteinIdentified.getDescription());
-        if (proteinIdentified.getSubmittedSequence() != null) {
-            mappedObject.setSequence(proteinIdentified.getSubmittedSequence());
-            mappedObject.setSequenceType(ProteinDetail.SequenceType.SUBMITTED);
-        } else if (proteinIdentified.getInferredSequence() != null) {
-            mappedObject.setSequence(proteinIdentified.getInferredSequence());
-            mappedObject.setSequenceType(ProteinDetail.SequenceType.INFERRED);
+        result.setSynonyms(synonyms);
+        result.setProjectAccession(mongoProteinIdentified.getProjectAccession());
+        result.setAssayAccession(mongoProteinIdentified.getAssayAccession());
+        result.setDescription(mongoProteinIdentified.getDescription());
+        if (mongoProteinIdentified.getSubmittedSequence() != null) {
+            result.setSequence(mongoProteinIdentified.getSubmittedSequence());
+            result.setSequenceType(ProteinDetail.SequenceType.SUBMITTED);
+        } else if (mongoProteinIdentified.getInferredSequence() != null) {
+            result.setSequence(mongoProteinIdentified.getInferredSequence());
+            result.setSequenceType(ProteinDetail.SequenceType.INFERRED);
         } else {
-            mappedObject.setSequence(null);
-            mappedObject.setSequenceType(ProteinDetail.SequenceType.NOT_AVAILABLE);
+            result.setSequence(null);
+            result.setSequenceType(ProteinDetail.SequenceType.NOT_AVAILABLE);
         }
-        return mappedObject;
+        return result;
     }
 
-
-    // PSM map methods
-    public static List<PsmDetail> mapPsmListToWSPsmDetailList(List<Psm> psms) {
-        if (psms == null) { return null; }
-        if (psms.isEmpty()) { return new ArrayList<PsmDetail>(0); }
-
-        List<PsmDetail> mappedObjects = new ArrayList<PsmDetail>();
-        for (Psm psm : psms) {
+    // MongoPSM map methods
+    public static List<PsmDetail> mapMongoPsmListToWSPsmDetailList(List<MongoPsm> mongoPsms) {
+        if (mongoPsms == null) { return null; }
+        if (mongoPsms.isEmpty()) { return new ArrayList<>(0); }
+        List<PsmDetail> mappedObjects = new ArrayList<>();
+        for (MongoPsm mongoPsm : mongoPsms) {
             PsmDetail mappedObject = new PsmDetail();
-            mappedObject.setSequence(psm.getPeptideSequence());
-            mappedObject.setStartPosition(psm.getStartPosition());
-            mappedObject.setEndPosition(psm.getEndPosition());
-            mappedObject.setProteinAccession(psm.getProteinAccession());
-            mappedObject.setProjectAccession(psm.getProjectAccession());
-            mappedObject.setAssayAccession(psm.getAssayAccession());
-            mappedObject.setCalculatedMZ(psm.getCalculatedMassToCharge());
-            mappedObject.setExperimentalMZ(psm.getExpMassToCharge());
-            mappedObject.setCharge(psm.getCharge());
-            mappedObject.setPreAA(psm.getPreAminoAcid());
-            mappedObject.setPostAA(psm.getPostAminoAcid());
-            mappedObject.setRetentionTime(psm.getRetentionTime());
-            mappedObject.setSearchEngines(getCvParamNames(psm.getSearchEngines()));
-            mappedObject.setSearchEngineScores(getCvParamNameValuePairs(psm.getSearchEngineScores()) );
-            mappedObject.setSpectrumID( psm.getSpectrumId() );
-            mappedObject.setId(psm.getId());
-            mappedObject.setReportedID( psm.getReportedId() );
-            mappedObject.setModifications( getModifiedLocations(psm.getModifications()) );
+            mappedObject.setSequence(mongoPsm.getPeptideSequence());
+            mappedObject.setStartPosition(mongoPsm.getStartPosition());
+            mappedObject.setEndPosition(mongoPsm.getEndPosition());
+            mappedObject.setProteinAccession(mongoPsm.getProteinAccession());
+            mappedObject.setProjectAccession(mongoPsm.getProjectAccession());
+            mappedObject.setAssayAccession(mongoPsm.getAssayAccession());
+            mappedObject.setCalculatedMZ(mongoPsm.getCalculatedMassToCharge());
+            mappedObject.setExperimentalMZ(mongoPsm.getExpMassToCharge());
+            mappedObject.setCharge(mongoPsm.getCharge());
+            mappedObject.setPreAA(mongoPsm.getPreAminoAcid());
+            mappedObject.setPostAA(mongoPsm.getPostAminoAcid());
+            mappedObject.setRetentionTime(mongoPsm.getRetentionTime());
+            mappedObject.setSearchEngines(getCvParamNames(mongoPsm.getSearchEngines()));
+            mappedObject.setSearchEngineScores(getCvParamNameValuePairs(mongoPsm.getSearchEngineScores()) );
+            mappedObject.setSpectrumID( mongoPsm.getSpectrumId() );
+            mappedObject.setId(mongoPsm.getId());
+            mappedObject.setReportedID( mongoPsm.getReportedId() );
+            mappedObject.setModifications( getModifiedLocations(mongoPsm.getModifications()) );
             mappedObjects.add(mappedObject);
         }
-
         return mappedObjects;
     }
 
