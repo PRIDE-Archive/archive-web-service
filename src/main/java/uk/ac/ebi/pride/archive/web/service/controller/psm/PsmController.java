@@ -36,7 +36,6 @@ public class PsmController {
   private static final Logger logger = LoggerFactory.getLogger(PsmController.class);
   private static final Sort SEQ_MONGO_SORT = new Sort(Sort.Direction.ASC, "peptideSequence", "_id");
   private static final String SOLR_PEPTIDE_SEQUENCE_FIELD = "peptide_sequence";
-  private static final String SOLR_ID_FIELD = "id";
 
 
   @Autowired
@@ -60,11 +59,11 @@ public class PsmController {
   ) {
     logger.info("Peptides for project " + projectAccession + " requested");
     if(showResults > WsUtils.MAX_PAGE_SIZE){
-      logger.error("Maximum size of page reach");
+      logger.error("Maximum size of page reached");
       throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
     }
     return getPsmDetailList(psmSecureSearchService.findByProjectAccession(
-        projectAccession, new PageRequest(page, showResults, Sort.Direction.ASC, SOLR_PEPTIDE_SEQUENCE_FIELD, SOLR_ID_FIELD)).
+        projectAccession, new PageRequest(page, showResults, Sort.Direction.ASC, SOLR_PEPTIDE_SEQUENCE_FIELD)).
         getContent());
   }
 
@@ -100,7 +99,7 @@ public class PsmController {
   ) {
     logger.info("Request for peptides for project " + projectAccession + " with sequence: " + sequence);
     return getPsmDetailList(psmSecureSearchService.findByPeptideSequenceAndProjectAccession(
-        sequence, projectAccession, new PageRequest(page, showResults, Sort.Direction.ASC, SOLR_PEPTIDE_SEQUENCE_FIELD, SOLR_ID_FIELD)).
+        sequence, projectAccession, new PageRequest(page, showResults, Sort.Direction.ASC, SOLR_PEPTIDE_SEQUENCE_FIELD)).
         getContent());
   }
 
@@ -140,7 +139,7 @@ public class PsmController {
       throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
     }
     return getPsmDetailList( psmSecureSearchService.findByAssayAccession(
-        assayAccession, new PageRequest(page, showResults, Sort.Direction.ASC, SOLR_PEPTIDE_SEQUENCE_FIELD, SOLR_ID_FIELD)).
+        assayAccession, new PageRequest(page, showResults, Sort.Direction.ASC, SOLR_PEPTIDE_SEQUENCE_FIELD)).
         getContent());
   }
 
@@ -177,7 +176,7 @@ public class PsmController {
   ) {
     logger.info("Request for peptides for assay " + assayAccession + " with sequence: " + sequence);
     return getPsmDetailList(psmSecureSearchService.findByPeptideSequenceAndAssayAccession(
-        sequence, assayAccession, new PageRequest(page, showResults, Sort.Direction.ASC, SOLR_PEPTIDE_SEQUENCE_FIELD, SOLR_ID_FIELD)).
+        sequence, assayAccession, new PageRequest(page, showResults, Sort.Direction.ASC, SOLR_PEPTIDE_SEQUENCE_FIELD)).
         getContent());
   }
 
