@@ -356,9 +356,9 @@
 
     <!--scm git config-->
     <scm>
-        <connection>scm:git:https://github.com/PRIDE-Archive/web-service.git</connection>
-        <developerConnection>scm:git:https://github.com/PRIDE-Archive/web-service.git</developerConnection>
-        <url>https://github.com/PRIDE-Archive/web-service.git</url>
+        <connection>scm:git:https://github.com/PRIDE-Archive/archive-web-service.git</connection>
+        <developerConnection>scm:git:https://github.com/PRIDE-Archive/archive-web-service.git</developerConnection>
+        <url>https://github.com/PRIDE-Archive/archive-web-service</url>
         <tag>web-service-1.0.8</tag>
     </scm>
 
