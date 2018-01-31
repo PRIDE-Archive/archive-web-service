@@ -1,5 +1,6 @@
 package uk.ac.ebi.pride.archive.web.service.interceptor;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,16 +61,19 @@ public class RateLimitInterceptor extends HandlerInterceptorAdapter {
         debugRequestHeaders(request);
       }
       String address = request.getHeader("requestx-forwarded-for");
-      if (address == null || address.length() == 0 || "unknown".equalsIgnoreCase(address)) {
+      final String UNKNOWN = "unknown";
+      final String LOCALHOST = "127.0.0.1";
+      final String ALT_LOCALHOST = "0:0:0:0:0:0:0:1";
+      if (StringUtils.isEmpty(address) || UNKNOWN.equalsIgnoreCase(address)) {
         address = request.getHeader("x-cluster-client-ip");
       }
-      if (address == null || address.length() == 0 || "unknown".equalsIgnoreCase(address)) {
+      if (StringUtils.isEmpty(address) || UNKNOWN.equalsIgnoreCase(address)) {
         address = request.getRemoteAddr();
       }
-      if (address == null || address.length() == 0 || "unknown".equalsIgnoreCase(address)) {
-        address = "127.0.0.1";
+      if (StringUtils.isEmpty(address) || UNKNOWN.equalsIgnoreCase(address)) {
+        address = LOCALHOST;
       }
-      if (!address.equals("127.0.0.1") && !address.equals("0:0:0:0:0:0:0:1")) {
+      if (!LOCALHOST.equals(address) && !ALT_LOCALHOST.equals(address)) {
         try {
           logger.debug("About to increment count for user: " + address);
           int incrementUserGetCount = rateLimitService.incrementLimit("GET~" + address, jedisPool);
@@ -101,7 +105,7 @@ public class RateLimitInterceptor extends HandlerInterceptorAdapter {
     while (headerNames.hasMoreElements()) {
       String headerName = (String) headerNames.nextElement();
       logger.debug(request.getRemoteAddr() + ": Header name: " + headerName);
-      logger.debug(request.getRemoteAddr() + ":     Header value: " + request.getHeader(headerName));
+      logger.debug(request.getRemoteAddr() + ": Header value: " + request.getHeader(headerName));
     }
     logger.debug("Finished printing all headers!");
   }
