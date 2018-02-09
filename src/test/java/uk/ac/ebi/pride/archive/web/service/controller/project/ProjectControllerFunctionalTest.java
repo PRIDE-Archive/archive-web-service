@@ -38,8 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 @ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-config.xml", "classpath:spring-mongo-test-context.xml"})
 public class ProjectControllerFunctionalTest {
-    // todo all unit tests need to be overhauled
-
     @Autowired
     private WebApplicationContext webApplicationContext;
 
