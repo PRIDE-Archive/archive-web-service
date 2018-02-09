@@ -30,6 +30,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Tests the retrieving  project-related information. A ProjectSearchService is mocked with test information, which
+ * is then queried.
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-config.xml", "classpath:spring-mongo-test-context.xml"})
@@ -47,16 +51,16 @@ public class ProjectControllerFunctionalTest {
     @Autowired
     private ProjectSearchService projectSearchService;
 
-
     private static final String PROJECT_ACCESSION = "PXTEST1";
     private static final String PROJECT_TITLE = "Project test title";
     private static final long NUM_COUNT_RESULTS = 12345;
 
+    /**
+     * Sets up the project and project summary test information, used to mock the project service.
+     */
     @Before
-    public void setUp() throws Exception {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
-
-        ///// mock results
+    public void setUp() {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build(); // mock results
         // DB ProjectSummary
         ProjectSummary projectSummary = new ProjectSummary();
         projectSummary.setAccession(PROJECT_ACCESSION);
@@ -74,47 +78,63 @@ public class ProjectControllerFunctionalTest {
         projectSearchSummary.setProjectAccession(PROJECT_ACCESSION);
         projectSearchSummary.setTitle(PROJECT_TITLE);
 
-        Collection<ProjectSearchSummary> projectSummaries = new ArrayList<ProjectSearchSummary>();
+        Collection<ProjectSearchSummary> projectSummaries = new ArrayList<>();
         projectSummaries.add(projectSearchSummary);
 
-
-        // mock project service
+        // mock the project service
         when(projectSecureServiceImpl.findByAccession(PROJECT_ACCESSION)).thenReturn(projectSummary);
         when(projectSearchService.searchProjects(anyString(), anyString(), any(String[].class), anyInt(), anyInt(), anyString(), anyString())).thenReturn(projectSummaries);
         when(projectSearchService.numSearchResults(anyString(), anyString(), any(String[].class))).thenReturn(NUM_COUNT_RESULTS);
     }
 
-    @Test // /project/{projectAccession}
+    /**
+     * Tests retrieving project details from the /project/{projectAccession} path.
+     * @throws Exception Failed to retrieve results from the mocked service.
+     */
+    @Test
     public void getProjectReturnProjectSummary() throws Exception {
-/*        mockMvc.perform(get("/project/" + PROJECT_ACCESSION))
+        mockMvc.perform(get("/project/" + PROJECT_ACCESSION))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString(PROJECT_ACCESSION)))
-                .andExpect(content().string(containsString("john.smith@ebi.ac.uk")));*/
+                .andExpect(content().string(containsString("john.smith@ebi.ac.uk")));
     }
 
 
-    @Test // /project/list
+    /**
+     * Tests retrieving a list of projects from the /project/list path.
+     * @throws Exception Failed to retrieve results from the mocked service.
+     */
+    @Test
     public void getProjectListReturnProjectSummary() throws Exception {
-/*        mockMvc.perform(get("/project/list"))
+        mockMvc.perform(get("/project/list"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString(PROJECT_ACCESSION)))
-                .andExpect(content().string(containsString(PROJECT_TITLE)));*/
+                .andExpect(content().string(containsString(PROJECT_TITLE)));
     }
 
-    @Test // /project/count
+    /**
+     * Tests retrieving a count of projects from the /project/count path.
+     * @throws Exception Failed to retrieve results from the mocked service.
+     */
+    @Test
     public void getProjectCount() throws Exception {
-/*        mockMvc.perform(get("/project/count"))
+        mockMvc.perform(get("/project/count"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string(containsString(""+NUM_COUNT_RESULTS)));*/
+                .andExpect(content().string(containsString(""+NUM_COUNT_RESULTS)));
     }
 
-    @Test // //project/list
-    public void ProteinByAssayAccessionMaxPageSizeException() throws Exception {
-        // test with custom paging configuration
-/*        mockMvc.perform(get("/project/list"+ "?show="+ (WsUtils.MAX_PAGE_SIZE + 1)+"&page=0"))
-                .andExpect(status().isForbidden());*/
+    /**
+     * Tests retrieving a list of projects using pagination from the /project/list path.
+     * @throws Exception Failed to retrieve results from the mocked service.
+     */
+    @Test
+    public void projectListMaxPageSizeException() throws Exception {
+        mockMvc.perform(get("/project/list"+ "?show="+ (WsUtils.MAX_PAGE_SIZE + 1)+"&page=0"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/project/list"+ "?show="+ (WsUtils.MAX_PAGE_SIZE)+"&page=0"))
+            .andExpect(status().isOk());
     }
 }
