@@ -30,9 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Tests the retrieving  protein-related information. A ProteinIdentificationSearchService is mocked with test information, which
  * is then queried.
- *
- * @author florian@ebi.ac.uk.
- * @since 1.0.8
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
@@ -49,7 +46,6 @@ public class ProteinControllerFunctionalTest {
 
     private MockMvc mockMvc;
 
-    // mock data values
     private static final String PROJECT_ACCESSION = "PXTEST1";
     private static final String ASSAY_ACCESSION = "1234";
     private static final String PROTEIN_ACCESSION = "P12345";

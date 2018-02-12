@@ -48,7 +48,6 @@ public class ProjectControllerFunctionalTest {
 
     private MockMvc mockMvc;
 
-    // mock data values
     private static final String PROJECT_ACCESSION = "PXTEST1";
     private static final String PROJECT_TITLE = "Project test title";
     private static final long NUM_COUNT_RESULTS = 12345;
@@ -76,12 +75,12 @@ public class ProjectControllerFunctionalTest {
         projectSearchSummary.setProjectAccession(PROJECT_ACCESSION);
         projectSearchSummary.setTitle(PROJECT_TITLE);
 
-        Collection<ProjectSearchSummary> projectSummaries = new ArrayList<>();
-        projectSummaries.add(projectSearchSummary);
+        Collection<ProjectSearchSummary> projectSearchSummaries = new ArrayList<>();
+        projectSearchSummaries.add(projectSearchSummary);
 
         // mock the project service
         when(projectSecureServiceImpl.findByAccession(PROJECT_ACCESSION)).thenReturn(projectSummary);
-        when(projectSearchService.searchProjects(anyString(), anyString(), any(String[].class), anyInt(), anyInt(), anyString(), anyString())).thenReturn(projectSummaries);
+        when(projectSearchService.searchProjects(anyString(), anyString(), any(String[].class), anyInt(), anyInt(), anyString(), anyString())).thenReturn(projectSearchSummaries);
         when(projectSearchService.numSearchResults(anyString(), anyString(), any(String[].class))).thenReturn(NUM_COUNT_RESULTS);
     }
 

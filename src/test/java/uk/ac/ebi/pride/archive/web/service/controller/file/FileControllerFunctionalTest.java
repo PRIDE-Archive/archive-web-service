@@ -85,14 +85,12 @@ public class FileControllerFunctionalTest {
         fileSummary.setAssayId(ASSAY_ID);
         fileSummary.setProjectId(PROJECT_ID);
 
-        Collection<FileSummary> files = new HashSet<FileSummary>();
-        files.add(fileSummary);
+        Collection<FileSummary> fileSummaries = new HashSet<FileSummary>();
+        fileSummaries.add(fileSummary);
 
         // mock the file secure service
-        when(fileSecureServiceImpl.findAllByProjectAccession(PROJECT_ACCESSION)).thenReturn(files);
-        when(fileSecureServiceImpl.findAllByAssayAccession(ASSAY_ACCESSION)).thenReturn(files);
-        // TODO: not tested since deprecated internal functionality
-//        when(fileServiceImpl.findById(fileId)).thenReturn(fileSummary);
+        when(fileSecureServiceImpl.findAllByProjectAccession(PROJECT_ACCESSION)).thenReturn(fileSummaries);
+        when(fileSecureServiceImpl.findAllByAssayAccession(ASSAY_ACCESSION)).thenReturn(fileSummaries);
 
         // mock the project service (used for mapping of project IDs to project accessions)
         ProjectSummary projectSummary = new ProjectSummary();

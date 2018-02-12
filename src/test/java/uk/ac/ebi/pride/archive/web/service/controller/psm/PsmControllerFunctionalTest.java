@@ -15,7 +15,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.ac.ebi.pride.archive.security.psm.PsmSecureSearchService;
 import uk.ac.ebi.pride.archive.web.service.util.WsUtils;
 import uk.ac.ebi.pride.psmindex.mongo.search.model.MongoPsm;
 import uk.ac.ebi.pride.psmindex.mongo.search.service.MongoPsmIndexService;
@@ -52,7 +51,6 @@ public class PsmControllerFunctionalTest {
 
     private MockMvc mockMvc;
 
-    //mock data values
     private static final String ID = "PXTEST1_1234";
     private static final String PROJECT_ACCESSION = "PXTEST1";
     private static final String ASSAY_ACCESSION = "1234";
@@ -129,7 +127,6 @@ public class PsmControllerFunctionalTest {
      */
     @Test
     public void getPsmByProjectAccessionMaxPageSizeException() throws Exception {
-        // test with custom paging configuration
         mockMvc.perform(get("/peptide/list/project/{projectAccession}?show={pageSize}&page=0",
                 PROJECT_ACCESSION, (WsUtils.MAX_PAGE_SIZE + 1)))
                 .andExpect(status().isForbidden());

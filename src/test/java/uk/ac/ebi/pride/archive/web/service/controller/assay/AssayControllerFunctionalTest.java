@@ -46,7 +46,6 @@ public class AssayControllerFunctionalTest {
 
     private MockMvc mockMvc;
 
-    // mock data values
     private static final String PROJECT_ACCESSION = "PXTEST1";
     private static final long PROJECT_ID = 100001;
     private static final String ASSAY_ACCESSION = "9876";
