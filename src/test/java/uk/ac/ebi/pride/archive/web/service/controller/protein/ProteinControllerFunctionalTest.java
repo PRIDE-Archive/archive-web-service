@@ -15,11 +15,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.pride.archive.web.service.util.WsUtils;
+import uk.ac.ebi.pride.proteinidentificationindex.mongo.search.model.MongoProteinIdentification;
+import uk.ac.ebi.pride.proteinidentificationindex.mongo.search.service.MongoProteinIdentificationIndexService;
 import uk.ac.ebi.pride.proteinidentificationindex.search.model.ProteinIdentification;
 import uk.ac.ebi.pride.proteinidentificationindex.search.service.ProteinIdentificationSearchService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
@@ -42,7 +43,9 @@ public class ProteinControllerFunctionalTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
     @Autowired
-    private ProteinIdentificationSearchService pissService;
+    private ProteinIdentificationSearchService proteinIdentificationSearchService;
+    @Autowired
+    private MongoProteinIdentificationIndexService mongoProteinIdentificationIndexService;
 
     private MockMvc mockMvc;
 
@@ -61,6 +64,7 @@ public class ProteinControllerFunctionalTest {
         // Create fake Protein
         ProteinIdentification protein = new ProteinIdentification();
         protein.setAccession(PROTEIN_ACCESSION);
+        protein.setId(PROTEIN_ACCESSION);
         protein.setProjectAccession(PROJECT_ACCESSION);
         protein.setAssayAccession(ASSAY_ACCESSION);
 
@@ -70,16 +74,29 @@ public class ProteinControllerFunctionalTest {
 
         // mock the protein identification service
         PageRequest pageRequest = new PageRequest(0, 10);
-        when(pissService.findByProjectAccession(PROJECT_ACCESSION, pageRequest)).thenReturn(page);
-        when(pissService.findByAssayAccession(ASSAY_ACCESSION, pageRequest)).thenReturn(page);
+        when(proteinIdentificationSearchService.findByProjectAccession(PROJECT_ACCESSION, pageRequest)).thenReturn(page);
+        when(proteinIdentificationSearchService.findByAssayAccession(ASSAY_ACCESSION, pageRequest)).thenReturn(page);
 
         pageRequest = new PageRequest(0, 2);
-        when(pissService.findByProjectAccession(PROJECT_ACCESSION, pageRequest)).thenReturn(page);
-        when(pissService.findByAssayAccession(ASSAY_ACCESSION, pageRequest)).thenReturn(page);
+        when(proteinIdentificationSearchService.findByProjectAccession(PROJECT_ACCESSION, pageRequest)).thenReturn(page);
+        when(proteinIdentificationSearchService.findByAssayAccession(ASSAY_ACCESSION, pageRequest)).thenReturn(page);
 
-        when(pissService.countByProjectAccession(PROJECT_ACCESSION)).thenReturn(NUM_COUNT_RESULTS);
-        when(pissService.countByProjectAccessionAndAccession(PROJECT_ACCESSION, PROTEIN_ACCESSION)).thenReturn(NUM_COUNT_RESULTS);
-        when(pissService.countByAssayAccession(ASSAY_ACCESSION)).thenReturn(NUM_COUNT_RESULTS);
+        when(proteinIdentificationSearchService.countByProjectAccession(PROJECT_ACCESSION)).thenReturn(NUM_COUNT_RESULTS);
+        when(proteinIdentificationSearchService.countByProjectAccessionAndAccession(PROJECT_ACCESSION, PROTEIN_ACCESSION)).thenReturn(NUM_COUNT_RESULTS);
+        when(proteinIdentificationSearchService.countByAssayAccession(ASSAY_ACCESSION)).thenReturn(NUM_COUNT_RESULTS);
+        when(proteinIdentificationSearchService.findByProjectAccessionAndAccession(PROJECT_ACCESSION, PROTEIN_ACCESSION)).thenReturn(list);
+
+        Set<String> assayAccessions = new HashSet<>(Arrays.asList("22134"));
+        Set<String> projectAccessions = new HashSet<>(Arrays.asList("PXD000001"));
+        when(proteinIdentificationSearchService.getUniqueProteinAccessionsByAssayAccession(ASSAY_ACCESSION)).thenReturn(assayAccessions);
+        when(proteinIdentificationSearchService.getUniqueProteinAccessionsByProjectAccession(PROJECT_ACCESSION)).thenReturn(projectAccessions);
+
+        MongoProteinIdentification mongoProteinIdentification = new MongoProteinIdentification();
+        mongoProteinIdentification.setId(PROTEIN_ACCESSION);
+        mongoProteinIdentification.setAccession(PROTEIN_ACCESSION);
+        mongoProteinIdentification.setAssayAccession(ASSAY_ACCESSION);
+        mongoProteinIdentification.setProjectAccession(PROJECT_ACCESSION);
+        mongoProteinIdentificationIndexService.save(mongoProteinIdentification);
     }
 
     /**
@@ -91,20 +108,20 @@ public class ProteinControllerFunctionalTest {
     @Test
     public void getProteinByProjectAccession() throws Exception {
         // test default use case
-//        mockMvc.perform(get("/protein/list/project/{projectAccession}", PROJECT_ACCESSION))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(content().string(containsString(PROJECT_ACCESSION)))
-//                .andExpect(content().string(containsString(ASSAY_ACCESSION)))
-//                .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
-//
-//        // test with custom paging configuration
-//        mockMvc.perform(get("/protein/list/project/{projectAccession}?show=2&page=0", PROJECT_ACCESSION))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(content().string(containsString(PROJECT_ACCESSION)))
-//                .andExpect(content().string(containsString(ASSAY_ACCESSION)))
-//                .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
+        mockMvc.perform(get("/protein/list/project/{projectAccession}", PROJECT_ACCESSION))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(containsString(PROJECT_ACCESSION)))
+                .andExpect(content().string(containsString(ASSAY_ACCESSION)))
+                .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
+
+        // test with custom paging configuration
+        mockMvc.perform(get("/protein/list/project/{projectAccession}?show=2&page=0", PROJECT_ACCESSION))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(containsString(PROJECT_ACCESSION)))
+                .andExpect(content().string(containsString(ASSAY_ACCESSION)))
+                .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
     }
 
     /**
@@ -129,20 +146,20 @@ public class ProteinControllerFunctionalTest {
     @Test
     public void getProteinByAssayAccession() throws Exception {
         // test default use case
-//        mockMvc.perform(get("/protein/list/assay/{assayAccession}", ASSAY_ACCESSION))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(content().string(containsString(PROJECT_ACCESSION)))
-//                .andExpect(content().string(containsString(ASSAY_ACCESSION)))
-//                .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
-//
-//        // test with custom paging configuration
-//        mockMvc.perform(get("/protein/list/assay/{assayAccession}?show=2&page=0", ASSAY_ACCESSION))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(content().string(containsString(PROJECT_ACCESSION)))
-//                .andExpect(content().string(containsString(ASSAY_ACCESSION)))
-//                .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
+        mockMvc.perform(get("/protein/list/assay/{assayAccession}", ASSAY_ACCESSION))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(containsString(PROJECT_ACCESSION)))
+                .andExpect(content().string(containsString(ASSAY_ACCESSION)))
+                .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
+
+        // test with custom paging configuration
+        mockMvc.perform(get("/protein/list/assay/{assayAccession}?show=2&page=0", ASSAY_ACCESSION))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(containsString(PROJECT_ACCESSION)))
+                .andExpect(content().string(containsString(ASSAY_ACCESSION)))
+                .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
     }
 
     /**
@@ -153,7 +170,6 @@ public class ProteinControllerFunctionalTest {
      */
     @Test
     public void ProteinByAssayAccessionMaxPageSizeException() throws Exception {
-        // test with custom paging configuration
         mockMvc.perform(get("/protein/list/assay/{assayAccession}?show={pageSize}&page=0",
                 ASSAY_ACCESSION, (WsUtils.MAX_PAGE_SIZE + 1)))
                 .andExpect(status().isForbidden());
@@ -200,5 +216,48 @@ public class ProteinControllerFunctionalTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString("" + NUM_COUNT_RESULTS)));
+    }
+
+    /**
+     * Tests retrieving list of proteins by providing project accession and protein accession
+     * from the /protein/list/project/{projectAccession}/protein/{proteinAccession} path.
+     *
+     * @throws Exception Failed to retrieve results from the mocked service.
+     */
+    @Test
+    public void getProteinsByProjectAndAccession() throws Exception {
+        mockMvc.perform(get("/protein/list/project/{projectAccession}/protein/{proteinAccession}", PROJECT_ACCESSION, PROTEIN_ACCESSION))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(containsString(PROJECT_ACCESSION)))
+                .andExpect(content().string(containsString(PROTEIN_ACCESSION)));
+    }
+
+    /**
+     * Tests retrieving list of proteins for assay by providing assay accession
+     * from the /protein/list/assay/{assayAccession}.acc path.
+     *
+     * @throws Exception Failed to retrieve results from the mocked service.
+     */
+    @Test
+    public void getProteinListForAssay() throws Exception {
+        mockMvc.perform(get("/protein/list/assay/{assayAccession}.acc", ASSAY_ACCESSION))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.TEXT_PLAIN_VALUE))
+                .andExpect(content().string(containsString(ASSAY_ACCESSION)));
+    }
+
+    /**
+     * Tests retrieving list of proteins for project by providing project accession
+     * from the /protein/list/project/{projectAccession}.acc path.
+     *
+     * @throws Exception Failed to retrieve results from the mocked service.
+     */
+    @Test
+    public void getProteinListForProject() throws Exception {
+        mockMvc.perform(get("/protein/list/project/{projectAccession}.acc", PROJECT_ACCESSION))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.TEXT_PLAIN_VALUE))
+                .andExpect(content().string(containsString(PROJECT_ACCESSION)));
     }
 }
