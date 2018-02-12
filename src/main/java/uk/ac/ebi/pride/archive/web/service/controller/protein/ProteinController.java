@@ -59,7 +59,7 @@ public class ProteinController {
       logger.error("Maximum size of page reach");
       throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
     }
-    return getPsmDetailList(proteinIdService.findByProjectAccession(projectAccession, new PageRequest(page, showResults)).getContent());
+    return getProteinDetailList(proteinIdService.findByProjectAccession(projectAccession, new PageRequest(page, showResults)).getContent());
   }
 
   @ApiOperation(value = "count protein identifications by project accession", position = 2)
@@ -87,7 +87,7 @@ public class ProteinController {
       @PathVariable("accession") String accession
   ) {
     logger.info("Proteins for project " + projectAccession + "and accession " + accession + " requested");
-    return getPsmDetailList(proteinIdService.findByProjectAccessionAndAccession(projectAccession, accession));
+    return getProteinDetailList(proteinIdService.findByProjectAccessionAndAccession(projectAccession, accession));
   }
 
   @ApiOperation(value = "count protein identifications by project accession and protein accession", position = 4)
@@ -123,7 +123,7 @@ public class ProteinController {
       logger.error("Maximum size of page reach");
       throw new MaxPageSizeReachedException("The number of items requested exceed the maximum size for the page: "+ WsUtils.MAX_PAGE_SIZE);
     }
-    return getPsmDetailList(proteinIdService.findByAssayAccession(assayAccession, new PageRequest(page, showResults)).getContent());
+    return getProteinDetailList(proteinIdService.findByAssayAccession(assayAccession, new PageRequest(page, showResults)).getContent());
   }
 
   @ApiOperation(value = "count protein identifications by assay accession", position = 6)
@@ -144,7 +144,7 @@ public class ProteinController {
     return !accession.toUpperCase().contains("DECOY") && !accession.toUpperCase().contains("REVERSE");
   }
 
-  private ProteinDetailList getPsmDetailList(List<ProteinIdentification> foundProteins) {
+  private ProteinDetailList getProteinDetailList(List<ProteinIdentification> foundProteins) {
     return new ProteinDetailList(
         ObjectMapper.mapMongoProteinIdentifiedListToWSProteinDetailList(
             mongoProteinIdService.findByIdIn(
