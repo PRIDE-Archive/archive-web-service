@@ -38,17 +38,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 @ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-config.xml", "classpath:spring-mongo-test-context.xml"})
 public class ProjectControllerFunctionalTest {
+
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    private MockMvc mockMvc;
-
     @Autowired
     private ProjectSecureServiceImpl projectSecureServiceImpl;
-
     @Autowired
     private ProjectSearchService projectSearchService;
 
+    private MockMvc mockMvc;
+
+    // mock data values
     private static final String PROJECT_ACCESSION = "PXTEST1";
     private static final String PROJECT_TITLE = "Project test title";
     private static final long NUM_COUNT_RESULTS = 12345;
@@ -87,20 +87,21 @@ public class ProjectControllerFunctionalTest {
 
     /**
      * Tests retrieving project details from the /project/{projectAccession} path.
+     *
      * @throws Exception Failed to retrieve results from the mocked service.
      */
     @Test
     public void getProjectReturnProjectSummary() throws Exception {
-        mockMvc.perform(get("/project/" + PROJECT_ACCESSION))
+        mockMvc.perform(get("/project/{projectAccession}", PROJECT_ACCESSION))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString(PROJECT_ACCESSION)))
                 .andExpect(content().string(containsString("john.smith@ebi.ac.uk")));
     }
 
-
     /**
      * Tests retrieving a list of projects from the /project/list path.
+     *
      * @throws Exception Failed to retrieve results from the mocked service.
      */
     @Test
@@ -114,6 +115,7 @@ public class ProjectControllerFunctionalTest {
 
     /**
      * Tests retrieving a count of projects from the /project/count path.
+     *
      * @throws Exception Failed to retrieve results from the mocked service.
      */
     @Test
@@ -121,18 +123,19 @@ public class ProjectControllerFunctionalTest {
         mockMvc.perform(get("/project/count"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string(containsString(""+NUM_COUNT_RESULTS)));
+                .andExpect(content().string(containsString("" + NUM_COUNT_RESULTS)));
     }
 
     /**
      * Tests retrieving a list of projects using pagination from the /project/list path.
+     *
      * @throws Exception Failed to retrieve results from the mocked service.
      */
     @Test
     public void projectListMaxPageSizeException() throws Exception {
-        mockMvc.perform(get("/project/list"+ "?show="+ (WsUtils.MAX_PAGE_SIZE + 1)+"&page=0"))
+        mockMvc.perform(get("/project/list?show={pageSize}&page=0", (WsUtils.MAX_PAGE_SIZE)))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/project/list?show={pageSize}&page=0", (WsUtils.MAX_PAGE_SIZE + 1)))
                 .andExpect(status().isForbidden());
-        mockMvc.perform(get("/project/list"+ "?show="+ (WsUtils.MAX_PAGE_SIZE)+"&page=0"))
-            .andExpect(status().isOk());
     }
 }

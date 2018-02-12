@@ -25,33 +25,41 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
+/**
+ * Tests the retrieving  Assay-related information. A AssaySecureService is mocked with test information,
+ * which is then queried.
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-config.xml", "classpath:spring-mongo-test-context.xml"})
+@ContextConfiguration({
+        "classpath:test-context.xml",
+        "classpath:mvc-config.xml",
+        "classpath:spring-mongo-test-context.xml"})
 public class AssayControllerFunctionalTest {
-    // todo all unit tests need to be overhauled
 
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    private MockMvc mockMvc;
-
     @Autowired
     private ProjectSecureServiceImpl projectSecureServiceImpl;
     @Autowired
     private AssaySecureServiceImpl assaySecureServiceImpl;
 
+    private MockMvc mockMvc;
 
+    // mock data values
     private static final String PROJECT_ACCESSION = "PXTEST1";
     private static final long PROJECT_ID = 100001;
     private static final String ASSAY_ACCESSION = "9876";
     private static final long ASSAY_ID = 200001;
     private static final String ASSAY_TITLE = "Assay title";
     private static final String ASSAY_SHORT_LABEL = "Assay short label";
+    private static final long NUM_COUNT_RESULTS = 12345L;
 
+    /**
+     * Sets up the assay summary test information, used to mock the assay service.
+     */
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
 
         //create fake assay
@@ -65,37 +73,62 @@ public class AssayControllerFunctionalTest {
         Collection<AssaySummary> assays = new HashSet<AssaySummary>();
         assays.add(assaySummary);
 
-        // mock assay service
-        when(assaySecureServiceImpl.findByAccession(ASSAY_ACCESSION)).thenReturn(assaySummary);
-        when(assaySecureServiceImpl.findAllByProjectAccession(PROJECT_ACCESSION)).thenReturn(assays);
-
         ProjectSummary projectSummary = new ProjectSummary();
         projectSummary.setAccession(PROJECT_ACCESSION);
         projectSummary.setId(PROJECT_ID);
+
+        // mock assay service
+        when(assaySecureServiceImpl.findByAccession(ASSAY_ACCESSION)).thenReturn(assaySummary);
+        when(assaySecureServiceImpl.findAllByProjectAccession(PROJECT_ACCESSION)).thenReturn(assays);
+        when(assaySecureServiceImpl.countByProjectAccession(PROJECT_ACCESSION)).thenReturn(NUM_COUNT_RESULTS);
+
         when(projectSecureServiceImpl.findByAccession(PROJECT_ACCESSION)).thenReturn(projectSummary);
         when(projectSecureServiceImpl.findById(PROJECT_ID)).thenReturn(projectSummary);
     }
 
-    @Test // /assay/project/{projectAccession}
+    /**
+     * Tests retrieving assay details by projectAccession from the /assay/project/{projectAccession} path.
+     *
+     * @throws Exception Failed to retrieve results from the mocked service.
+     */
+    @Test
     public void getByProjectAccession() throws Exception {
-/*        mockMvc.perform(get("/assay/list/project/" + PROJECT_ACCESSION))
+        mockMvc.perform(get("/assay/list/project/{projectAccession}", PROJECT_ACCESSION))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString(PROJECT_ACCESSION)))
                 .andExpect(content().string(containsString(ASSAY_ACCESSION)))
                 .andExpect(content().string(containsString(ASSAY_TITLE)))
-                .andExpect(content().string(containsString(ASSAY_SHORT_LABEL)));*/
+                .andExpect(content().string(containsString(ASSAY_SHORT_LABEL)));
     }
 
-    @Test // /assay/{assayAccession}
+    /**
+     * Tests retrieving assay details by assayAccession from the /assay/{assayAccession} path.
+     *
+     * @throws Exception Failed to retrieve results from the mocked service.
+     */
+    @Test
     public void getByAssayAccession() throws Exception {
-/*        mockMvc.perform(get("/assay/" + ASSAY_ACCESSION))
+        mockMvc.perform(get("/assay/{assayAccession}", ASSAY_ACCESSION))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(containsString(PROJECT_ACCESSION)))
                 .andExpect(content().string(containsString(ASSAY_ACCESSION)))
                 .andExpect(content().string(containsString(ASSAY_TITLE)))
-                .andExpect(content().string(containsString(ASSAY_SHORT_LABEL)));*/
+                .andExpect(content().string(containsString(ASSAY_SHORT_LABEL)));
     }
 
+    /**
+     * Tests retrieving count of assays by providing project accession
+     * from the /assay/count/project/{projectAccession} path.
+     *
+     * @throws Exception Failed to retrieve results from the mocked service.
+     */
+    @Test
+    public void countByProjectAccession() throws Exception {
+        mockMvc.perform(get("/assay/count/project/{projectAccession}", PROJECT_ACCESSION))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(containsString("" + NUM_COUNT_RESULTS)));
+    }
 }

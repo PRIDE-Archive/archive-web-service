@@ -34,26 +34,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Tests the retrieving  File-related information. A FileSecureServiceImpl is mocked with test information,
+ * which is then queried.
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration({"classpath:test-context.xml", "classpath:mvc-config.xml", "classpath:spring-mongo-test-context.xml"})
+@ContextConfiguration({
+        "classpath:test-context.xml",
+        "classpath:mvc-config.xml",
+        "classpath:spring-mongo-test-context.xml"})
 public class FileControllerFunctionalTest {
     // todo all unit tests need to be overhauled
 
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
-
-    private MockMvc mockMvc;
-
     @Autowired
     private FileSecureServiceImpl fileSecureServiceImpl;
     @Autowired
     private ProjectSecureServiceImpl projectSecureServiceImpl;
     @Autowired
     private AssaySecureServiceImpl assaySecureServiceImpl;
+
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    private MockMvc mockMvc;
 
     // mock data values
     private static final String PROJECT_ACCESSION = "PXTEST1";
@@ -64,11 +70,14 @@ public class FileControllerFunctionalTest {
     private static final String FILE_NAME = "aFileName";
     private static final String FTP_PATH_FRAGMENT = "ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2010/01/" + PROJECT_ACCESSION + "/" + FILE_NAME;
 
+    /**
+     * Sets up the file summary information, used to mock the file secure service.
+     */
     @Before
     public void setUp() throws Exception {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
 
-        ///// mock results
+        // create fake file
         FileSummary fileSummary = new FileSummary();
         fileSummary.setFileName(FILE_NAME);
         fileSummary.setFileSize(FILE_SIZE);
@@ -79,19 +88,18 @@ public class FileControllerFunctionalTest {
         Collection<FileSummary> files = new HashSet<FileSummary>();
         files.add(fileSummary);
 
-
-        ///// mock services
-        // mock file service
+        // mock the file secure service
         when(fileSecureServiceImpl.findAllByProjectAccession(PROJECT_ACCESSION)).thenReturn(files);
         when(fileSecureServiceImpl.findAllByAssayAccession(ASSAY_ACCESSION)).thenReturn(files);
-//        when(fileServiceImpl.findById(fileId)).thenReturn(fileSummary); // not tested since deprecated internal functionality
+        // TODO: not tested since deprecated internal functionality
+//        when(fileServiceImpl.findById(fileId)).thenReturn(fileSummary);
 
-
-        // mock project service (used for mapping of project IDs to project accessions)
+        // mock the project service (used for mapping of project IDs to project accessions)
         ProjectSummary projectSummary = new ProjectSummary();
         projectSummary.setId(PROJECT_ID);
         projectSummary.setAccession(PROJECT_ACCESSION);
         projectSummary.setPublicProject(true);
+
         // set a date, so the FTP download path can be created (needs to match the FTP path defined above)
         Date date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).parse("2010-01-30");
         projectSummary.setPublicationDate(date);
@@ -99,19 +107,22 @@ public class FileControllerFunctionalTest {
         when(projectSecureServiceImpl.findByAccession(PROJECT_ACCESSION)).thenReturn(projectSummary);
         when(projectSecureServiceImpl.findById(PROJECT_ID)).thenReturn(projectSummary);
 
-
         // mock assay service (used for mapping of assay IDs to assay accessions)
         AssaySummary assaySummary = new AssaySummary();
         assaySummary.setId(ASSAY_ID);
         assaySummary.setAccession(ASSAY_ACCESSION);
 
         when(assaySecureServiceImpl.findById(ASSAY_ID)).thenReturn(assaySummary);
-
     }
 
-    @Test // /file/list/project/{projectAccession}
+    /**
+     * Tests retrieving file summary details from the /file/list/project/{projectAccession} path.
+     *
+     * @throws Exception Failed to retrieve results from the mocked service.
+     */
+    @Test
     public void getFilesByProjectReturnsFileSummary() throws Exception {
-/*        mockMvc.perform(get("/file/list/project/" + PROJECT_ACCESSION))
+        mockMvc.perform(get("/file/list/project/{projectAccession}", PROJECT_ACCESSION))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -119,12 +130,17 @@ public class FileControllerFunctionalTest {
                 .andExpect(content().string(containsString(ASSAY_ACCESSION)))
                 .andExpect(content().string(containsString(PROJECT_ACCESSION)))
                 .andExpect(content().string(containsString(FTP_PATH_FRAGMENT)))
-                .andExpect(content().string(containsString(""+ FILE_SIZE)));*/
+                .andExpect(content().string(containsString("" + FILE_SIZE)));
     }
 
-    @Test // /file/list/assay/{assayAccession}
+    /**
+     * Tests retrieving file summary details from the /file/list/assay/{assayAccession} path.
+     *
+     * @throws Exception Failed to retrieve results from the mocked service.
+     */
+    @Test
     public void getFilesByAssayReturnsFileSummary() throws Exception {
-/*        mockMvc.perform(get("/file/list/assay/" + ASSAY_ACCESSION))
+        mockMvc.perform(get("/file/list/assay/{assayAccession}", ASSAY_ACCESSION))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -132,7 +148,6 @@ public class FileControllerFunctionalTest {
                 .andExpect(content().string(containsString(ASSAY_ACCESSION)))
                 .andExpect(content().string(containsString(PROJECT_ACCESSION)))
                 .andExpect(content().string(containsString(FTP_PATH_FRAGMENT)))
-                .andExpect(content().string(containsString(""+ FILE_SIZE)));*/
+                .andExpect(content().string(containsString("" + FILE_SIZE)));
     }
-
 }
