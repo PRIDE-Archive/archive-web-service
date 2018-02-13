@@ -69,7 +69,7 @@ public class AssayControllerFunctionalTest {
         assaySummary.setTitle(ASSAY_TITLE);
         assaySummary.setShortLabel(ASSAY_SHORT_LABEL);
 
-        Collection<AssaySummary> assays = new HashSet<AssaySummary>();
+        Collection<AssaySummary> assays = new HashSet<>();
         assays.add(assaySummary);
 
         ProjectSummary projectSummary = new ProjectSummary();

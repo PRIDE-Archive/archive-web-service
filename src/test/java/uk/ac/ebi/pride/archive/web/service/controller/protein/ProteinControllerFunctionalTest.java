@@ -53,6 +53,7 @@ public class ProteinControllerFunctionalTest {
     private static final String ASSAY_ACCESSION = "1234";
     private static final String PROTEIN_ACCESSION = "P12345";
     private static final long NUM_COUNT_RESULTS = 12345L;
+    private static final String ID = "PXTEST1_1234";
 
     /**
      * Sets up the protein test information, used to mock the protein identification service.
@@ -63,14 +64,14 @@ public class ProteinControllerFunctionalTest {
 
         // Create fake Protein
         ProteinIdentification protein = new ProteinIdentification();
+        protein.setId(ID);
         protein.setAccession(PROTEIN_ACCESSION);
-        protein.setId(PROTEIN_ACCESSION);
         protein.setProjectAccession(PROJECT_ACCESSION);
         protein.setAssayAccession(ASSAY_ACCESSION);
 
-        List<ProteinIdentification> list = new ArrayList<ProteinIdentification>(1);
+        List<ProteinIdentification> list = new ArrayList<>(1);
         list.add(protein);
-        Page<ProteinIdentification> page = new PageImpl<ProteinIdentification>(list);
+        Page<ProteinIdentification> page = new PageImpl<>(list);
 
         // mock the protein identification service
         PageRequest pageRequest = new PageRequest(0, 10);
@@ -86,16 +87,16 @@ public class ProteinControllerFunctionalTest {
         when(proteinIdentificationSearchService.countByAssayAccession(ASSAY_ACCESSION)).thenReturn(NUM_COUNT_RESULTS);
         when(proteinIdentificationSearchService.findByProjectAccessionAndAccession(PROJECT_ACCESSION, PROTEIN_ACCESSION)).thenReturn(list);
 
-        Set<String> assayAccessions = new HashSet<>(Arrays.asList("22134"));
-        Set<String> projectAccessions = new HashSet<>(Arrays.asList("PXD000001"));
+        Set<String> assayAccessions = new HashSet<>(Collections.singletonList("22134"));
+        Set<String> projectAccessions = new HashSet<>(Collections.singletonList("PXD000001"));
         when(proteinIdentificationSearchService.getUniqueProteinAccessionsByAssayAccession(ASSAY_ACCESSION)).thenReturn(assayAccessions);
         when(proteinIdentificationSearchService.getUniqueProteinAccessionsByProjectAccession(PROJECT_ACCESSION)).thenReturn(projectAccessions);
 
         MongoProteinIdentification mongoProteinIdentification = new MongoProteinIdentification();
-        mongoProteinIdentification.setId(PROTEIN_ACCESSION);
+        mongoProteinIdentification.setId(ID);
         mongoProteinIdentification.setAccession(PROTEIN_ACCESSION);
-        mongoProteinIdentification.setAssayAccession(ASSAY_ACCESSION);
         mongoProteinIdentification.setProjectAccession(PROJECT_ACCESSION);
+        mongoProteinIdentification.setAssayAccession(ASSAY_ACCESSION);
         mongoProteinIdentificationIndexService.save(mongoProteinIdentification);
     }
 

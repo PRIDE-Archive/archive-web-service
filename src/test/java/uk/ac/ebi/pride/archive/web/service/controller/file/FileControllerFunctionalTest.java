@@ -45,7 +45,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "classpath:mvc-config.xml",
         "classpath:spring-mongo-test-context.xml"})
 public class FileControllerFunctionalTest {
-    // todo all unit tests need to be overhauled
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -85,7 +84,7 @@ public class FileControllerFunctionalTest {
         fileSummary.setAssayId(ASSAY_ID);
         fileSummary.setProjectId(PROJECT_ID);
 
-        Collection<FileSummary> fileSummaries = new HashSet<FileSummary>();
+        Collection<FileSummary> fileSummaries = new HashSet<>();
         fileSummaries.add(fileSummary);
 
         // mock the file secure service
