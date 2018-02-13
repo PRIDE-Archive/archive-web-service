@@ -68,6 +68,7 @@ public class FileControllerFunctionalTest {
     private static final int FILE_SIZE = 1000;
     private static final String FILE_NAME = "aFileName";
     private static final String FTP_PATH_FRAGMENT = "ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2010/01/" + PROJECT_ACCESSION + "/" + FILE_NAME;
+    private static final String ASPERA_PATH_FRAGMENT = "prd_ascp@fasp.ebi.ac.uk:pride/data/archive/2010/01/" + PROJECT_ACCESSION + "/" + FILE_NAME;
 
     /**
      * Sets up the file summary information, used to mock the file secure service.
@@ -127,6 +128,7 @@ public class FileControllerFunctionalTest {
                 .andExpect(content().string(containsString(ASSAY_ACCESSION)))
                 .andExpect(content().string(containsString(PROJECT_ACCESSION)))
                 .andExpect(content().string(containsString(FTP_PATH_FRAGMENT)))
+                .andExpect(content().string(containsString(ASPERA_PATH_FRAGMENT)))
                 .andExpect(content().string(containsString("" + FILE_SIZE)));
     }
 
@@ -145,6 +147,7 @@ public class FileControllerFunctionalTest {
                 .andExpect(content().string(containsString(ASSAY_ACCESSION)))
                 .andExpect(content().string(containsString(PROJECT_ACCESSION)))
                 .andExpect(content().string(containsString(FTP_PATH_FRAGMENT)))
+                .andExpect(content().string(containsString(ASPERA_PATH_FRAGMENT)))
                 .andExpect(content().string(containsString("" + FILE_SIZE)));
     }
 }

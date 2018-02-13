@@ -1,6 +1,5 @@
 package uk.ac.ebi.pride.archive.web.service.controller.file;
 
-import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -13,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileSource;
-import uk.ac.ebi.pride.archive.dataprovider.file.ProjectFileType;
 import uk.ac.ebi.pride.archive.repo.assay.service.AssaySummary;
 import uk.ac.ebi.pride.archive.repo.file.service.FileSummary;
 import uk.ac.ebi.pride.archive.repo.project.service.ProjectSummary;
@@ -29,10 +27,6 @@ import uk.ac.ebi.pride.archive.web.service.model.file.FileDetailList;
 import uk.ac.ebi.pride.archive.web.service.util.IdMapper;
 import uk.ac.ebi.pride.archive.web.service.util.ObjectMapper;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -75,6 +69,8 @@ public class FileController {
     private String ftpPublicRoot;
     @Value("#{fileConfig['ftp.private.base.path']}")
     private String ftpPrivateRoot;
+    @Value("#{fileConfig['aspera.download.link.prefix']}")
+    private String asperaLinkPrefix;
     private String httpPrivateRoot = "http://www.ebi.ac.uk/pride/archive/files/";
 
     @ApiOperation(value = "list files for a project", position = 1)
@@ -106,7 +102,7 @@ public class FileController {
 
         if (projectSummary.isPublicProject()) {
             URL url = buildPublicFtpUrlForProject(projectSummary.getAccession(), projectSummary.getPublicationDate());
-            addFtpUrls(fileDetails, url);
+            addDownloadableUrls(fileDetails, url);
         } else {
             // now there is no private path, so we don't add any FTP links
             // we can only use the http streaming method currently provided by the web
@@ -117,7 +113,7 @@ public class FileController {
 //            UserDetails currentUser = (UserDetails)a.getPrincipal();
 //            // add private URLs for the project files
 //            ftpPath = buildPrivateFtpPathForProject(projectSummary.getAccession(), currentUser.getUsername());
-//            addFtpUrls(fileDetails, ftpPath);
+//            addDownloadableUrls(fileDetails, ftpPath);
         }
 
         Collections.sort(fileDetails, new DefaultFileComparator());
@@ -183,7 +179,7 @@ public class FileController {
 
         if (projectSummary.isPublicProject()) {
             URL url = buildPublicFtpUrlForProject(projectSummary.getAccession(), projectSummary.getPublicationDate());
-            addFtpUrls(fileDetails, url);
+            addDownloadableUrls(fileDetails, url);
         } else {
             // now there is no private path, so we don't add any FTP links
             // we can only use the http streaming method currently provided by the web
@@ -197,7 +193,7 @@ public class FileController {
 //            UserDetails currentUser = (UserDetails)a.getPrincipal();
 //            // add private URLs for the project files
 //            ftpPath = buildPrivateFtpPathForProject(projectSummary.getAccession(), currentUser.getUsername());
-//            addFtpUrls(fileDetails, ftpPath);
+//            addDownloadableUrls(fileDetails, ftpPath);
 //        }
 
         Collections.sort(fileDetails, new DefaultFileComparator());
@@ -236,8 +232,8 @@ public class FileController {
     }
 
     /**
-     * Annotate the FileDetail object in the provided collection with the FTP download link for a given project.
-     * This uses a pre-configured FTP domain URL as basis.
+     * Annotate the FileDetail object in the provided collection with the FTP and Aspera download link for a given project.
+     * This uses a pre-configured FTP domain URL/Aspera prefix as basis.
      * Note: all FileDetail objects in the provided list have to come from the same record.
      * Otherwise a correct link cannot be generated.
      *
@@ -245,13 +241,10 @@ public class FileController {
      * @param projectFtpUrl a URL defining the full FTP path to the directory where the files are located.
      * @throws java.net.MalformedURLException in case a proper URL could not be formed from the available details.
      */
-    private void addFtpUrls(Collection<FileDetail> fileDetails, URL projectFtpUrl) throws MalformedURLException {
+    private void addDownloadableUrls(Collection<FileDetail> fileDetails, URL projectFtpUrl) throws MalformedURLException {
         for (FileDetail fileDetail : fileDetails) {
-            // ToDo: dirty hack to work around inconsistent file names in DB and file system (not guaranteed to work for all cases!)
             String fileName = fileDetail.getFileName();
-            if ( fileName.endsWith(".xml") && fileDetail.getFileType() == ProjectFileType.RESULT ) {
-                fileName += ".gz";
-            }
+
             // Files generated by PRIDE on top of the submission files are kept in a sub-directory
             URL fileUrl;
             if (fileDetail.getFileSource() == ProjectFileSource.GENERATED) {
@@ -259,7 +252,10 @@ public class FileController {
             } else {
                 fileUrl = new URL(projectFtpUrl, fileName);
             }
-            fileDetail.setDownloadLink(fileUrl);
+            fileDetail.setFtpDownloadLink(fileUrl);
+            String fileUrlPath = fileUrl.getPath();
+            String asperaPath = asperaLinkPrefix + fileUrlPath.substring(fileUrlPath.indexOf(ftpPublicRoot)+1);
+            fileDetail.setAsperaDownloadLink(asperaPath);
         }
     }
 
@@ -282,7 +278,7 @@ public class FileController {
 
             // generate and add the private download link
             URL privateUrl = new URL(httpPrivateRoot + requestedFile.getId());
-            fileDetail.setDownloadLink(privateUrl);
+            fileDetail.setFtpDownloadLink(privateUrl);
         }
 
 
