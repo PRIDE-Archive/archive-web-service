@@ -101,7 +101,6 @@ public class CheckController {
         // Service layer version
         builder.append("Service Layer Version: ").append(serviceLayerVersion).append(lineSeparator);
 
-
         return builder.toString();
     }
 
@@ -132,7 +131,7 @@ public class CheckController {
             if (fileName == null || fileName.trim().isEmpty()) { return false; }
 
             // there has to be a download URL (since we are testing a public project)
-            URL fileUrl = fileDetail.getDownloadLink();
+            URL fileUrl = fileDetail.getFtpDownloadLink();
             if (fileUrl == null) { return false; }
 
             // the download URL has to end in the file name
