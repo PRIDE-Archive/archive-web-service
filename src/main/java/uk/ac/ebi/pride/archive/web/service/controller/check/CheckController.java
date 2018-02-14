@@ -101,7 +101,6 @@ public class CheckController {
         // Service layer version
         builder.append("Service Layer Version: ").append(serviceLayerVersion).append(lineSeparator);
 
-
         return builder.toString();
     }
 
