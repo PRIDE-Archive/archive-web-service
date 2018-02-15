@@ -131,7 +131,7 @@ public class CheckController {
             if (fileName == null || fileName.trim().isEmpty()) { return false; }
 
             // there has to be a download URL (since we are testing a public project)
-            URL fileUrl = fileDetail.getFtpDownloadLink();
+            URL fileUrl = fileDetail.getDownloadLink();
             if (fileUrl == null) { return false; }
 
             // the download URL has to end in the file name
