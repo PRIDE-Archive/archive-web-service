@@ -3,8 +3,7 @@ package uk.ac.ebi.pride.archive.web.service.interceptor;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisCluster;
 
 import java.time.Instant;
 
@@ -26,45 +25,37 @@ public class RateLimitServiceImpl extends GenericApplicationContext implements R
   /**
    * This method connects to Redis to track the count of users' total requests within the defined time period.
    * @param userKey the key to use for the user.
-   * @param jedisPool the pool for new Redis connections.
+   * @param jedisCluster the new Redis connection.
    * @return the user's current count of requests within the latest time period.
    */
   @Override
-  public int incrementLimit(String userKey, JedisPool jedisPool) throws Exception {
+  public int incrementLimit(String userKey, JedisCluster jedisCluster) throws Exception {
     int result = 0;
-    Jedis jedis = null;
-    try {
-      jedis = jedisPool.getResource();
-      if (jedis.exists(userKey)) {
-        logger.debug("Jedis user key exists, has been flagged for rate limit");
-        result = Integer.parseInt(jedis.get(userKey)); // user has already been flagged at the limit
-      } else {
-        long currentTimeStampSeconds = Instant.now().getEpochSecond();
-        String timedUserKey = userKey + ":" + currentTimeStampSeconds;
-        for (int i=1; i<=COUNT_EXPIRY_PERIOD_SECONDS; i++) {
-          String keyToTry = userKey + ":" + (currentTimeStampSeconds - i);
-          if (jedis.exists(keyToTry)) {
-            result += Integer.parseInt(jedis.get(keyToTry));
-          }
-        }
-        if (jedis.exists(timedUserKey)) {
-          jedis.incr(timedUserKey);
-          result += Integer.parseInt(jedis.get(timedUserKey));
-        } else {
-          jedis.set(timedUserKey, "1");
-          jedis.expire(timedUserKey, COUNT_EXPIRY_PERIOD_SECONDS*2);
-          result++;
-        }
-        logger.debug("Current count for user:" + timedUserKey + " - " + result);
-        if (result > MAX_REQUESTS_PER_PERIOD){
-          logger.debug("Reached user, flagging as reached limit");
-          jedis.set(userKey, "" + ++result); // flag user
-          jedis.expire(userKey, COUNT_EXPIRY_PERIOD_SECONDS*2); // throttle users harder who hit the cap
+    if (jedisCluster.exists(userKey)) {
+      logger.debug("Redis user key exists, has been flagged for rate limit");
+      result = Integer.parseInt(jedisCluster.get(userKey)); // user has already been flagged at the limit
+    } else {
+      long currentTimeStampSeconds = Instant.now().getEpochSecond();
+      String timedUserKey = userKey + ":" + currentTimeStampSeconds;
+      for (int i=1; i<=COUNT_EXPIRY_PERIOD_SECONDS; i++) {
+        String keyToTry = userKey + ":" + (currentTimeStampSeconds - i);
+        if (jedisCluster.exists(keyToTry)) {
+          result += Integer.parseInt(jedisCluster.get(keyToTry));
         }
       }
-    } finally {
-      if (jedis!=null) {
-        jedis.close();
+      if (jedisCluster.exists(timedUserKey)) {
+        jedisCluster.incr(timedUserKey);
+        result += Integer.parseInt(jedisCluster.get(timedUserKey));
+      } else {
+        jedisCluster.set(timedUserKey, "1");
+        jedisCluster.expire(timedUserKey, COUNT_EXPIRY_PERIOD_SECONDS*2);
+        result++;
+      }
+      logger.debug("Current count for user:" + timedUserKey + " - " + result);
+      if (result > MAX_REQUESTS_PER_PERIOD){
+        logger.debug("Reached user, flagging as reached limit");
+        jedisCluster.set(userKey, "" + ++result); // flag user
+        jedisCluster.expire(userKey, COUNT_EXPIRY_PERIOD_SECONDS*2); // throttle users harder who hit the cap
       }
     }
     return result;

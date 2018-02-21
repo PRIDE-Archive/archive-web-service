@@ -7,13 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPoolConfig;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 import static uk.ac.ebi.pride.archive.web.service.interceptor.RateLimitServiceImpl.COUNT_EXPIRY_PERIOD_SECONDS;
 
@@ -35,9 +38,8 @@ public class RateLimitInterceptor extends HandlerInterceptorAdapter {
   private String redisServer;
   @Value("#{redisConfig['redis.port']}")
   private String redisPort;
-  @Value("#{redisConfig['redis.password']}")
-  private String redisPassword;
-  private JedisPool jedisPool;
+  private JedisCluster jedisCluster;
+
 
   @Autowired
   private RateLimitService rateLimitService;
@@ -48,14 +50,11 @@ public class RateLimitInterceptor extends HandlerInterceptorAdapter {
    * @param response the response sent back to the user.
    * @param handler the handler object.
    * @return true to process the request onwards as normal, false otherwise and the request is not processed at all.
-   * @throws Exception Any exception encountered attempting to limit the user's requests.
    */
   public boolean preHandle(HttpServletRequest request,
-                           HttpServletResponse response, Object handler) throws Exception {
+                           HttpServletResponse response, Object handler) {
     boolean result = true;
-    if (jedisPool==null) {
-      jedisPool = new JedisPool(new JedisPoolConfig(), redisServer, Integer.parseInt(redisPort), 0, redisPassword);
-    }
+    setupRedisConnection();
     if ("GET".equalsIgnoreCase(request.getMethod())) {
       if (logger.isDebugEnabled()) {
         debugRequestHeaders(request);
@@ -76,7 +75,7 @@ public class RateLimitInterceptor extends HandlerInterceptorAdapter {
       if (!LOCALHOST.equals(address) && !ALT_LOCALHOST.equals(address)) {
         try {
           logger.debug("About to increment count for user: " + address);
-          int incrementUserGetCount = rateLimitService.incrementLimit("GET~" + address, jedisPool);
+          int incrementUserGetCount = rateLimitService.incrementLimit("GET~" + address, jedisCluster);
           logger.debug("Current count for user: " + address + " is: " + incrementUserGetCount);
           if (incrementUserGetCount >= MAX_REQUESTS_PER_PERIOD) { // temp ban user
             response.sendError(429, "Rate limit exceeded: " + MAX_REQUESTS_PER_PERIOD + " requests per " +
@@ -92,6 +91,37 @@ public class RateLimitInterceptor extends HandlerInterceptorAdapter {
       }
     }
     return result;
+  }
+
+  /**
+   * Sets up the connection to Redis cluster.
+   */
+  private void setupRedisConnection() {
+    if (jedisCluster == null) {
+      final String STRING_SEPARATOR = "##";
+      Set<HostAndPort> jedisClusterNodes = new HashSet<>();
+      if (redisServer.contains(STRING_SEPARATOR)) {
+        String[] servers = redisServer.split(STRING_SEPARATOR);
+        String[] ports;
+        if (redisPort.contains(STRING_SEPARATOR)) {
+          ports = redisPort.split(STRING_SEPARATOR);
+        } else {
+          ports = new String[]{redisPort};
+        }
+        if (ports.length!=1 && ports.length!=servers.length) {
+          logger.error("Mismatch between provided Redis ports and servers. Should either have 1 port for all servers, or 1 port per server");
+        }
+        for (int i=0; i<servers.length; i++) {
+          String serverPort = ports.length == 1 ? ports[0] : ports[i];
+          jedisClusterNodes.add(new HostAndPort(servers[i], Integer.parseInt(serverPort)));
+          logger.info("Added Jedis node: " + servers[i] + " " + serverPort);
+        }
+      } else {
+        jedisClusterNodes.add(new HostAndPort(redisServer, Integer.parseInt(redisPort))); //Jedis Cluster will attempt to discover cluster nodes automatically
+        logger.info("Added Jedis node: " + redisServer + " " + redisPort);
+      }
+      jedisCluster =  new JedisCluster(jedisClusterNodes, new JedisPoolConfig());
+    }
   }
 
   /**

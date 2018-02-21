@@ -1,6 +1,6 @@
 package uk.ac.ebi.pride.archive.web.service.interceptor;
 
-import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisCluster;
 
 /** This defines the interface for limiing the rate of users' requests.
  *
@@ -8,5 +8,5 @@ import redis.clients.jedis.JedisPool;
  */
 public interface RateLimitService {
 
-  public int incrementLimit(String userKey, JedisPool jedisPool) throws Exception;
+  public int incrementLimit(String userKey, JedisCluster jedisCluster) throws Exception;
 }
