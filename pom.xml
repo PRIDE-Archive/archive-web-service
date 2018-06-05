@@ -32,13 +32,13 @@
 
     <properties>
         <archive.ws.model.version>1.0.2</archive.ws.model.version>
-        <archive.security.version>1.0.3</archive.security.version>
-        <archive.search.version>1.0.13</archive.search.version>
+        <archive.security.version>1.0.4</archive.security.version>
+        <archive.search.version>1.0.14</archive.search.version>
         <archive.utils.version>0.1.24</archive.utils.version>
         <pride.web.utils.version>1.3.10</pride.web.utils.version>
-        <psm.index.search.version>1.0.2</psm.index.search.version>
-        <mongo.psm.index.search.version>1.0.1</mongo.psm.index.search.version>
-        <mongo.protein.identification.index.search.version>1.0.1</mongo.protein.identification.index.search.version>
+        <psm.index.search.version>1.0.3</psm.index.search.version>
+        <mongo.psm.index.search.version>1.0.3</mongo.psm.index.search.version>
+        <mongo.protein.identification.index.search.version>1.0.3</mongo.protein.identification.index.search.version>
 
     </properties>
 
